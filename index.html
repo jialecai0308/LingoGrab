@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>拾得 Pickup · 把读过的东西，变成记得住的东西</title>
+<style>
+  :root{
+    --paper:#FAF7F0; --card:#FFFFFF; --ink:#2E2A26; --soft:#847A6D;
+    --line:#EBE3D6; --accent:#12988A; --accent-d:#0E7C70;
+    --gold:#FCE7A6; --gold-d:#EBCB74;
+    --shadow:0 6px 28px rgba(60,48,30,.07), 0 1px 3px rgba(60,48,30,.05);
+    --radius:18px;
+    --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+    --serif:"Georgia","Songti SC","Noto Serif SC",serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-font-smoothing:antialiased}
+  body{background:var(--paper);color:var(--ink);font-family:var(--sans);
+    line-height:1.6;min-height:100vh;display:flex;flex-direction:column;align-items:center}
+  .wrap{width:100%;max-width:520px;padding:0 20px 120px;flex:1}
+
+  /* ---- header ---- */
+  header{text-align:center;padding:38px 0 22px}
+  .brand{font-size:26px;font-weight:700;letter-spacing:.5px}
+  .brand .en{color:var(--accent);font-weight:600}
+  .tag{color:var(--soft);font-size:14px;margin-top:6px}
+
+  /* ---- tabs ---- */
+  nav{position:sticky;top:14px;z-index:10;display:flex;gap:4px;background:#fff;
+    border:1px solid var(--line);border-radius:999px;padding:5px;box-shadow:var(--shadow);
+    margin:0 auto 26px;width:fit-content}
+  nav button{border:none;background:none;font-family:inherit;font-size:14px;font-weight:600;
+    color:var(--soft);padding:9px 18px;border-radius:999px;cursor:pointer;transition:.22s}
+  nav button.on{background:var(--accent);color:#fff}
+
+  .screen{display:none;animation:rise .32s ease}
+  .screen.on{display:block}
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:26px}
+
+  /* ---- reading ---- */
+  .doc-meta{font-size:12px;color:var(--soft);margin-bottom:10px;letter-spacing:.3px}
+  .doc-title{font-family:var(--serif);font-size:21px;font-weight:700;margin-bottom:16px}
+  .reading{font-family:var(--serif);font-size:17.5px;line-height:2}
+  mark.pick{background:linear-gradient(transparent 62%,var(--gold) 62%);color:inherit;
+    padding:0 1px;cursor:pointer;border-radius:2px;transition:.18s;font-style:normal}
+  mark.pick:hover{background:var(--gold)}
+  mark.pick.got{background:var(--gold);box-shadow:inset 0 0 0 1px var(--gold-d)}
+  .hint{color:var(--soft);font-size:13px;margin:16px 0 4px;text-align:center}
+  .btn{display:block;width:100%;border:none;font-family:inherit;font-size:15px;font-weight:600;
+    background:var(--accent);color:#fff;padding:14px;border-radius:14px;cursor:pointer;
+    transition:.2s;margin-top:16px}
+  .btn:hover{background:var(--accent-d)}
+  .btn.ghost{background:#fff;color:var(--accent);border:1.5px solid var(--accent)}
+
+  /* ---- library ---- */
+  .lib-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px}
+  .lib-head h2{font-size:17px}
+  .lib-head .count{color:var(--accent);font-weight:700}
+  .term-card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:16px 18px;margin-bottom:12px;box-shadow:var(--shadow);position:relative}
+  .term-card.hl{border-color:var(--gold-d);background:linear-gradient(#fffdf6,#fff)}
+  .term-en{font-family:var(--serif);font-size:18px;font-weight:700}
+  .term-def{color:var(--ink);font-size:14px;margin:2px 0 8px}
+  .term-ctx{color:var(--soft);font-size:13px;font-style:italic;border-left:3px solid var(--line);
+    padding-left:10px;margin-bottom:6px}
+  .term-ctx b{color:var(--accent-d);font-style:normal;background:var(--gold)}
+  .term-src{font-size:11px;color:var(--soft)}
+  .star{position:absolute;top:14px;right:16px;color:var(--gold-d);font-size:14px}
+  .empty{text-align:center;color:var(--soft);padding:50px 0;font-size:14px}
+
+  /* ---- review ---- */
+  .rev-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+  .rev-top .lbl{font-size:12px;color:var(--soft);letter-spacing:1px}
+  .ring{--p:0;width:46px;height:46px;border-radius:50%;
+    background:conic-gradient(var(--accent) calc(var(--p)*1%),var(--line) 0);
+    display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--accent)}
+  .ring span{background:#fff;width:36px;height:36px;border-radius:50%;display:grid;place-items:center}
+  .prompt-def{font-size:22px;font-weight:700;text-align:center;margin:18px 0 4px}
+  .prompt-sub{text-align:center;color:var(--soft);font-size:13px;margin-bottom:20px}
+  .cloze{font-family:var(--serif);font-size:18px;line-height:2;text-align:center;
+    background:var(--paper);border-radius:12px;padding:18px}
+  .blank{display:inline-block;min-width:78px;border-bottom:2px solid var(--accent);
+    color:var(--accent-d);font-weight:700}
+  .reveal-word{background:var(--gold)}
+  .rev-input{width:100%;font-family:var(--serif);font-size:17px;text-align:center;
+    padding:12px;border:1.5px solid var(--line);border-radius:12px;margin-top:16px;outline:none}
+  .rev-input:focus{border-color:var(--accent)}
+  .judge{display:flex;gap:10px;margin-top:16px}
+  .judge button{flex:1;border:none;font-family:inherit;font-size:14px;font-weight:600;
+    padding:13px;border-radius:12px;cursor:pointer;transition:.2s}
+  .j-no{background:#FBEEE8;color:#C1552B}.j-no:hover{background:#F6E0D4}
+  .j-yes{background:#E4F4EE;color:var(--accent-d)}.j-yes:hover{background:#D3ECE2}
+  .src-line{font-size:12px;color:var(--soft);text-align:center;margin-top:14px}
+  .done{text-align:center;padding:40px 6px}
+  .done .big{font-size:40px}.done h3{margin:8px 0 6px}
+  .done p{color:var(--soft);font-size:14px}
+
+  /* ---- 底部详情卡（点词弹出，不挡正文）---- */
+  .backdrop{position:fixed;inset:0;background:rgba(40,34,28,.28);opacity:0;
+    pointer-events:none;transition:.28s;z-index:40}
+  .backdrop.show{opacity:1;pointer-events:auto}
+  .sheet{position:fixed;left:50%;bottom:0;transform:translateX(-50%) translateY(115%);
+    width:100%;max-width:520px;background:#fff;border-radius:22px 22px 0 0;
+    box-shadow:0 -8px 44px rgba(60,48,30,.18);padding:14px 24px 26px;z-index:45;
+    transition:transform .34s cubic-bezier(.22,.61,.36,1)}
+  .sheet.show{transform:translateX(-50%) translateY(0)}
+  .grip{width:40px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 16px}
+  .s-en{font-family:var(--serif);font-size:23px;font-weight:700}
+  .s-tag{display:inline-block;font-size:11px;color:var(--accent-d);background:#E4F4EE;
+    padding:2px 9px;border-radius:6px;margin-left:8px;vertical-align:middle;font-weight:600}
+  .s-def{font-size:15px;margin:9px 0 12px}
+  .s-ctx{color:var(--soft);font-size:13.5px;font-style:italic;border-left:3px solid var(--gold-d);
+    padding-left:11px;margin-bottom:8px}
+  .s-ctx b{color:var(--accent-d);font-style:normal;background:var(--gold)}
+  .s-src{font-size:11px;color:var(--soft);margin-bottom:16px}
+
+  .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--ink);color:#fff;padding:12px 22px;border-radius:999px;font-size:14px;
+    opacity:0;transition:.3s;pointer-events:none;z-index:50;box-shadow:var(--shadow)}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  footer{color:var(--soft);font-size:12px;text-align:center;padding:8px 0 0;line-height:1.8}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">拾得 <span class="en">Pickup</span></div>
+    <div class="tag">把读过的东西，变成记得住的东西</div>
+  </header>
+
+  <nav>
+    <button data-s="read" class="on">阅读投喂</button>
+    <button data-s="lib">我的库</button>
+    <button data-s="rev">复习</button>
+  </nav>
+
+  <!-- 1. 阅读投喂 -->
+  <section class="screen on" id="read">
+    <div class="card">
+      <div class="doc-meta">跨境电商行业阅读 · 你贴进来的一篇文章</div>
+      <div class="doc-title">Why retention beats acquisition</div>
+      <p class="reading" id="article"></p>
+      <div class="hint">下划线的词是「拾得」替你挑出的、值得记住的表达 —— 点它单独收，或一键全收</div>
+      <button class="btn" id="pickAll">✦ 一键拾得本页（<span id="pn">7</span> 条）</button>
+    </div>
+  </section>
+
+  <!-- 2. 我的库 -->
+  <section class="screen" id="lib">
+    <div class="lib-head">
+      <h2>我的知识库</h2>
+      <div>已拾得 <span class="count" id="libCount">0</span> 条</div>
+    </div>
+    <div id="libList"></div>
+  </section>
+
+  <!-- 3. 复习 -->
+  <section class="screen" id="rev">
+    <div class="card" id="revCard">
+      <div class="rev-top">
+        <div class="lbl">复习 · 主动回忆</div>
+        <div class="ring" id="ring" style="--p:0"><span id="ringT">0/0</span></div>
+      </div>
+      <div id="revBody"></div>
+    </div>
+  </section>
+</div>
+<div class="backdrop" id="backdrop"></div>
+<div class="sheet" id="sheet">
+  <div class="grip"></div>
+  <div><span class="s-en" id="sEn"></span><span class="s-tag" id="sTag"></span></div>
+  <div class="s-def" id="sDef"></div>
+  <div class="s-ctx" id="sCtx"></div>
+  <div class="s-src" id="sSrc"></div>
+  <button class="btn" id="sBtn"></button>
+</div>
+<div class="toast" id="toast"></div>
+<footer>
+  拾得 Pickup · 概念 Demo（数据为演示用）<br>
+  参考 Lingvist 的丝滑卡片 · 微信读书的阅读质感 · 蒙哥的阅读+遗忘曲线
+</footer>
+
+<script>
+// ---- 演示数据（通用行业词，非任何内部信息）----
+const SEED = [
+  {t:"retention", d:"留存（让用户持续回来用）", s:"Improving %s beats chasing new users.", src:"行业阅读 · 增长笔记", hl:true},
+  {t:"onboarding", d:"新用户引导 / 上手体验", s:"A smooth %s in the first week keeps people around.", src:"行业阅读 · 增长笔记", hl:false},
+  {t:"churn", d:"流失（用户流失率）", s:"A smooth onboarding is what reduces %s.", src:"行业阅读 · 增长笔记", hl:true},
+  {t:"order density", d:"订单密度（同一区域的订单集中度）", s:"Higher %s in each region lowers delivery cost.", src:"行业阅读 · 物流笔记", hl:true},
+  {t:"last-mile", d:"最后一公里（配送末端环节）", s:"%s delivery is often the most expensive part.", src:"行业阅读 · 物流笔记", hl:false},
+  {t:"fulfillment", d:"履约（下单到收货的全过程）", s:"A reliable %s network makes delivery faster.", src:"行业阅读 · 物流笔记", hl:false},
+  {t:"PUDO", d:"自提/寄件点（Pick Up Drop Off）", s:"A wide %s network cuts cost and speeds things up.", src:"行业阅读 · 物流笔记", hl:true},
+];
+// 库里预置前 3 条，好让「复习」一进来就有内容
+let lib = SEED.slice(0,3).map(x=>({...x}));
+
+// ---- 文章渲染（把词高亮成可点的 mark）----
+const articleHTML =
+  `To win in cross-border e-commerce, we can't just chase new users. Improving `+
+  `<mark class="pick" data-t="retention">retention</mark> beats acquisition. A smooth `+
+  `<mark class="pick" data-t="onboarding">onboarding</mark> in the first week is what reduces `+
+  `<mark class="pick" data-t="churn">churn</mark>. On the supply side, higher `+
+  `<mark class="pick" data-t="order density">order density</mark> in each region lowers `+
+  `<mark class="pick" data-t="last-mile">last-mile</mark> cost, and a reliable `+
+  `<mark class="pick" data-t="fulfillment">fulfillment</mark> network — including a wide `+
+  `<mark class="pick" data-t="PUDO">PUDO</mark> network — makes delivery cheaper and faster.`;
+document.getElementById('article').innerHTML = articleHTML;
+
+// ---- 工具 ----
+const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),1600);}
+function inLib(t){return lib.some(x=>x.t===t);}
+function addTerm(t){if(inLib(t))return false;const src=SEED.find(x=>x.t===t);if(src){lib.push({...src});return true;}return false;}
+
+// ---- tab 切换 ----
+$$('nav button').forEach(b=>b.onclick=()=>{
+  $$('nav button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+  $$('.screen').forEach(x=>x.classList.remove('on'));
+  $('#'+b.dataset.s).classList.add('on');
+  if(b.dataset.s==='lib')renderLib();
+  if(b.dataset.s==='rev')startReview();
+});
+function goTab(s){$$('nav button').forEach(b=>{if(b.dataset.s===s)b.click();});}
+
+// ---- 阅读投喂 ----
+// ---- 阅读投喂：点词 → 底部详情卡 ----
+const sheet=$('#sheet'), backdrop=$('#backdrop');
+let curTerm=null;
+function openSheet(t){
+  const x=SEED.find(s=>s.t===t); if(!x)return;
+  curTerm=t;
+  $('#sEn').textContent=x.t;
+  $('#sDef').textContent=x.d;
+  $('#sCtx').innerHTML=x.s.replace('%s','<b>'+x.t+'</b>');
+  $('#sSrc').textContent='来源：'+x.src;
+  const tag=$('#sTag'); tag.textContent=x.hl?'★ 重点':''; tag.style.display=x.hl?'inline-block':'none';
+  refreshSheetBtn();
+  backdrop.classList.add('show'); sheet.classList.add('show');
+}
+function refreshSheetBtn(){
+  const b=$('#sBtn');
+  if(inLib(curTerm)){b.textContent='✓ 已在库中，点此关闭';b.classList.add('ghost');}
+  else{b.textContent='＋ 拾得这条';b.classList.remove('ghost');}
+}
+function closeSheet(){backdrop.classList.remove('show');sheet.classList.remove('show');}
+$('#sBtn').onclick=()=>{
+  if(!inLib(curTerm)){
+    addTerm(curTerm);
+    const m=document.querySelector('mark.pick[data-t="'+curTerm+'"]'); if(m)m.classList.add('got');
+    toast('拾得：'+curTerm); refreshSheetBtn();
+  }else closeSheet();
+};
+backdrop.onclick=closeSheet;
+$$('mark.pick').forEach(m=>m.onclick=()=>openSheet(m.dataset.t));
+$('#pickAll').onclick=()=>{
+  let n=0;SEED.forEach(x=>{if(addTerm(x.t))n++;});
+  $$('mark.pick').forEach(m=>m.classList.add('got'));
+  toast(n?('拾得 '+n+' 条，已入库'):'本页都已在库中');
+  setTimeout(()=>goTab('lib'),650);
+};
+
+// ---- 我的库 ----
+function renderLib(){
+  $('#libCount').textContent=lib.length;
+  const box=$('#libList');
+  if(!lib.length){box.innerHTML='<div class="empty">库还是空的～去「阅读投喂」拾几条吧</div>';return;}
+  box.innerHTML=lib.map(x=>{
+    const ctx=x.s.replace('%s','<b>'+x.t+'</b>');
+    return `<div class="term-card ${x.hl?'hl':''}">
+      ${x.hl?'<div class="star">★ 重点</div>':''}
+      <div class="term-en">${x.t}</div>
+      <div class="term-def">${x.d}</div>
+      <div class="term-ctx">${ctx}</div>
+      <div class="term-src">来源：${x.src}</div>
+    </div>`;}).join('');
+}
+
+// ---- 复习（Lingvist 风：看释义→回忆→显示答案→自评）----
+let queue=[], idx=0;
+function startReview(){
+  queue=lib.slice();idx=0;renderReview();
+}
+function renderReview(){
+  const ring=$('#ring'),body=$('#revBody');
+  const total=queue.length;
+  if(idx>=total){
+    ring.style.setProperty('--p',100);$('#ringT').textContent=total+'/'+total;
+    body.innerHTML=`<div class="done"><div class="big">🎉</div>
+      <h3>今日复习完成</h3>
+      <p>记得的会拉长下次出现的间隔，忘了的很快再见你 —— 这就是遗忘曲线。</p>
+      <button class="btn ghost" style="margin-top:20px" onclick="goTab('read')">再去读点新东西</button></div>`;
+    return;
+  }
+  ring.style.setProperty('--p', Math.round(idx/total*100));
+  $('#ringT').textContent=idx+'/'+total;
+  const c=queue[idx];
+  const cloze=c.s.replace('%s','<span class="blank" id="blank">? ? ?</span>');
+  body.innerHTML=`
+    <div class="prompt-def">${c.d}</div>
+    <div class="prompt-sub">这个意思，对应的英文表达是？先自己想一想</div>
+    <div class="cloze" id="cloze">${cloze}</div>
+    <input class="rev-input" id="guess" placeholder="试着敲出来（可留空）" autocomplete="off" />
+    <button class="btn" id="showBtn">显示答案</button>`;
+  $('#showBtn').onclick=reveal;
+  const g=$('#guess');g.focus();
+  g.onkeydown=e=>{if(e.key==='Enter')reveal();};
+}
+function reveal(){
+  const c=queue[idx];
+  const blank=$('#blank');
+  if(blank){blank.textContent=c.t;blank.classList.add('reveal-word');}
+  const guess=$('#guess'); const val=(guess&&guess.value.trim().toLowerCase())||'';
+  const hit = val && val===c.t.toLowerCase();
+  if(guess)guess.remove();
+  $('#showBtn').outerHTML=`
+    <div class="src-line">来源：${c.src}</div>
+    <div class="judge">
+      <button class="j-no" onclick="judge(false)">✗ 没记住</button>
+      <button class="j-yes" onclick="judge(true)">✓ 记得了</button>
+    </div>`;
+  if(hit)toast('答对啦 🎯');
+}
+function judge(ok){
+  if(!ok){queue.push(queue[idx]);} // 忘了的排到队尾，稍后再考
+  idx++;renderReview();
+}
+
+renderLib();
+</script>
+</body>
+</html>
