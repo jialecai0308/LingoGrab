@@ -1,336 +1,69 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>拾得 Pickup · 把读过的东西，变成记得住的东西</title>
-<style>
-  :root{
-    --paper:#FAF7F0; --card:#FFFFFF; --ink:#2E2A26; --soft:#847A6D;
-    --line:#EBE3D6; --accent:#12988A; --accent-d:#0E7C70;
-    --gold:#FCE7A6; --gold-d:#EBCB74;
-    --shadow:0 6px 28px rgba(60,48,30,.07), 0 1px 3px rgba(60,48,30,.05);
-    --radius:18px;
-    --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
-    --serif:"Georgia","Songti SC","Noto Serif SC",serif;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html{-webkit-font-smoothing:antialiased}
-  body{background:var(--paper);color:var(--ink);font-family:var(--sans);
-    line-height:1.6;min-height:100vh;display:flex;flex-direction:column;align-items:center}
-  .wrap{width:100%;max-width:520px;padding:0 20px 120px;flex:1}
-
-  /* ---- header ---- */
-  header{text-align:center;padding:38px 0 22px}
-  .brand{font-size:26px;font-weight:700;letter-spacing:.5px}
-  .brand .en{color:var(--accent);font-weight:600}
-  .tag{color:var(--soft);font-size:14px;margin-top:6px}
-
-  /* ---- tabs ---- */
-  nav{position:sticky;top:14px;z-index:10;display:flex;gap:4px;background:#fff;
-    border:1px solid var(--line);border-radius:999px;padding:5px;box-shadow:var(--shadow);
-    margin:0 auto 26px;width:fit-content}
-  nav button{border:none;background:none;font-family:inherit;font-size:14px;font-weight:600;
-    color:var(--soft);padding:9px 18px;border-radius:999px;cursor:pointer;transition:.22s}
-  nav button.on{background:var(--accent);color:#fff}
-
-  .screen{display:none;animation:rise .32s ease}
-  .screen.on{display:block}
-  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-
-  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
-    box-shadow:var(--shadow);padding:26px}
-
-  /* ---- reading ---- */
-  .doc-meta{font-size:12px;color:var(--soft);margin-bottom:10px;letter-spacing:.3px}
-  .doc-title{font-family:var(--serif);font-size:21px;font-weight:700;margin-bottom:16px}
-  .reading{font-family:var(--serif);font-size:17.5px;line-height:2}
-  mark.pick{background:linear-gradient(transparent 62%,var(--gold) 62%);color:inherit;
-    padding:0 1px;cursor:pointer;border-radius:2px;transition:.18s;font-style:normal}
-  mark.pick:hover{background:var(--gold)}
-  mark.pick.got{background:var(--gold);box-shadow:inset 0 0 0 1px var(--gold-d)}
-  .hint{color:var(--soft);font-size:13px;margin:16px 0 4px;text-align:center}
-  .btn{display:block;width:100%;border:none;font-family:inherit;font-size:15px;font-weight:600;
-    background:var(--accent);color:#fff;padding:14px;border-radius:14px;cursor:pointer;
-    transition:.2s;margin-top:16px}
-  .btn:hover{background:var(--accent-d)}
-  .btn.ghost{background:#fff;color:var(--accent);border:1.5px solid var(--accent)}
-
-  /* ---- library ---- */
-  .lib-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px}
-  .lib-head h2{font-size:17px}
-  .lib-head .count{color:var(--accent);font-weight:700}
-  .term-card{background:var(--card);border:1px solid var(--line);border-radius:14px;
-    padding:16px 18px;margin-bottom:12px;box-shadow:var(--shadow);position:relative}
-  .term-card.hl{border-color:var(--gold-d);background:linear-gradient(#fffdf6,#fff)}
-  .term-en{font-family:var(--serif);font-size:18px;font-weight:700}
-  .term-def{color:var(--ink);font-size:14px;margin:2px 0 8px}
-  .term-ctx{color:var(--soft);font-size:13px;font-style:italic;border-left:3px solid var(--line);
-    padding-left:10px;margin-bottom:6px}
-  .term-ctx b{color:var(--accent-d);font-style:normal;background:var(--gold)}
-  .term-src{font-size:11px;color:var(--soft)}
-  .star{position:absolute;top:14px;right:16px;color:var(--gold-d);font-size:14px}
-  .empty{text-align:center;color:var(--soft);padding:50px 0;font-size:14px}
-
-  /* ---- review ---- */
-  .rev-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
-  .rev-top .lbl{font-size:12px;color:var(--soft);letter-spacing:1px}
-  .ring{--p:0;width:46px;height:46px;border-radius:50%;
-    background:conic-gradient(var(--accent) calc(var(--p)*1%),var(--line) 0);
-    display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--accent)}
-  .ring span{background:#fff;width:36px;height:36px;border-radius:50%;display:grid;place-items:center}
-  .prompt-def{font-size:22px;font-weight:700;text-align:center;margin:18px 0 4px}
-  .prompt-sub{text-align:center;color:var(--soft);font-size:13px;margin-bottom:20px}
-  .cloze{font-family:var(--serif);font-size:18px;line-height:2;text-align:center;
-    background:var(--paper);border-radius:12px;padding:18px}
-  .blank{display:inline-block;min-width:78px;border-bottom:2px solid var(--accent);
-    color:var(--accent-d);font-weight:700}
-  .reveal-word{background:var(--gold)}
-  .rev-input{width:100%;font-family:var(--serif);font-size:17px;text-align:center;
-    padding:12px;border:1.5px solid var(--line);border-radius:12px;margin-top:16px;outline:none}
-  .rev-input:focus{border-color:var(--accent)}
-  .judge{display:flex;gap:10px;margin-top:16px}
-  .judge button{flex:1;border:none;font-family:inherit;font-size:14px;font-weight:600;
-    padding:13px;border-radius:12px;cursor:pointer;transition:.2s}
-  .j-no{background:#FBEEE8;color:#C1552B}.j-no:hover{background:#F6E0D4}
-  .j-yes{background:#E4F4EE;color:var(--accent-d)}.j-yes:hover{background:#D3ECE2}
-  .src-line{font-size:12px;color:var(--soft);text-align:center;margin-top:14px}
-  .done{text-align:center;padding:40px 6px}
-  .done .big{font-size:40px}.done h3{margin:8px 0 6px}
-  .done p{color:var(--soft);font-size:14px}
-
-  /* ---- 底部详情卡（点词弹出，不挡正文）---- */
-  .backdrop{position:fixed;inset:0;background:rgba(40,34,28,.28);opacity:0;
-    pointer-events:none;transition:.28s;z-index:40}
-  .backdrop.show{opacity:1;pointer-events:auto}
-  .sheet{position:fixed;left:50%;bottom:0;transform:translateX(-50%) translateY(115%);
-    width:100%;max-width:520px;background:#fff;border-radius:22px 22px 0 0;
-    box-shadow:0 -8px 44px rgba(60,48,30,.18);padding:14px 24px 26px;z-index:45;
-    transition:transform .34s cubic-bezier(.22,.61,.36,1)}
-  .sheet.show{transform:translateX(-50%) translateY(0)}
-  .grip{width:40px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 16px}
-  .s-en{font-family:var(--serif);font-size:23px;font-weight:700}
-  .s-tag{display:inline-block;font-size:11px;color:var(--accent-d);background:#E4F4EE;
-    padding:2px 9px;border-radius:6px;margin-left:8px;vertical-align:middle;font-weight:600}
-  .s-def{font-size:15px;margin:9px 0 12px}
-  .s-ctx{color:var(--soft);font-size:13.5px;font-style:italic;border-left:3px solid var(--gold-d);
-    padding-left:11px;margin-bottom:8px}
-  .s-ctx b{color:var(--accent-d);font-style:normal;background:var(--gold)}
-  .s-src{font-size:11px;color:var(--soft);margin-bottom:16px}
-
-  .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(20px);
-    background:var(--ink);color:#fff;padding:12px 22px;border-radius:999px;font-size:14px;
-    opacity:0;transition:.3s;pointer-events:none;z-index:50;box-shadow:var(--shadow)}
-  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-  footer{color:var(--soft);font-size:12px;text-align:center;padding:8px 0 0;line-height:1.8}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f4f1e9">
+  <meta name="description" content="拾得 Pickup：把工作与阅读中遇见的英语、法语，变成今天能学、以后能用的个人语言课。">
+  <title>拾得 Pickup · 你的工作，就是你的语言课</title>
+  <style>
+    :root{--paper:#f4f1e9;--card:#fffefb;--ink:#253132;--muted:#6f7975;--line:#dfe2da;--teal:#087f73;--teal2:#0d9b89;--mint:#dff2e9;--coral:#d86c52;--sand:#eee5ce;--violet:#725d91;--shadow:0 18px 50px rgba(42,57,52,.1);--sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;--serif:"Songti SC","Noto Serif SC",Georgia,serif}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.65}button,input,textarea{font:inherit}button{color:inherit}.shell{width:min(1180px,calc(100% - 34px));margin:auto}.topbar{height:72px;display:flex;align-items:center;justify-content:space-between;gap:18px}.brand{display:flex;align-items:center;gap:11px;font-weight:760}.brand-mark{width:38px;height:38px;border-radius:13px;background:var(--teal);color:#fff;display:grid;place-items:center;font-family:var(--serif);font-size:21px;box-shadow:0 8px 20px #087f7330}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:.14em;font-weight:650}.top-actions{display:flex;align-items:center;gap:9px}.chip,.icon-btn{border:1px solid var(--line);background:#ffffffb3;border-radius:999px;padding:8px 12px;font-size:12px}.icon-btn{cursor:pointer}.app{display:grid;grid-template-columns:230px 1fr;gap:24px;padding-bottom:70px}.sidebar{position:sticky;top:20px;align-self:start;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;box-shadow:var(--shadow)}.side-nav{display:grid;gap:6px}.side-nav button{border:0;background:transparent;text-align:left;padding:12px 13px;border-radius:13px;cursor:pointer;color:var(--muted);font-weight:650}.side-nav button.on{background:var(--mint);color:var(--teal)}.side-nav button span{display:inline-block;width:28px}.profile-mini{margin-top:18px;padding:15px 12px 4px;border-top:1px solid var(--line)}.profile-mini b{font-size:13px}.profile-mini p{font-size:11px;color:var(--muted);margin:3px 0 10px}.level{height:6px;background:#edf0eb;border-radius:9px;overflow:hidden}.level i{display:block;width:34%;height:100%;background:var(--teal2);border-radius:inherit}.main{min-width:0}.screen{display:none;animation:rise .3s ease}.screen.on{display:block}@keyframes rise{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}.hero{background:linear-gradient(135deg,#0d796f,#0e9684);color:#fff;border-radius:28px;padding:34px;position:relative;overflow:hidden;box-shadow:var(--shadow)}.hero:after{content:"拾";position:absolute;right:25px;top:-30px;font-family:var(--serif);font-size:180px;color:#ffffff12}.eyebrow{font-size:11px;font-weight:750;letter-spacing:.16em;text-transform:uppercase;color:inherit;opacity:.74}.hero h1{font-family:var(--serif);font-size:clamp(30px,4vw,48px);line-height:1.25;margin:13px 0 10px;font-weight:620}.hero p{max-width:620px;color:#e8fffa;margin:0;font-size:14px}.hero-actions{display:flex;gap:11px;flex-wrap:wrap;margin-top:25px}.btn{border:0;border-radius:999px;padding:11px 18px;cursor:pointer;font-weight:720;font-size:13px;transition:.2s}.btn:hover{transform:translateY(-2px)}.btn.light{background:#fff;color:var(--teal)}.btn.dark{background:var(--ink);color:#fff}.btn.ghost{background:transparent;border:1px solid currentColor;color:var(--teal)}.hero .btn.ghost{color:#fff}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}.stat,.panel{background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:0 10px 30px rgba(42,57,52,.05)}.stat{padding:20px}.stat small{font-size:11px;color:var(--muted)}.stat strong{display:block;font-family:var(--serif);font-size:29px;margin:2px 0}.stat span{font-size:11px;color:var(--teal)}.section-title{display:flex;align-items:end;justify-content:space-between;gap:18px;margin:34px 0 14px}.section-title h2{font-family:var(--serif);font-size:24px;margin:0}.section-title p{margin:0;color:var(--muted);font-size:12px}.wheels{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.wheel{padding:21px;background:var(--card);border:1px solid var(--line);border-radius:19px}.wheel b{display:flex;align-items:center;gap:9px;font-family:var(--serif);font-size:18px}.wheel em{font-style:normal;width:28px;height:28px;display:grid;place-items:center;border-radius:9px;background:var(--mint);color:var(--teal);font-family:var(--sans);font-size:12px}.wheel p{margin:8px 0 0;color:var(--muted);font-size:12px}.deck-row{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.deck-card{padding:22px;background:var(--card);border:1px solid var(--line);border-radius:20px;cursor:pointer;position:relative;overflow:hidden}.deck-card.active{border-color:var(--teal);box-shadow:0 0 0 2px #087f7312}.deck-card .lang{font-size:11px;font-weight:750;color:var(--teal);letter-spacing:.12em}.deck-card h3{font-family:var(--serif);font-size:21px;margin:8px 0 5px}.deck-card p{color:var(--muted);font-size:12px;margin:0}.progress{height:7px;background:#edf0eb;border-radius:10px;margin-top:18px;overflow:hidden}.progress i{display:block;height:100%;background:var(--teal2);border-radius:inherit}.deck-card .deck-n{position:absolute;right:18px;top:18px;font-size:11px;color:var(--muted)}.study-wrap{min-height:690px;display:grid;place-items:center;padding:10px 0}.study-card{width:min(720px,100%);background:var(--card);border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow);overflow:hidden}.study-head{padding:20px 25px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line)}.study-head b{font-size:13px}.study-head span{font-size:11px;color:var(--muted)}.study-progress{height:4px;background:#edf0eb}.study-progress i{display:block;height:100%;background:var(--teal2);transition:.3s}.study-body{padding:38px 44px 34px}.translation{font-size:14px;color:var(--muted);text-align:center}.cloze{font-family:var(--serif);font-size:clamp(27px,4vw,39px);line-height:1.65;text-align:center;margin:22px 0}.blank{display:inline-block;min-width:118px;color:var(--teal);border-bottom:2px solid var(--teal);padding:0 6px}.answer{width:100%;border:1.5px solid var(--line);border-radius:15px;padding:14px 16px;text-align:center;font-size:18px;outline:none;background:#fff}.answer:focus{border-color:var(--teal)}.answer.good{border-color:var(--teal2);background:#effaf6}.answer.bad{border-color:var(--coral);background:#fff5f2}.submit{width:100%;margin-top:12px;background:var(--teal);color:#fff;border-radius:15px;padding:14px}.feedback{display:none;margin-top:20px;padding:18px;border-radius:16px;background:#f3f6f2;border:1px solid var(--line)}.feedback.show{display:block}.feedback.good{background:#edfaf5}.feedback.bad{background:#fff5f2}.feedback-top{display:flex;justify-content:space-between;gap:16px;align-items:start}.feedback h3{margin:0 0 5px;font-family:var(--serif);font-size:20px}.feedback p{font-size:13px;margin:7px 0;color:#52605d}.grammar-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.grammar-tags span{font-size:10px;border-radius:999px;padding:4px 8px;background:#fff;border:1px solid var(--line)}.feedback-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:15px}.feedback-actions .btn{border-radius:11px}.grammar-link{color:var(--violet);background:#eee8f4}.source-note{text-align:center;font-size:10px;color:#919993;margin-top:14px}.library-tools{display:flex;gap:9px;flex-wrap:wrap;margin:20px 0}.filter{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 13px;font-size:12px;cursor:pointer}.filter.on{background:var(--ink);color:#fff;border-color:var(--ink)}.term-list{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.term{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:19px}.term-head{display:flex;justify-content:space-between;gap:12px}.term h3{font-family:var(--serif);font-size:20px;margin:0}.term .tag{font-size:10px;color:var(--teal);background:var(--mint);height:fit-content;padding:4px 8px;border-radius:999px}.term .meaning{font-size:13px;margin:6px 0}.term .example{font-size:12px;color:var(--muted);border-left:3px solid var(--sand);padding-left:10px;margin:10px 0}.term .meta{font-size:10px;color:#919993}.import-layout{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}.import-box{padding:25px}.import-box h2{font-family:var(--serif);font-size:25px;margin:0 0 8px}.import-box>p{font-size:12px;color:var(--muted)}textarea{width:100%;min-height:230px;resize:vertical;border:1.5px solid var(--line);border-radius:15px;padding:16px;outline:none;background:#fff;line-height:1.8}.candidate{padding:13px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px}.candidate:last-child{border-bottom:0}.candidate b{font-family:var(--serif)}.candidate small{display:block;color:var(--muted)}.candidate button{align-self:center;border:0;background:var(--mint);color:var(--teal);border-radius:9px;padding:7px 10px;cursor:pointer}.empty{padding:38px;text-align:center;color:var(--muted);font-size:13px}.modal-back{display:none;position:fixed;inset:0;background:#1f2d2b66;z-index:50;padding:20px;align-items:center;justify-content:center}.modal-back.show{display:flex}.modal{width:min(760px,100%);max-height:88vh;overflow:auto;background:var(--card);border-radius:24px;box-shadow:var(--shadow)}.modal-head{position:sticky;top:0;background:var(--card);padding:19px 23px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.modal-head h2{font-family:var(--serif);margin:0;font-size:23px}.modal-head button{border:0;background:transparent;font-size:23px;cursor:pointer}.tense-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:22px}.tense{padding:15px;border:1px solid var(--line);border-radius:14px}.tense b{display:block;color:var(--violet);font-size:13px}.tense p{margin:5px 0 0;color:var(--muted);font-size:12px}.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);opacity:0;background:var(--ink);color:#fff;border-radius:999px;padding:11px 18px;font-size:12px;z-index:80;transition:.25s;pointer-events:none}.toast.show{opacity:1;transform:translate(-50%,0)}.mobile-nav{display:none}.footer{text-align:center;color:#8a938e;font-size:10px;padding:26px 0 0}.footer a{color:var(--teal)}
+    @media(max-width:850px){.app{grid-template-columns:1fr}.sidebar{display:none}.mobile-nav{display:flex;position:fixed;left:50%;bottom:13px;transform:translateX(-50%);z-index:30;background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px;box-shadow:var(--shadow)}.mobile-nav button{border:0;background:transparent;padding:10px 13px;border-radius:999px;font-size:11px;color:var(--muted)}.mobile-nav button.on{background:var(--teal);color:#fff}.grid3,.wheels{grid-template-columns:1fr}.deck-row,.term-list,.import-layout{grid-template-columns:1fr}.study-body{padding:30px 22px}.top-actions .chip{display:none}.shell{width:min(100% - 24px,1180px)}.hero{padding:27px 23px}.tense-grid{grid-template-columns:1fr}.topbar{height:62px}.footer{padding-bottom:76px}}
+  </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div class="brand">拾得 <span class="en">Pickup</span></div>
-    <div class="tag">把读过的东西，变成记得住的东西</div>
-  </header>
-
-  <nav>
-    <button data-s="read" class="on">阅读投喂</button>
-    <button data-s="lib">我的库</button>
-    <button data-s="rev">复习</button>
-  </nav>
-
-  <!-- 1. 阅读投喂 -->
-  <section class="screen on" id="read">
-    <div class="card">
-      <div class="doc-meta">跨境电商行业阅读 · 你贴进来的一篇文章</div>
-      <div class="doc-title">Why retention beats acquisition</div>
-      <p class="reading" id="article"></p>
-      <div class="hint">下划线的词是「拾得」替你挑出的、值得记住的表达 —— 点它单独收，或一键全收</div>
-      <button class="btn" id="pickAll">✦ 一键拾得本页（<span id="pn">7</span> 条）</button>
-    </div>
-  </section>
-
-  <!-- 2. 我的库 -->
-  <section class="screen" id="lib">
-    <div class="lib-head">
-      <h2>我的知识库</h2>
-      <div>已拾得 <span class="count" id="libCount">0</span> 条</div>
-    </div>
-    <div id="libList"></div>
-  </section>
-
-  <!-- 3. 复习 -->
-  <section class="screen" id="rev">
-    <div class="card" id="revCard">
-      <div class="rev-top">
-        <div class="lbl">复习 · 主动回忆</div>
-        <div class="ring" id="ring" style="--p:0"><span id="ringT">0/0</span></div>
-      </div>
-      <div id="revBody"></div>
-    </div>
-  </section>
-</div>
-<div class="backdrop" id="backdrop"></div>
-<div class="sheet" id="sheet">
-  <div class="grip"></div>
-  <div><span class="s-en" id="sEn"></span><span class="s-tag" id="sTag"></span></div>
-  <div class="s-def" id="sDef"></div>
-  <div class="s-ctx" id="sCtx"></div>
-  <div class="s-src" id="sSrc"></div>
-  <button class="btn" id="sBtn"></button>
-</div>
-<div class="toast" id="toast"></div>
-<footer>
-  拾得 Pickup · 概念 Demo（数据为演示用）<br>
-  参考 Lingvist 的丝滑卡片 · 微信读书的阅读质感 · 蒙哥的阅读+遗忘曲线
-</footer>
-
-<script>
-// ---- 演示数据（通用行业词，非任何内部信息）----
-const SEED = [
-  {t:"retention", d:"留存（让用户持续回来用）", s:"Improving %s beats chasing new users.", src:"行业阅读 · 增长笔记", hl:true},
-  {t:"onboarding", d:"新用户引导 / 上手体验", s:"A smooth %s in the first week keeps people around.", src:"行业阅读 · 增长笔记", hl:false},
-  {t:"churn", d:"流失（用户流失率）", s:"A smooth onboarding is what reduces %s.", src:"行业阅读 · 增长笔记", hl:true},
-  {t:"order density", d:"订单密度（同一区域的订单集中度）", s:"Higher %s in each region lowers delivery cost.", src:"行业阅读 · 物流笔记", hl:true},
-  {t:"last-mile", d:"最后一公里（配送末端环节）", s:"%s delivery is often the most expensive part.", src:"行业阅读 · 物流笔记", hl:false},
-  {t:"fulfillment", d:"履约（下单到收货的全过程）", s:"A reliable %s network makes delivery faster.", src:"行业阅读 · 物流笔记", hl:false},
-  {t:"PUDO", d:"自提/寄件点（Pick Up Drop Off）", s:"A wide %s network cuts cost and speeds things up.", src:"行业阅读 · 物流笔记", hl:true},
-];
-// 库里预置前 3 条，好让「复习」一进来就有内容
-let lib = SEED.slice(0,3).map(x=>({...x}));
-
-// ---- 文章渲染（把词高亮成可点的 mark）----
-const articleHTML =
-  `To win in cross-border e-commerce, we can't just chase new users. Improving `+
-  `<mark class="pick" data-t="retention">retention</mark> beats acquisition. A smooth `+
-  `<mark class="pick" data-t="onboarding">onboarding</mark> in the first week is what reduces `+
-  `<mark class="pick" data-t="churn">churn</mark>. On the supply side, higher `+
-  `<mark class="pick" data-t="order density">order density</mark> in each region lowers `+
-  `<mark class="pick" data-t="last-mile">last-mile</mark> cost, and a reliable `+
-  `<mark class="pick" data-t="fulfillment">fulfillment</mark> network — including a wide `+
-  `<mark class="pick" data-t="PUDO">PUDO</mark> network — makes delivery cheaper and faster.`;
-document.getElementById('article').innerHTML = articleHTML;
-
-// ---- 工具 ----
-const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
-function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');
-  clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),1600);}
-function inLib(t){return lib.some(x=>x.t===t);}
-function addTerm(t){if(inLib(t))return false;const src=SEED.find(x=>x.t===t);if(src){lib.push({...src});return true;}return false;}
-
-// ---- tab 切换 ----
-$$('nav button').forEach(b=>b.onclick=()=>{
-  $$('nav button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
-  $$('.screen').forEach(x=>x.classList.remove('on'));
-  $('#'+b.dataset.s).classList.add('on');
-  if(b.dataset.s==='lib')renderLib();
-  if(b.dataset.s==='rev')startReview();
-});
-function goTab(s){$$('nav button').forEach(b=>{if(b.dataset.s===s)b.click();});}
-
-// ---- 阅读投喂 ----
-// ---- 阅读投喂：点词 → 底部详情卡 ----
-const sheet=$('#sheet'), backdrop=$('#backdrop');
-let curTerm=null;
-function openSheet(t){
-  const x=SEED.find(s=>s.t===t); if(!x)return;
-  curTerm=t;
-  $('#sEn').textContent=x.t;
-  $('#sDef').textContent=x.d;
-  $('#sCtx').innerHTML=x.s.replace('%s','<b>'+x.t+'</b>');
-  $('#sSrc').textContent='来源：'+x.src;
-  const tag=$('#sTag'); tag.textContent=x.hl?'★ 重点':''; tag.style.display=x.hl?'inline-block':'none';
-  refreshSheetBtn();
-  backdrop.classList.add('show'); sheet.classList.add('show');
-}
-function refreshSheetBtn(){
-  const b=$('#sBtn');
-  if(inLib(curTerm)){b.textContent='✓ 已在库中，点此关闭';b.classList.add('ghost');}
-  else{b.textContent='＋ 拾得这条';b.classList.remove('ghost');}
-}
-function closeSheet(){backdrop.classList.remove('show');sheet.classList.remove('show');}
-$('#sBtn').onclick=()=>{
-  if(!inLib(curTerm)){
-    addTerm(curTerm);
-    const m=document.querySelector('mark.pick[data-t="'+curTerm+'"]'); if(m)m.classList.add('got');
-    toast('拾得：'+curTerm); refreshSheetBtn();
-  }else closeSheet();
-};
-backdrop.onclick=closeSheet;
-$$('mark.pick').forEach(m=>m.onclick=()=>openSheet(m.dataset.t));
-$('#pickAll').onclick=()=>{
-  let n=0;SEED.forEach(x=>{if(addTerm(x.t))n++;});
-  $$('mark.pick').forEach(m=>m.classList.add('got'));
-  toast(n?('拾得 '+n+' 条，已入库'):'本页都已在库中');
-  setTimeout(()=>goTab('lib'),650);
-};
-
-// ---- 我的库 ----
-function renderLib(){
-  $('#libCount').textContent=lib.length;
-  const box=$('#libList');
-  if(!lib.length){box.innerHTML='<div class="empty">库还是空的～去「阅读投喂」拾几条吧</div>';return;}
-  box.innerHTML=lib.map(x=>{
-    const ctx=x.s.replace('%s','<b>'+x.t+'</b>');
-    return `<div class="term-card ${x.hl?'hl':''}">
-      ${x.hl?'<div class="star">★ 重点</div>':''}
-      <div class="term-en">${x.t}</div>
-      <div class="term-def">${x.d}</div>
-      <div class="term-ctx">${ctx}</div>
-      <div class="term-src">来源：${x.src}</div>
-    </div>`;}).join('');
-}
-
-// ---- 复习（Lingvist 风：看释义→回忆→显示答案→自评）----
-let queue=[], idx=0;
-function startReview(){
-  queue=lib.slice();idx=0;renderReview();
-}
-function renderReview(){
-  const ring=$('#ring'),body=$('#revBody');
-  const total=queue.length;
-  if(idx>=total){
-    ring.style.setProperty('--p',100);$('#ringT').textContent=total+'/'+total;
-    body.innerHTML=`<div class="done"><div class="big">🎉</div>
-      <h3>今日复习完成</h3>
-      <p>记得的会拉长下次出现的间隔，忘了的很快再见你 —— 这就是遗忘曲线。</p>
-      <button class="btn ghost" style="margin-top:20px" onclick="goTab('read')">再去读点新东西</button></div>`;
-    return;
-  }
-  ring.style.setProperty('--p', Math.round(idx/total*100));
-  $('#ringT').textContent=idx+'/'+total;
-  const c=queue[idx];
-  const cloze=c.s.replace('%s','<span class="blank" id="blank">? ? ?</span>');
-  body.innerHTML=`
-    <div class="prompt-def">${c.d}</div>
-    <div class="prompt-sub">这个意思，对应的英文表达是？先自己想一想</div>
-    <div class="cloze" id="cloze">${cloze}</div>
-    <input class="rev-input" id="guess" placeholder="试着敲出来（可留空）" autocomplete="off" />
-    <button class="btn" id="showBtn">显示答案</button>`;
-  $('#showBtn').onclick=reveal;
-  const g=$('#guess');g.focus();
-  g.onkeydown=e=>{if(e.key==='Enter')reveal();};
-}
-function reveal(){
-  const c=queue[idx];
-  const blank=$('#blank');
-  if(blank){blank.textContent=c.t;blank.classList.add('reveal-word');}
-  const guess=$('#guess'); const val=(guess&&guess.value.trim().toLowerCase())||'';
-  const hit = val && val===c.t.toLowerCase();
-  if(guess)guess.remove();
-  $('#showBtn').outerHTML=`
-    <div class="src-line">来源：${c.src}</div>
-    <div class="judge">
-      <button class="j-no" onclick="judge(false)">✗ 没记住</button>
-      <button class="j-yes" onclick="judge(true)">✓ 记得了</button>
-    </div>`;
-  if(hit)toast('答对啦 🎯');
-}
-function judge(ok){
-  if(!ok){queue.push(queue[idx]);} // 忘了的排到队尾，稍后再考
-  idx++;renderReview();
-}
-
-renderLib();
-</script>
+  <header class="topbar shell"><div class="brand"><span class="brand-mark">拾</span><span>拾得 Pickup<small>LANGUAGE FROM REAL LIFE</small></span></div><div class="top-actions"><span class="chip">职场优先 · English / Français</span><button class="icon-btn" id="resetBtn">重置演示</button></div></header>
+  <div class="app shell">
+    <aside class="sidebar"><div class="side-nav"><button class="on" data-screen="today"><span>⌂</span>今天</button><button data-screen="study"><span>✦</span>学习</button><button data-screen="library"><span>▤</span>词库</button><button data-screen="import"><span>＋</span>拾取</button></div><div class="profile-mini"><b>我的语言资产</b><p id="profileLine"></p><div class="level"><i></i></div></div></aside>
+    <main class="main">
+      <section class="screen on" id="today">
+        <div class="hero"><div class="eyebrow">TODAY · 10 MINUTES</div><h1>你的工作，<br>就是你的语言课。</h1><p>从结构化词库起步，用精选内容补充，再把你读过的文章、会议纪要和表达变成可复习的情境卡片。</p><div class="hero-actions"><button class="btn light" data-go="study">开始今日 8 词 →</button><button class="btn ghost" data-go="import">导入一段材料</button></div></div>
+        <div class="grid3"><div class="stat"><small>连续学习</small><strong>7 天</strong><span>今天完成即可续上</span></div><div class="stat"><small>待复习</small><strong id="dueCount">8</strong><span>主动回忆，而不是重复浏览</span></div><div class="stat"><small>已掌握</small><strong id="masteredCount">0</strong><span>跨词库累计</span></div></div>
+        <div class="section-title"><h2>三轮驱动的内容系统</h2><p>没有素材也能学，有真实材料时会更懂你</p></div>
+        <div class="wheels"><div class="wheel"><b><em>01</em>结构化词库</b><p>职场英语、法语 A1–A2 等开箱即学，保证课程骨架与难度梯度。</p></div><div class="wheel"><b><em>02</em>AI 精选</b><p>按岗位与已掌握词推荐文章、表达和错题解析，控制“刚好够难”。</p></div><div class="wheel"><b><em>03</em>个人导入</b><p>粘贴文章、纪要或链接，把真实上下文沉淀成自己的长期语言资产。</p></div></div>
+        <div class="section-title"><h2>选择今天的词库</h2><p>进度仅保存在当前浏览器</p></div><div class="deck-row" id="deckRow"></div>
+      </section>
+      <section class="screen" id="study"><div class="study-wrap"><div class="study-card"><div class="study-head"><b id="studyDeck"></b><span id="studyIndex"></span></div><div class="study-progress"><i id="studyBar"></i></div><div class="study-body"><div class="translation" id="translation"></div><div class="cloze" id="cloze"></div><input class="answer" id="answer" autocomplete="off" autocapitalize="off" placeholder="输入缺失的词或表达"><button class="btn submit" id="checkBtn">检查答案</button><div class="feedback" id="feedback"></div><div class="source-note">示例内容由拾得原创；词频排序参考 FrequencyWords（CC BY-SA 4.0）</div></div></div></div></section>
+      <section class="screen" id="library"><div class="section-title"><div><div class="eyebrow" style="color:var(--teal)">MY LANGUAGE ASSETS</div><h2>我的词库</h2></div><p id="libraryCount"></p></div><div class="library-tools"><button class="filter on" data-filter="all">全部</button><button class="filter" data-filter="fr">Français</button><button class="filter" data-filter="en">English</button><button class="filter" data-filter="picked">个人拾取</button></div><div class="term-list" id="termList"></div></section>
+      <section class="screen" id="import"><div class="import-layout"><div class="panel import-box"><div class="eyebrow" style="color:var(--teal)">PERSONAL INPUT</div><h2>把真实材料变成你的课</h2><p>粘贴文章、会议纪要或工作表达。MVP 用可解释规则演示“识别—筛选—入库”，正式版再接 AI 做难度估计与个性化解析。</p><textarea id="importText">Before the project starts, let's align on the priorities and clarify the scope. I will follow up with the supplier after the meeting and send a brief update to the team.</textarea><button class="btn dark" id="analyseBtn">分析这段材料 →</button></div><div class="panel import-box"><div class="eyebrow" style="color:var(--violet)">PICKUP CANDIDATES</div><h2>值得拾得的表达</h2><p>优先保留可迁移的搭配和真实语境，不把所有生词都塞进来。</p><div id="candidates"><div class="empty">点击“分析这段材料”查看推荐</div></div></div></div></section>
+      <div class="footer">拾得 Pickup · 职场英法学习 MVP · 数据为演示用 · <a href="https://github.com/jialecai0308/shide-pickup" target="_blank" rel="noopener">查看源码</a></div>
+    </main>
+  </div>
+  <nav class="mobile-nav" aria-label="移动端导航"><button class="on" data-screen="today">今天</button><button data-screen="study">学习</button><button data-screen="library">词库</button><button data-screen="import">拾取</button></nav>
+  <div class="modal-back" id="grammarModal"><div class="modal"><div class="modal-head"><h2>法语动词与时态速查</h2><button id="closeModal" aria-label="关闭">×</button></div><div class="tense-grid" id="tenseGrid"></div></div></div><div class="toast" id="toast"></div>
+  <script>
+    const DECKS={
+      fr:{id:'fr',title:'法语职场基础 A1–A2',subtitle:'会议、邮件与项目协作',progress:18,cards:[
+        {id:'fr-savoir',target:'savez',lemma:'savoir',level:'A1',cloze:'Vous ___ préparer ce rapport avant vendredi ?',translation:'您会在周五之前准备好这份报告吗？',grammar:['直陈式现在时','vous · 第二人称复数'],explanation:'savoir + 动词不定式表示“会做某事”。主语 vous 对应 savez；这里不是 connaître，因为后面接的是动作。'},
+        {id:'fr-pouvoir',target:'pouvez',lemma:'pouvoir',level:'A1',cloze:'___-vous m’envoyer la version finale aujourd’hui ?',translation:'您今天能把最终版本发给我吗？',grammar:['直陈式现在时','倒装疑问句'],explanation:'Pouvez-vous… 是正式且常用的请求结构，适合邮件和会议。倒装后动词与主语代词用连字符连接。'},
+        {id:'fr-devoir',target:'devons',lemma:'devoir',level:'A1',cloze:'Nous ___ clarifier les priorités avant la réunion.',translation:'我们必须在会议前明确优先事项。',grammar:['直陈式现在时','nous · 第一人称复数'],explanation:'devoir + 动词不定式表示“必须做某事”。nous 对应 devons。'},
+        {id:'fr-vouloir',target:'voudrais',lemma:'vouloir',level:'A2',cloze:'Je ___ proposer une autre solution.',translation:'我想提出另一种解决方案。',grammar:['条件式现在时','礼貌表达'],explanation:'je voudrais 比 je veux 更委婉，表达建议或请求时更适合正式沟通。'},
+        {id:'fr-aller',target:'allons',lemma:'aller',level:'A1',cloze:'Nous ___ présenter les résultats demain.',translation:'我们明天将介绍结果。',grammar:['最近将来时','aller + infinitif'],explanation:'aller 的现在时 + 动词不定式构成最近将来时。nous 对应 allons。'},
+        {id:'fr-venir',target:'viens',lemma:'venir',level:'A2',cloze:'Je ___ de terminer le compte rendu.',translation:'我刚刚完成会议纪要。',grammar:['最近过去时','venir de + infinitif'],explanation:'venir de + 动词不定式表示“刚刚做完”。je 对应 viens。'},
+        {id:'fr-faire',target:'faisons',lemma:'faire',level:'A1',cloze:'Nous ___ le point chaque lundi matin.',translation:'我们每周一早上同步进展。',grammar:['直陈式现在时','固定搭配'],explanation:'faire le point 是职场高频表达，表示梳理或同步当前情况。nous 对应 faisons。'},
+        {id:'fr-prendre',target:'pris',lemma:'prendre',level:'A2',cloze:'J’ai ___ note de votre commentaire.',translation:'我已经记下您的意见。',grammar:['复合过去时','过去分词'],explanation:'prendre note de 表示“记下”。复合过去时使用 avoir + pris；prendre 的过去分词是不规则形式 pris。'}]},
+      en:{id:'en',title:'英语职场表达 B1–B2',subtitle:'地道会议表达与项目沟通',progress:31,cards:[
+        {id:'en-clarify',target:'clarify',lemma:'clarify',level:'B1',cloze:'Could you ___ what success looks like for this project?',translation:'你能说明一下这个项目的成功标准吗？',grammar:['请求澄清','Could you + verb'],explanation:'clarify 用于请求把要求、目标或含义说得更清楚；比 explain again 更聚焦“消除歧义”。'},
+        {id:'en-align',target:'align',lemma:'align',level:'B2',cloze:'Let’s ___ on the priorities before we start.',translation:'开始之前，我们先就优先事项达成一致。',grammar:['职场搭配','align on'],explanation:'align on 表示就目标、范围或优先级形成一致认识，适合会议开场或决策前确认。'},
+        {id:'en-prioritize',target:'prioritize',lemma:'prioritize',level:'B2',cloze:'We need to ___ the issues that affect customers.',translation:'我们需要优先处理影响客户的问题。',grammar:['need to + verb','动词'],explanation:'prioritize 表示确定优先顺序或优先处理，后面直接接对象。'},
+        {id:'en-update',target:'update',lemma:'update',level:'B1',cloze:'I’ll send a brief ___ after the client call.',translation:'客户电话结束后，我会发一份简短进展。',grammar:['send an update','名词'],explanation:'send an update 是项目协作常用搭配，指发送简短进展说明。'},
+        {id:'en-scope',target:'scope',lemma:'scope',level:'B2',cloze:'This request is outside the current project ___.',translation:'这个需求不在当前项目范围内。',grammar:['project scope','名词'],explanation:'project scope 指项目约定的工作边界。outside the scope 用于温和地说明暂不覆盖。'},
+        {id:'en-feedback',target:'feedback',lemma:'feedback',level:'B1',cloze:'Thanks for the ___; we’ll revise the proposal.',translation:'感谢反馈，我们会修改方案。',grammar:['不可数名词','thanks for'],explanation:'feedback 通常作不可数名词，不说 a feedback；需要计数时可说 a piece of feedback。'},
+        {id:'en-follow-up',target:'follow up',lemma:'follow up',level:'B1',cloze:'I’ll ___ with the supplier tomorrow.',translation:'我明天会继续跟进供应商。',grammar:['短语动词','follow up with'],explanation:'follow up with someone 表示继续向某人跟进；名词或形容词形式常写作 follow-up。'},
+        {id:'en-review',target:'review',lemma:'review',level:'B1',cloze:'Could you ___ the document before the meeting?',translation:'你能在会议前审阅这份文档吗？',grammar:['职场动词','Could you + verb'],explanation:'review 在职场中常指审阅、检查或评估，比 look at 更正式。'}]}
+    };
+    const TENSES=[['Infinitif · 不定式','parler / finir / prendre。可作词典形式，也可跟在情态动词后。'],['Présent de l’indicatif · 直陈式现在时','描述事实、习惯与当前动作：nous faisons le point。'],['Imparfait · 未完成过去时','描述过去背景、持续状态或习惯：nous travaillions。'],['Passé composé · 复合过去时','描述已完成的过去动作：j’ai pris note。'],['Futur proche · 最近将来时','aller 现在时 + 不定式：nous allons présenter。'],['Futur simple · 简单将来时','用于更正式或较远的将来：nous présenterons。'],['Conditionnel · 条件式','表达假设或礼貌：je voudrais proposer…'],['Subjonctif · 虚拟式','表达必要、情绪、怀疑等：il faut que nous soyons…'],['Impératif · 命令式','建议或指令：confirmez la date。'],['Participe présent · 现在分词','表达同时发生或方式：en travaillant。'],['Participe passé · 过去分词','用于复合时态或被动：pris / terminé。'],['Passé simple / Imparfait du subjonctif','主要出现在文学或高度正式文本；职场口语不作为 MVP 学习重点。']];
+    const PICKABLE=[{target:'align',lang:'en',meaning:'就目标或优先级达成一致',example:'Let’s align on the priorities before we start.',level:'B2'},{target:'clarify',lang:'en',meaning:'澄清、说明清楚',example:'Could you clarify the project scope?',level:'B1'},{target:'scope',lang:'en',meaning:'项目范围 / 边界',example:'This request is outside the current scope.',level:'B2'},{target:'follow up',lang:'en',meaning:'继续跟进',example:'I’ll follow up with the supplier tomorrow.',level:'B1'},{target:'update',lang:'en',meaning:'进展说明',example:'I’ll send a brief update after the meeting.',level:'B1'},{target:'priorities',lang:'en',meaning:'优先事项',example:'Let’s agree on the priorities first.',level:'B1'}];
+    const DEFAULT={activeDeck:'fr',index:{fr:0,en:0},mastered:[],wrong:[],picked:[]};let state=loadState(),currentFilter='all';
+    function loadState(){try{return {...DEFAULT,...JSON.parse(localStorage.getItem('pickup-mvp-state')||'{}')}}catch(e){return {...DEFAULT}}}function save(){localStorage.setItem('pickup-mvp-state',JSON.stringify(state));renderStats()}const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
+    function toast(msg){const el=$('#toast');el.textContent=msg;el.classList.add('show');clearTimeout(el.t);el.t=setTimeout(()=>el.classList.remove('show'),1700)}function go(id){$$('[data-screen]').forEach(b=>b.classList.toggle('on',b.dataset.screen===id));$$('.screen').forEach(s=>s.classList.toggle('on',s.id===id));if(id==='study')renderStudy();if(id==='library')renderLibrary();window.scrollTo({top:0,behavior:'smooth'})}$$('[data-screen]').forEach(b=>b.onclick=()=>go(b.dataset.screen));$$('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
+    function renderStats(){const all=DECKS.fr.cards.length+DECKS.en.cards.length;$('#masteredCount').textContent=state.mastered.length;$('#dueCount').textContent=Math.max(0,8-(state.mastered.length%9));$('#profileLine').textContent=`法语 A2 · 职场英语 B2 · ${state.mastered.length}/${all}`}function renderDecks(){const box=$('#deckRow');box.innerHTML=Object.values(DECKS).map(d=>`<article class="deck-card ${state.activeDeck===d.id?'active':''}" data-deck="${d.id}"><span class="deck-n">${d.cards.length} 词</span><div class="lang">${d.id==='fr'?'FRANÇAIS':'ENGLISH'}</div><h3>${d.title}</h3><p>${d.subtitle}</p><div class="progress"><i style="width:${d.progress}%"></i></div></article>`).join('');$$('[data-deck]').forEach(c=>c.onclick=()=>{state.activeDeck=c.dataset.deck;save();renderDecks();toast('已切换：'+DECKS[state.activeDeck].title)})}function card(){const d=DECKS[state.activeDeck],i=state.index[state.activeDeck]%d.cards.length;return {d,c:d.cards[i],i}}
+    function renderStudy(){const {d,c,i}=card();$('#studyDeck').textContent=d.title;$('#studyIndex').textContent=`${i+1} / ${d.cards.length}`;$('#studyBar').style.width=`${(i+1)/d.cards.length*100}%`;$('#translation').textContent=c.translation;$('#cloze').innerHTML=c.cloze.replace('___','<span class="blank">?</span>');const a=$('#answer');a.value='';a.className='answer';a.disabled=false;$('#checkBtn').style.display='block';$('#feedback').className='feedback';setTimeout(()=>a.focus(),80)}function norm(v){return v.trim().toLowerCase().normalize('NFC').replace(/[’']/g,"'").replace(/\s+/g,' ')}
+    function check(){const {c}=card(),a=$('#answer'),val=norm(a.value),ok=val===norm(c.target);a.classList.add(ok?'good':'bad');a.disabled=true;$('#checkBtn').style.display='none';if(ok&&!state.mastered.includes(c.id))state.mastered.push(c.id);if(!ok&&!state.wrong.includes(c.id))state.wrong.push(c.id);save();const fb=$('#feedback');fb.className='feedback show '+(ok?'good':'bad');fb.innerHTML=`<div class="feedback-top"><div><h3>${ok?'答对了':'这次没答对'} · ${c.target}</h3><p>${ok?'你完成了一次主动回忆。':'你的答案：'+(val||'（未填写）')+'。先看规则，再用原句回想。'}</p></div><span>${c.level}</span></div><p><b>AI 解读：</b>${c.explanation}</p><div class="grammar-tags">${c.grammar.map(x=>`<span>${x}</span>`).join('')}</div><div class="feedback-actions"><button class="btn dark" id="nextBtn">下一词 →</button>${state.activeDeck==='fr'?'<button class="btn grammar-link" id="grammarBtn">查看完整时态表</button>':''}</div>`;$('#cloze').innerHTML=c.cloze.replace('___',`<span class="blank">${c.target}</span>`);$('#nextBtn').onclick=()=>{state.index[state.activeDeck]=(state.index[state.activeDeck]+1)%DECKS[state.activeDeck].cards.length;save();renderStudy()};if($('#grammarBtn'))$('#grammarBtn').onclick=openGrammar}$('#checkBtn').onclick=check;$('#answer').onkeydown=e=>{if(e.key==='Enter')check()};
+    function openGrammar(){$('#tenseGrid').innerHTML=TENSES.map(x=>`<div class="tense"><b>${x[0]}</b><p>${x[1]}</p></div>`).join('');$('#grammarModal').classList.add('show')}$('#closeModal').onclick=()=>$('#grammarModal').classList.remove('show');$('#grammarModal').onclick=e=>{if(e.target.id==='grammarModal')$('#grammarModal').classList.remove('show')};
+    function allTerms(){const curated=Object.values(DECKS).flatMap(d=>d.cards.map(c=>({id:c.id,target:c.lemma,lang:d.id,meaning:c.translation,example:c.cloze.replace('___',c.target),level:c.level,source:'结构化词库'})));return [...state.picked,...curated]}function renderLibrary(){let arr=allTerms();if(currentFilter==='fr'||currentFilter==='en')arr=arr.filter(x=>x.lang===currentFilter);if(currentFilter==='picked')arr=arr.filter(x=>x.source==='个人拾取');$('#libraryCount').textContent=`共 ${allTerms().length} 条 · 已掌握 ${state.mastered.length} 条`;$('#termList').innerHTML=arr.length?arr.slice(0,30).map(x=>`<article class="term"><div class="term-head"><h3>${x.target}</h3><span class="tag">${x.lang.toUpperCase()} · ${x.level}</span></div><div class="meaning">${x.meaning}</div><div class="example">${x.example}</div><div class="meta">${x.source}</div></article>`).join(''):'<div class="empty">这里还没有个人拾取内容。</div>'}$$('.filter').forEach(b=>b.onclick=()=>{$$('.filter').forEach(x=>x.classList.remove('on'));b.classList.add('on');currentFilter=b.dataset.filter;renderLibrary()});
+    $('#analyseBtn').onclick=()=>{const text=norm($('#importText').value),found=PICKABLE.filter(x=>text.includes(norm(x.target)));$('#candidates').innerHTML=found.length?found.map((x,i)=>`<div class="candidate"><div><b>${x.target}</b><small>${x.meaning} · ${x.level}</small></div><button data-pick="${i}">＋ 拾得</button></div>`).join(''):'<div class="empty">暂未识别到样板词库中的高价值表达。试试默认文本。</div>';$$('[data-pick]').forEach(b=>b.onclick=()=>{const x=found[+b.dataset.pick];if(!state.picked.some(p=>p.target===x.target)){state.picked.unshift({...x,id:'picked-'+x.target,source:'个人拾取'});save();b.textContent='✓ 已入库';toast('已拾得：'+x.target)}else toast('已在个人词库中')})};$('#resetBtn').onclick=()=>{if(confirm('清空当前浏览器里的演示进度？')){localStorage.removeItem('pickup-mvp-state');state=loadState();renderAll();toast('演示进度已重置')}};function renderAll(){renderStats();renderDecks();renderLibrary();renderStudy()}renderAll();
+  </script>
 </body>
 </html>
