@@ -1,0 +1,11 @@
+{
+  "name": "拾得 Pickup",
+  "short_name": "拾得",
+  "description": "把真实语料变成今天能学、以后能用的英法语言课。",
+  "start_url": "/shide-pickup/",
+  "display": "standalone",
+  "background_color": "#f6f7f3",
+  "theme_color": "#315d52",
+  "lang": "zh-CN",
+  "icons": []
+}
