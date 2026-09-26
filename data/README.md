@@ -12,8 +12,12 @@ licenses its code under MIT and its generated content under CC BY-SA 4.0.
 
 Pickup loads these source files in the browser, removes obvious non-word tokens
 and duplicates, and uses the first 5,000 valid entries per language as the MVP
-core-frequency index. Frequency rank is not presented as a CEFR level, meaning,
-or proof that a learning card has already been editorially reviewed.
+core-frequency index. Each language is then split into two frequency bands for
+the current sample bookshelf. These bands are product learning gradients, not
+official CEFR certification. Preview words are separately curated so subtitle
+names and function-word noise are not presented as lesson content. Frequency
+rank is not treated as a meaning or proof that a learning card has already been
+editorially reviewed.
 
 Source: https://github.com/hermitdave/FrequencyWords
 
