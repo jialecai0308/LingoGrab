@@ -1,0 +1,1175 @@
+{
+  "generatedAt": "2026-09-28T17:13:21.051Z",
+  "codeVersion": "main",
+  "routing": {
+    "total": 35,
+    "routePasses": 35,
+    "routeAccuracy": 100,
+    "autoPasses": 35,
+    "autoDecisionAccuracy": 100,
+    "failures": [],
+    "byGold": {
+      "empty": {
+        "total": 2,
+        "passes": 2
+      },
+      "typo": {
+        "total": 12,
+        "passes": 12
+      },
+      "semantic": {
+        "total": 11,
+        "passes": 11
+      },
+      "complex": {
+        "total": 4,
+        "passes": 4
+      },
+      "other": {
+        "total": 6,
+        "passes": 6
+      }
+    }
+  },
+  "live": {
+    "endpoint": "https://www.getyuli.com/api/pickup",
+    "total": 17,
+    "available": 13,
+    "availability": 76.5,
+    "latency": {
+      "medianMs": 4354,
+      "p95Ms": 20045,
+      "minMs": 745,
+      "maxMs": 20045
+    },
+    "models": {
+      "model_unavailable": 4,
+      "glm-4-flash-250414": 9,
+      "structured-rules": 4
+    },
+    "degradedCount": 9,
+    "explanations": {
+      "total": 12,
+      "passes": 8,
+      "automaticPassRate": 66.7,
+      "rows": [
+        {
+          "id": "explain-en-clarify",
+          "language": "en",
+          "userAnswer": "explain",
+          "card": {
+            "cloze": "Could you ___ what success looks like for this project?",
+            "target": "clarify",
+            "explanation": "clarify 用于请求把要求、目标或含义说得更清楚；比 explain again 更聚焦“消除歧义”。",
+            "grammar": [
+              "请求澄清",
+              "Could you + verb"
+            ]
+          },
+          "requiredGroups": [
+            [
+              "clarify"
+            ],
+            [
+              "explain"
+            ],
+            [
+              "澄清",
+              "歧义"
+            ]
+          ],
+          "forbidden": [
+            "clarify 是解释原因",
+            "explain 一定错误"
+          ],
+          "result": {
+            "ok": false,
+            "status": 502,
+            "latencyMs": 1090,
+            "error": "model_unavailable"
+          },
+          "required": [
+            {
+              "group": [
+                "clarify"
+              ],
+              "pass": false
+            },
+            {
+              "group": [
+                "explain"
+              ],
+              "pass": false
+            },
+            {
+              "group": [
+                "澄清",
+                "歧义"
+              ],
+              "pass": false
+            }
+          ],
+          "forbiddenHits": [],
+          "structurePass": false,
+          "automaticPass": false
+        },
+        {
+          "id": "explain-en-align",
+          "language": "en",
+          "userAnswer": "agree",
+          "card": {
+            "cloze": "Let’s ___ on the priorities before we start.",
+            "target": "align",
+            "explanation": "align on 表示就目标、范围或优先级形成一致认识，适合会议开场或决策前确认。",
+            "grammar": [
+              "职场搭配",
+              "align on"
+            ]
+          },
+          "requiredGroups": [
+            [
+              "align"
+            ],
+            [
+              "agree"
+            ],
+            [
+              "一致",
+              "共识"
+            ]
+          ],
+          "forbidden": [
+            "align with the priorities",
+            "align to the priorities"
+          ],
+          "result": {
+            "ok": true,
+            "status": 200,
+            "latencyMs": 2499,
+            "content": "为什么答错：用户答案“agree”虽意为同意，但“align on”特指就优先级达成一致认知。易错点：混淆“agree”与“align on”在职场语境下的精确含义。例句：Let’s align on the project goals before the meeting starts.",
+            "model": "glm-4-flash-250414",
+            "degraded": true,
+            "memoryApplied": false,
+            "apiVersion": "pickup-memory-v1"
+          },
+          "required": [
+            {
+              "group": [
+                "align"
+              ],
+              "pass": true
+            },
+            {
+              "group": [
+                "agree"
+              ],
+              "pass": true
+            },
+            {
+              "group": [
+                "一致",
+                "共识"
+              ],
+              "pass": true
+            }
+          ],
+          "forbiddenHits": [],
+          "structurePass": true,
+          "automaticPass": true
+        },
+        {
+          "id": "explain-en-prioritize",
+          "language": "en",
+          "userAnswer": "order",
+          "card": {
+            "cloze": "We need to ___ the issues that affect customers.",
+            "target": "prioritize",
+            "explanation": "prioritize 表示确定优先顺序或优先处理，后面直接接对象。",
+            "grammar": [
+              "need to + verb",
+              "动词"
+            ]
+          },
+          "requiredGroups": [
+            [
+              "prioritize"
+            ],
+            [
+              "order"
+            ],
+            [
+              "优先"
+            ]
+          ],
+          "forbidden": [
+            "prioritize to"
+          ],
+          "result": {
+            "ok": true,
+            "status": 200,
+            "latencyMs": 17643,
+            "content": "为什么答错：order 意为“排列顺序”，但未体现优先处理含义。易错点：混淆“排序”与“确定优先级”。优先处理需用 prioritize。例句：We need to prioritize the tasks for the next week.",
+            "model": "glm-4-flash-250414",
+            "degraded": true,
+            "memoryApplied": false,
+            "apiVersion": "pickup-memory-v1"
+          },
+          "required": [
+            {
+              "group": [
+                "prioritize"
+              ],
+              "pass": true
+            },
+            {
+              "group": [
+                "order"
+              ],
+              "pass": true
+            },
+            {
+              "group": [
+                "优先"
+              ],
+              "pass": true
+            }
+          ],
+          "forbiddenHits": [],
+          "structurePass": true,
+          "automaticPass": true
+        },
+        {
+          "id": "explain-en-update",
+          "language": "en",
+          "userAnswer": "report",
+          "card": {
+            "cloze": "I’ll send a brief ___ after the client call.",
+            "target": "update",
+            "explanation": "send an update 是项目协作常用搭配，指发送简短进展说明。",
+            "grammar": [
+              "send an update",
+              "名词"
+            ]
+          },
+          "requiredGroups": [
+            [
+              "update"
+            ],
+            [
+              "report"
+            ],
+            [
+              "进展",
+              "简短"
+            ]
+          ],
+          "forbidden": [
+            "send update without article"
+          ],
+          "result": {
+            "ok": false,
+            "status": 502,
+            "latencyMs": 1092,
+            "error": "model_unavailable"
+          },
+          "required": [
+            {
+              "group": [
+                "update"
+              ],
+              "pass": false
+            },
+            {
+              "group": [
+                "report"
+              ],
+              "pass": false
+            },
+            {
+              "group": [
+                "进展",
+                "简短"
+              ],
+              "pass": false
+            }
+          ],
+          "forbiddenHits": [],
+          "structurePass": false,
+          "automaticPass": false
+        },
+        {
+          "id": "explain-en-scope",
+          "language": "en",
+          "userAnswer": "range",
+          "card": {
+            "cloze": "This request is outside the current project ___.",
+            "target": "scope",
+            "explanation": "project scope 指项目约定的工作边界。outside the scope 用于温和地说明暂不覆盖。",
+            "grammar": [
+              "project scope",
+              "名词"
+            ]
+          },
+          "requiredGroups": [
+            [
+              "scope"
+            ],
+            [
+              "range"
+            ],
+            [
+              "范围",
+              "边界"
+            ]
+          ],
+          "forbidden": [
+            "scope 是时间表"
+          ],
+          "result": {
+            "ok": false,
+            "status": 502,
+            "latencyMs": 1062,
+            "error": "model_unavailable"
+          },
+          "required": [
+            {
+              "group": [
+                "scope"
+              ],
+              "pass": false
+            },
+            {
+              "group": [
+                "range"
+              ],
+              "pass": false
+            },
+            {
+              "group": [
+                "范围",
+                "边界"
+              ],
+              "pass": false
+            }
+          ],
+          "forbiddenHits": [],
+          "structurePass": false,
+          "automaticPass": false
+        },
+        {
+          "id": "explain-en-feedback",
+          "language": "en",
+          "userAnswer": "comment",
+          "card": {
+            "cloze": "Thanks for the ___; we’ll revise the proposal.",
+            "target": "feedback",
+            "explanation": "feedback 通常作不可数名词，不说 a feedback；需要计数时可说 a piece of feedback。",
+            "grammar": [
+              "不可数名词",
+              "thanks for"
+            ]
+          },
+          "requiredGroups": [
+            [
+              "feedback"
+            ],
+            [
+              "comment"
+            ],
+            [
+              "不可数",
+              "a piece of"
+            ]
+          ],
+          "forbidden": [
+            "a feedback",
+            "feedback 是可数"
+          ],
+          "result": {
+            "ok": false,
+            "status": 502,
+            "latencyMs": 1110,
+            "error": "model_unavailable"
+          },
+          "required": [
+            {
+              "group": [
+                "feedback"
+              ],
+              "pass": false
+            },
+            {
+              "group": [
+                "comment"
+              ],
+              "pass": false
+            },
+            {
+              "group": [
+                "不可数",
+                "a piece of"
+              ],
+              "pass": false
+            }
+          ],
+          "forbiddenHits": [],
+          "structurePass": false,
+          "automaticPass": false
+        },
+        {
+          "id": "explain-en-follow-up",
+          "language": "en",
+          "userAnswer": "contact",
+          "card": {
+            "cloze": "I’ll ___ with the supplier tomorrow.",
+            "target": "follow up",
+            "explanation": "follow up with someone 表示继续向某人跟进；名词或形容词形式常写作 follow-up。",
+            "grammar": [
+              "短语动词",
+              "follow up with"
+            ]
+          },
+          "requiredGroups": [
+            [
+              "follow up"
+            ],
+            [
+              "contact"
+            ],
+            [
+              "跟进"
+            ]
+          ],
+          "forbidden": [
+            "follow-up with the supplier tomorrow"
+          ],
+          "result": {
+            "ok": true,
+            "status": 200,
+            "latencyMs": 1849,
+            "content": "为什么错：follow up with 表示继续跟进，contact 表示联系。  \n易错点：混淆了短语动词的固定搭配。  \n例句：She will follow up with the client next week to confirm the details.",
+            "model": "glm-4-flash-250414",
+            "degraded": true,
+            "memoryApplied": false,
+            "apiVersion": "pickup-memory-v1"
+          },
+          "required": [
+            {
+              "group": [
+                "follow up"
+              ],
+              "pass": true
+            },
+            {
+              "group": [
+                "contact"
+              ],
+              "pass": true
+            },
+            {
+              "group": [
+                "跟进"
+              ],
+              "pass": true
+            }
+          ],
+          "forbiddenHits": [],
+          "structurePass": true,
+          "automaticPass": true
+        },
+        {
+          "id": "explain-en-review",
+          "language": "en",
+          "userAnswer": "look",
+          "card": {
+            "cloze": "Could you ___ the document before the meeting?",
+            "target": "review",
+            "explanation": "review 在职场中常指审阅、检查或评估，比 look at 更正式。",
+            "grammar": [
+              "职场动词",
+              "Could you + verb"
+            ]
+          },
+          "requiredGroups": [
+            [
+              "review"
+            ],
+            [
+              "look"
+            ],
+            [
+              "审阅",
+              "正式"
+            ]
+          ],
+          "forbidden": [
+            "look the document"
+          ],
+          "result": {
+            "ok": true,
+            "status": 200,
+            "latencyMs": 4354,
+            "content": "为什么答错：review 意为审阅，比 look at 更正式，符合职场场景。look 太随意。  \n易错点：混淆 look at（随意看）和 review（审阅）。  \n例句：Could you review the report before the presentation?",
+            "model": "glm-4-flash-250414",
+            "degraded": true,
+            "memoryApplied": false,
+            "apiVersion": "pickup-memory-v1"
+          },
+          "required": [
+            {
+              "group": [
+                "review"
+              ],
+              "pass": true
+            },
+            {
+              "group": [
+                "look"
+              ],
+              "pass": true
+            },
+            {
+              "group": [
+                "审阅",
+                "正式"
+              ],
+              "pass": true
+            }
+          ],
+          "forbiddenHits": [],
+          "structurePass": true,
+          "automaticPass": true
+        },
+        {
+          "id": "explain-fr-savoir",
+          "language": "fr",
+          "userAnswer": "connaissez",
+          "card": {
+            "cloze": "Vous ___ préparer ce rapport avant vendredi ?",
+            "target": "savez",
+            "explanation": "savoir + 动词不定式表示“会做某事”。主语 vous 对应 savez；这里不是 connaître，因为后面接的是动作。",
+            "grammar": [
+              "直陈式现在时",
+              "vous · 第二人称复数"
+            ]
+          },
+          "requiredGroups": [
+            [
+              "savez"
+            ],
+            [
+              "connaissez"
+            ],
+            [
+              "vous 对应 savez"
+            ],
+            [
+              "直陈式现在时"
+            ]
+          ],
+          "forbidden": [
+            "第三人称",
+            "saviez"
+          ],
+          "result": {
+            "ok": true,
+            "status": 200,
+            "latencyMs": 751,
+            "content": "为什么：你写的是「connaissez」，这里应使用「savez」。savoir + 动词不定式表示“会做某事”。主语 vous 对应 savez；这里不是 connaître，因为后面接的是动作。\n易错点：直陈式现在时、vous · 第二人称复数。\n记忆方式：把当前主语和「savez」作为一组，再完整读一遍原句。",
+            "model": "structured-rules",
+            "degraded": false,
+            "memoryApplied": false,
+            "apiVersion": "pickup-memory-v1"
+          },
+          "required": [
+            {
+              "group": [
+                "savez"
+              ],
+              "pass": true
+            },
+            {
+              "group": [
+                "connaissez"
+              ],
+              "pass": true
+            },
+            {
+              "group": [
+                "vous 对应 savez"
+              ],
+              "pass": true
+            },
+            {
+              "group": [
+                "直陈式现在时"
+              ],
+              "pass": true
+            }
+          ],
+          "forbiddenHits": [],
+          "structurePass": true,
+          "automaticPass": true
+        },
+        {
+          "id": "explain-fr-pouvoir",
+          "language": "fr",
+          "userAnswer": "voulez",
+          "card": {
+            "cloze": "___-vous m’envoyer la version finale aujourd’hui ?",
+            "target": "Pouvez",
+            "explanation": "Pouvez-vous… 是正式且常用的请求结构，适合邮件和会议。倒装后动词与主语代词用连字符连接。",
+            "grammar": [
+              "直陈式现在时",
+              "倒装疑问句"
+            ]
+          },
+          "requiredGroups": [
+            [
+              "Pouvez"
+            ],
+            [
+              "voulez"
+            ],
+            [
+              "倒装疑问句"
+            ],
+            [
+              "连字符"
+            ]
+          ],
+          "forbidden": [
+            "第三人称"
+          ],
+          "result": {
+            "ok": true,
+            "status": 200,
+            "latencyMs": 745,
+            "content": "为什么：你写的是「voulez」，这里应使用「Pouvez」。Pouvez-vous… 是正式且常用的请求结构，适合邮件和会议。倒装后动词与主语代词用连字符连接。\n易错点：直陈式现在时、倒装疑问句。\n记忆方式：把当前主语和「Pouvez」作为一组，再完整读一遍原句。",
+            "model": "structured-rules",
+            "degraded": false,
+            "memoryApplied": false,
+            "apiVersion": "pickup-memory-v1"
+          },
+          "required": [
+            {
+              "group": [
+                "Pouvez"
+              ],
+              "pass": true
+            },
+            {
+              "group": [
+                "voulez"
+              ],
+              "pass": true
+            },
+            {
+              "group": [
+                "倒装疑问句"
+              ],
+              "pass": true
+            },
+            {
+              "group": [
+                "连字符"
+              ],
+              "pass": true
+            }
+          ],
+          "forbiddenHits": [],
+          "structurePass": true,
+          "automaticPass": true
+        },
+        {
+          "id": "explain-fr-vouloir",
+          "language": "fr",
+          "userAnswer": "veux",
+          "card": {
+            "cloze": "Je ___ proposer une autre solution.",
+            "target": "voudrais",
+            "explanation": "je voudrais 比 je veux 更委婉，表达建议或请求时更适合正式沟通。",
+            "grammar": [
+              "条件式现在时",
+              "礼貌表达"
+            ]
+          },
+          "requiredGroups": [
+            [
+              "voudrais"
+            ],
+            [
+              "veux"
+            ],
+            [
+              "条件式现在时"
+            ],
+            [
+              "礼貌"
+            ]
+          ],
+          "forbidden": [
+            "直陈式过去时"
+          ],
+          "result": {
+            "ok": true,
+            "status": 200,
+            "latencyMs": 790,
+            "content": "为什么：你写的是「veux」，这里应使用「voudrais」。je voudrais 比 je veux 更委婉，表达建议或请求时更适合正式沟通。\n易错点：条件式现在时、礼貌表达。\n记忆方式：把当前主语和「voudrais」作为一组，再完整读一遍原句。",
+            "model": "structured-rules",
+            "degraded": false,
+            "memoryApplied": false,
+            "apiVersion": "pickup-memory-v1"
+          },
+          "required": [
+            {
+              "group": [
+                "voudrais"
+              ],
+              "pass": true
+            },
+            {
+              "group": [
+                "veux"
+              ],
+              "pass": true
+            },
+            {
+              "group": [
+                "条件式现在时"
+              ],
+              "pass": true
+            },
+            {
+              "group": [
+                "礼貌"
+              ],
+              "pass": true
+            }
+          ],
+          "forbiddenHits": [],
+          "structurePass": true,
+          "automaticPass": true
+        },
+        {
+          "id": "explain-fr-prendre",
+          "language": "fr",
+          "userAnswer": "prends",
+          "card": {
+            "cloze": "J’ai ___ note de votre commentaire.",
+            "target": "pris",
+            "explanation": "prendre note de 表示“记下”。复合过去时使用 avoir + pris；prendre 的过去分词是不规则形式 pris。",
+            "grammar": [
+              "复合过去时",
+              "过去分词"
+            ]
+          },
+          "requiredGroups": [
+            [
+              "pris"
+            ],
+            [
+              "prends"
+            ],
+            [
+              "复合过去时"
+            ],
+            [
+              "过去分词"
+            ]
+          ],
+          "forbidden": [
+            "使用 être",
+            "prends 是过去分词"
+          ],
+          "result": {
+            "ok": true,
+            "status": 200,
+            "latencyMs": 746,
+            "content": "为什么：你写的是「prends」，这里应使用「pris」。prendre note de 表示“记下”。复合过去时使用 avoir + pris；prendre 的过去分词是不规则形式 pris。\n易错点：复合过去时、过去分词。\n记忆方式：把当前主语和「pris」作为一组，再完整读一遍原句。",
+            "model": "structured-rules",
+            "degraded": false,
+            "memoryApplied": false,
+            "apiVersion": "pickup-memory-v1"
+          },
+          "required": [
+            {
+              "group": [
+                "pris"
+              ],
+              "pass": true
+            },
+            {
+              "group": [
+                "prends"
+              ],
+              "pass": true
+            },
+            {
+              "group": [
+                "复合过去时"
+              ],
+              "pass": true
+            },
+            {
+              "group": [
+                "过去分词"
+              ],
+              "pass": true
+            }
+          ],
+          "forbiddenHits": [],
+          "structurePass": true,
+          "automaticPass": true
+        }
+      ]
+    },
+    "extraction": {
+      "total": 5,
+      "passes": 1,
+      "automaticPassRate": 20,
+      "schemaPassRate": 100,
+      "relevancePassRate": 100,
+      "privacyPassRate": 80,
+      "rows": [
+        {
+          "id": "extract-en-meeting",
+          "language": "en",
+          "text": "Before we begin, let's align on the priorities and clarify the project scope. We need to prioritize the customer issues, then I will follow up with the supplier after the meeting.",
+          "expectedAny": [
+            "align",
+            "align on",
+            "clarify",
+            "scope",
+            "prioritize",
+            "follow up"
+          ],
+          "prohibited": [],
+          "result": {
+            "ok": true,
+            "status": 200,
+            "latencyMs": 6047,
+            "content": "```json\n[\n  {\n    \"target\": \"align on\",\n    \"lang\": \"en\",\n    \"meaning\": \"达成一致\",\n    \"example\": \"Before we begin, let's align on the priorities.\",\n    \"level\": \"B1\",\n    \"reason\": \"常用商务表达\"\n  },\n  {\n    \"target\": \"project scope\",\n    \"lang\": \"en\",\n    \"meaning\": \"项目范围\",\n    \"example\": \"We need to clarify the project scope.\",\n    \"level\": \"B2\",\n    \"reason\": \"职场必备术语\"\n  },\n  {\n    \"target\": \"prioritize\",\n    \"lang\": \"en\",\n    \"meaning\": \"优先处理\",\n    \"example\": \"We need to prioritize the customer issues.\",\n    \"level\": \"B1\",\n    \"reason\": \"高频动词搭配\"\n  },\n  {\n    \"target\": \"follow up with\",\n    \"lang\": \"en\",\n    \"meaning\": \"跟进\",\n    \"example\": \"I will follow up with the supplier after the meeting.\",\n    \"level\": \"B2\",\n    \"reason\": \"商务场景高频\"\n  }\n]\n```",
+            "model": "glm-4-flash-250414",
+            "degraded": true,
+            "memoryApplied": false,
+            "apiVersion": "pickup-memory-v1"
+          },
+          "array": [
+            {
+              "target": "align on",
+              "lang": "en",
+              "meaning": "达成一致",
+              "example": "Before we begin, let's align on the priorities.",
+              "level": "B1",
+              "reason": "常用商务表达"
+            },
+            {
+              "target": "project scope",
+              "lang": "en",
+              "meaning": "项目范围",
+              "example": "We need to clarify the project scope.",
+              "level": "B2",
+              "reason": "职场必备术语"
+            },
+            {
+              "target": "prioritize",
+              "lang": "en",
+              "meaning": "优先处理",
+              "example": "We need to prioritize the customer issues.",
+              "level": "B1",
+              "reason": "高频动词搭配"
+            },
+            {
+              "target": "follow up with",
+              "lang": "en",
+              "meaning": "跟进",
+              "example": "I will follow up with the supplier after the meeting.",
+              "level": "B2",
+              "reason": "商务场景高频"
+            }
+          ],
+          "validLength": true,
+          "validSchema": true,
+          "expectedHits": [
+            "align",
+            "align on",
+            "clarify",
+            "scope",
+            "prioritize",
+            "follow up"
+          ],
+          "prohibitedHits": [],
+          "targetGrounded": 4,
+          "exampleGrounded": 1,
+          "relevancePass": true,
+          "automaticPass": false
+        },
+        {
+          "id": "extract-en-writing",
+          "language": "en",
+          "text": "Could you review the proposal before Thursday? Please send a brief update after the client call and share any feedback with the project team.",
+          "expectedAny": [
+            "review",
+            "brief update",
+            "update",
+            "feedback",
+            "client call"
+          ],
+          "prohibited": [],
+          "result": {
+            "ok": true,
+            "status": 200,
+            "latencyMs": 6390,
+            "content": "```json\n[\n  {\n    \"target\": \"review\",\n    \"lang\": \"en\",\n    \"meaning\": \"审阅\",\n    \"example\": \"Could you review the proposal before Thursday?\",\n    \"level\": \"B1\",\n    \"reason\": \"高频商务场景\"\n  },\n  {\n    \"target\": \"brief update\",\n    \"lang\": \"en\",\n    \"meaning\": \"简要更新\",\n    \"example\": \"Please send a brief update after the client call\",\n    \"level\": \"B1\",\n    \"reason\": \"固定搭配常用\"\n  },\n  {\n    \"target\": \"client call\",\n    \"lang\": \"en\",\n    \"meaning\": \"客户通话\",\n    \"example\": \"Please send a brief update after the client call\",\n    \"level\": \"B1\",\n    \"reason\": \"商务场景高频\"\n  },\n  {\n    \"target\": \"share feedback\",\n    \"lang\": \"en\",\n    \"meaning\": \"分享反馈\",\n    \"example\": \"share any feedback with the project team\",\n    \"level\": \"B1\",\n    \"reason\": \"团队协作必备\"\n  }\n]\n```",
+            "model": "glm-4-flash-250414",
+            "degraded": true,
+            "memoryApplied": false,
+            "apiVersion": "pickup-memory-v1"
+          },
+          "array": [
+            {
+              "target": "review",
+              "lang": "en",
+              "meaning": "审阅",
+              "example": "Could you review the proposal before Thursday?",
+              "level": "B1",
+              "reason": "高频商务场景"
+            },
+            {
+              "target": "brief update",
+              "lang": "en",
+              "meaning": "简要更新",
+              "example": "Please send a brief update after the client call",
+              "level": "B1",
+              "reason": "固定搭配常用"
+            },
+            {
+              "target": "client call",
+              "lang": "en",
+              "meaning": "客户通话",
+              "example": "Please send a brief update after the client call",
+              "level": "B1",
+              "reason": "商务场景高频"
+            },
+            {
+              "target": "share feedback",
+              "lang": "en",
+              "meaning": "分享反馈",
+              "example": "share any feedback with the project team",
+              "level": "B1",
+              "reason": "团队协作必备"
+            }
+          ],
+          "validLength": true,
+          "validSchema": true,
+          "expectedHits": [
+            "review",
+            "brief update",
+            "update",
+            "feedback",
+            "client call"
+          ],
+          "prohibitedHits": [],
+          "targetGrounded": 3,
+          "exampleGrounded": 4,
+          "relevancePass": true,
+          "automaticPass": false
+        },
+        {
+          "id": "extract-en-privacy",
+          "language": "en",
+          "text": "Maya Chen asked us to clarify the delivery constraint and follow up with the vendor. Contact her at maya.chen@example.com or 13800138000 after the scope review.",
+          "expectedAny": [
+            "clarify",
+            "delivery constraint",
+            "follow up",
+            "scope review",
+            "scope"
+          ],
+          "prohibited": [
+            "Maya Chen",
+            "maya.chen@example.com",
+            "13800138000"
+          ],
+          "result": {
+            "ok": true,
+            "status": 200,
+            "latencyMs": 4483,
+            "content": "```json\n[\n  {\n    \"target\": \"delivery constraint\",\n    \"lang\": \"en\",\n    \"meaning\": \"运输限制\",\n    \"example\": \"Maya Chen asked us to clarify the delivery constraint and follow up with the vendor.\",\n    \"level\": \"B1\",\n    \"reason\": \"商务场景高频\"\n  },\n  {\n    \"target\": \"follow up with\",\n    \"lang\": \"en\",\n    \"meaning\": \"跟进\",\n    \"example\": \"Maya Chen asked us to clarify the delivery constraint and follow up with the vendor.\",\n    \"level\": \"B1\",\n    \"reason\": \"固定搭配常用\"\n  },\n  {\n    \"target\": \"scope review\",\n    \"lang\": \"en\",\n    \"meaning\": \"范围评审\",\n    \"example\": \"Contact her at maya.chen@example.com or 13800138000 after the scope review.\",\n    \"level\": \"B2\",\n    \"reason\": \"项目管理核心\"\n  }\n]\n```",
+            "model": "glm-4-flash-250414",
+            "degraded": true,
+            "memoryApplied": false,
+            "apiVersion": "pickup-memory-v1"
+          },
+          "array": [
+            {
+              "target": "delivery constraint",
+              "lang": "en",
+              "meaning": "运输限制",
+              "example": "Maya Chen asked us to clarify the delivery constraint and follow up with the vendor.",
+              "level": "B1",
+              "reason": "商务场景高频"
+            },
+            {
+              "target": "follow up with",
+              "lang": "en",
+              "meaning": "跟进",
+              "example": "Maya Chen asked us to clarify the delivery constraint and follow up with the vendor.",
+              "level": "B1",
+              "reason": "固定搭配常用"
+            },
+            {
+              "target": "scope review",
+              "lang": "en",
+              "meaning": "范围评审",
+              "example": "Contact her at maya.chen@example.com or 13800138000 after the scope review.",
+              "level": "B2",
+              "reason": "项目管理核心"
+            }
+          ],
+          "validLength": true,
+          "validSchema": true,
+          "expectedHits": [
+            "clarify",
+            "delivery constraint",
+            "follow up",
+            "scope review",
+            "scope"
+          ],
+          "prohibitedHits": [
+            "Maya Chen",
+            "maya.chen@example.com",
+            "13800138000"
+          ],
+          "targetGrounded": 3,
+          "exampleGrounded": 3,
+          "relevancePass": true,
+          "automaticPass": false
+        },
+        {
+          "id": "extract-fr-work",
+          "language": "fr",
+          "text": "Nous devons clarifier les priorités avant la réunion. Je vais faire le point avec l'équipe, puis envoyer le compte rendu et proposer une autre solution.",
+          "expectedAny": [
+            "clarifier les priorités",
+            "faire le point",
+            "compte rendu",
+            "proposer une autre solution"
+          ],
+          "prohibited": [],
+          "result": {
+            "ok": true,
+            "status": 200,
+            "latencyMs": 5570,
+            "content": "```json\n[\n  {\n    \"target\": \"clarifier les priorités\",\n    \"lang\": \"fr\",\n    \"meaning\": \"明确优先事项\",\n    \"example\": \"Nous devons clarifier les priorités avant la réunion.\",\n    \"level\": \"B1\",\n    \"reason\": \"常用商务场景\"\n  },\n  {\n    \"target\": \"faire le point\",\n    \"lang\": \"fr\",\n    \"meaning\": \"了解情况\",\n    \"example\": \"Je vais faire le point avec l'équipe, puis envoyer le compte rendu.\",\n    \"level\": \"B1\",\n    \"reason\": \"团队沟通高频\"\n  },\n  {\n    \"target\": \"compte rendu\",\n    \"lang\": \"fr\",\n    \"meaning\": \"会议纪要\",\n    \"example\": \"Je vais faire le point avec l'équipe, puis envoyer le compte rendu et proposer une autre solution.\",\n    \"level\": \"B1\",\n    \"reason\": \"职场必备表达\"\n  }\n]\n```",
+            "model": "glm-4-flash-250414",
+            "degraded": true,
+            "memoryApplied": false,
+            "apiVersion": "pickup-memory-v1"
+          },
+          "array": [
+            {
+              "target": "clarifier les priorités",
+              "lang": "fr",
+              "meaning": "明确优先事项",
+              "example": "Nous devons clarifier les priorités avant la réunion.",
+              "level": "B1",
+              "reason": "常用商务场景"
+            },
+            {
+              "target": "faire le point",
+              "lang": "fr",
+              "meaning": "了解情况",
+              "example": "Je vais faire le point avec l'équipe, puis envoyer le compte rendu.",
+              "level": "B1",
+              "reason": "团队沟通高频"
+            },
+            {
+              "target": "compte rendu",
+              "lang": "fr",
+              "meaning": "会议纪要",
+              "example": "Je vais faire le point avec l'équipe, puis envoyer le compte rendu et proposer une autre solution.",
+              "level": "B1",
+              "reason": "职场必备表达"
+            }
+          ],
+          "validLength": true,
+          "validSchema": true,
+          "expectedHits": [
+            "clarifier les priorités",
+            "faire le point",
+            "compte rendu",
+            "proposer une autre solution"
+          ],
+          "prohibitedHits": [],
+          "targetGrounded": 3,
+          "exampleGrounded": 2,
+          "relevancePass": true,
+          "automaticPass": false
+        },
+        {
+          "id": "extract-fr-travel",
+          "language": "fr",
+          "text": "Je voudrais réserver une chambre pour deux nuits. Où est la station de métro la plus proche ? J'ai perdu mon passeport et je dois aller à l'aéroport.",
+          "expectedAny": [
+            "réserver une chambre",
+            "station de métro",
+            "perdu mon passeport",
+            "aller à l'aéroport"
+          ],
+          "prohibited": [],
+          "result": {
+            "ok": true,
+            "status": 200,
+            "latencyMs": 20045,
+            "content": "```json\n[\n  {\n    \"target\": \"réserver\",\n    \"lang\": \"fr\",\n    \"meaning\": \"预订\",\n    \"example\": \"Je voudrais réserver une chambre pour deux nuits.\",\n    \"level\": \"B1\",\n    \"reason\": \"高频动词\"\n  },\n  {\n    \"target\": \"station de métro\",\n    \"lang\": \"fr\",\n    \"meaning\": \"地铁站\",\n    \"example\": \"Où est la station de métro la plus proche ?\",\n    \"level\": \"A2\",\n    \"reason\": \"常用名词短语\"\n  },\n  {\n    \"target\": \"passeport\",\n    \"lang\": \"fr\",\n    \"meaning\": \"护照\",\n    \"example\": \"J'ai perdu mon passeport et je dois aller à l'aéroport.\",\n    \"level\": \"B1\",\n    \"reason\": \"重要名词\"\n  }\n]\n```",
+            "model": "glm-4-flash-250414",
+            "degraded": true,
+            "memoryApplied": false,
+            "apiVersion": "pickup-memory-v1"
+          },
+          "array": [
+            {
+              "target": "réserver",
+              "lang": "fr",
+              "meaning": "预订",
+              "example": "Je voudrais réserver une chambre pour deux nuits.",
+              "level": "B1",
+              "reason": "高频动词"
+            },
+            {
+              "target": "station de métro",
+              "lang": "fr",
+              "meaning": "地铁站",
+              "example": "Où est la station de métro la plus proche ?",
+              "level": "A2",
+              "reason": "常用名词短语"
+            },
+            {
+              "target": "passeport",
+              "lang": "fr",
+              "meaning": "护照",
+              "example": "J'ai perdu mon passeport et je dois aller à l'aéroport.",
+              "level": "B1",
+              "reason": "重要名词"
+            }
+          ],
+          "validLength": true,
+          "validSchema": true,
+          "expectedHits": [
+            "réserver une chambre",
+            "station de métro",
+            "perdu mon passeport",
+            "aller à l'aéroport"
+          ],
+          "prohibitedHits": [],
+          "targetGrounded": 3,
+          "exampleGrounded": 3,
+          "relevancePass": true,
+          "automaticPass": true
+        }
+      ]
+    }
+  }
+}

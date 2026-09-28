@@ -1,0 +1,35 @@
+{"id":"route-empty-01","language":"en","answer":"","gold":"empty","card":{"target":"clarify","level":"B1","grammar":["请求澄清"]}}
+{"id":"route-empty-02","language":"fr","answer":"   ","gold":"empty","card":{"target":"savez","level":"A1","grammar":["直陈式现在时"]}}
+{"id":"route-typo-en-01","language":"en","answer":"clarfy","gold":"typo","card":{"target":"clarify","level":"B1","grammar":["请求澄清"]}}
+{"id":"route-typo-en-02","language":"en","answer":"clairfy","gold":"typo","card":{"target":"clarify","level":"B1","grammar":["请求澄清"]}}
+{"id":"route-typo-en-03","language":"en","answer":"prioritze","gold":"typo","card":{"target":"prioritize","level":"B2","grammar":["动词"]}}
+{"id":"route-typo-en-04","language":"en","answer":"updatee","gold":"typo","card":{"target":"update","level":"B1","grammar":["名词"]}}
+{"id":"route-typo-en-05","language":"en","answer":"scpe","gold":"typo","card":{"target":"scope","level":"B2","grammar":["名词"]}}
+{"id":"route-typo-en-06","language":"en","answer":"feedbak","gold":"typo","card":{"target":"feedback","level":"B1","grammar":["不可数名词"]}}
+{"id":"route-typo-en-07","language":"en","answer":"revie","gold":"typo","card":{"target":"review","level":"B1","grammar":["职场动词"]}}
+{"id":"route-typo-en-08","language":"en","answer":"followup","gold":"typo","card":{"target":"follow up","level":"B1","grammar":["短语动词"]}}
+{"id":"route-typo-fr-01","language":"fr","answer":"reserve","gold":"typo","card":{"target":"réservé","level":"A2","grammar":["复合过去时","过去分词"]}}
+{"id":"route-typo-fr-02","language":"fr","answer":"Ou","gold":"typo","card":{"target":"Où","level":"A1","grammar":["疑问词"]}}
+{"id":"route-typo-fr-03","language":"fr","answer":"save","gold":"typo","card":{"target":"savez","level":"A1","grammar":["直陈式现在时"]}}
+{"id":"route-typo-fr-04","language":"fr","answer":"voudrai","gold":"typo","card":{"target":"voudrais","level":"A1","grammar":["条件式现在时"]}}
+{"id":"route-semantic-en-01","language":"en","answer":"explain","gold":"semantic","card":{"target":"clarify","level":"B1","grammar":["请求澄清"]}}
+{"id":"route-semantic-en-02","language":"en","answer":"agree","gold":"semantic","card":{"target":"align","level":"B2","grammar":["职场搭配","align on"]}}
+{"id":"route-semantic-en-03","language":"en","answer":"plan","gold":"semantic","card":{"target":"prioritize","level":"B2","grammar":["动词"]}}
+{"id":"route-semantic-en-04","language":"en","answer":"report","gold":"semantic","card":{"target":"update","level":"B1","grammar":["名词"]}}
+{"id":"route-semantic-en-05","language":"en","answer":"comment","gold":"semantic","card":{"target":"feedback","level":"B1","grammar":["不可数名词"]}}
+{"id":"route-semantic-en-06","language":"en","answer":"look","gold":"semantic","card":{"target":"review","level":"B1","grammar":["职场动词"]}}
+{"id":"route-semantic-en-07","language":"en","answer":"make clear","gold":"semantic","card":{"target":"clarify","level":"B1","grammar":["请求澄清"]}}
+{"id":"route-semantic-fr-01","language":"fr","answer":"connaissez","gold":"semantic","card":{"target":"savez","level":"A1","grammar":["直陈式现在时"]}}
+{"id":"route-semantic-fr-02","language":"fr","answer":"voulez","gold":"semantic","card":{"target":"pouvez","level":"A1","grammar":["倒装疑问句"]}}
+{"id":"route-semantic-fr-03","language":"fr","answer":"prend","gold":"semantic","card":{"target":"prends","level":"A1","grammar":["直陈式现在时"]}}
+{"id":"route-complex-en-01","language":"en","answer":"synthesise","gold":"complex","card":{"target":"align","level":"B2","grammar":["职场搭配","align on"]}}
+{"id":"route-complex-en-02","language":"en","answer":"triage","gold":"complex","card":{"target":"prioritize","level":"B2","grammar":["动词"]}}
+{"id":"route-complex-fr-01","language":"fr","answer":"réserverons","gold":"complex","card":{"target":"réservé","level":"A2","grammar":["复合过去时","过去分词"]}}
+{"id":"route-semantic-fr-04","language":"fr","answer":"viendrais","gold":"semantic","card":{"target":"viens","level":"A2","grammar":["最近过去时","venir de + infinitif"]}}
+{"id":"route-complex-fr-02","language":"fr","answer":"finaliserions","gold":"complex","card":{"target":"voudrais","level":"A2","grammar":["条件式现在时","礼貌表达"]}}
+{"id":"route-other-en-01","language":"en","answer":"qwerty","gold":"other","card":{"target":"clarify","level":"B1","grammar":["请求澄清"]}}
+{"id":"route-other-en-02","language":"en","answer":"zzzzzz","gold":"other","card":{"target":"align","level":"B2","grammar":["职场搭配"]}}
+{"id":"route-other-en-03","language":"en","answer":"foo bar","gold":"other","card":{"target":"review","level":"B1","grammar":["职场动词"]}}
+{"id":"route-other-fr-01","language":"fr","answer":"1234","gold":"other","card":{"target":"savez","level":"A1","grammar":["直陈式现在时"]}}
+{"id":"route-other-fr-02","language":"fr","answer":"bonjour!!!","gold":"other","card":{"target":"pouvez","level":"A1","grammar":["倒装疑问句"]}}
+{"id":"route-other-fr-03","language":"fr","answer":"zzzz xxxx","gold":"other","card":{"target":"réservé","level":"A2","grammar":["复合过去时"]}}

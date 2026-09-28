@@ -1,0 +1,18 @@
+{
+  "reviewer": "产品负责人逐例复核（非语言学专家盲评）",
+  "method": "逐例检查是否解释用户答案与目标答案的差异、是否忠于词书事实、是否给出包含目标答案的可用例句",
+  "cases": {
+    "explain-en-clarify": { "pass": true, "reason": "准确区分 explain 的泛化解释与 clarify 的消除歧义，例句包含目标词。" },
+    "explain-en-align": { "pass": true, "reason": "承认 agree 可表达同意，并说明 align on 更强调统一优先级认知。" },
+    "explain-en-prioritize": { "pass": true, "reason": "准确区分一般排序与优先级处理，例句可迁移。" },
+    "explain-en-update": { "pass": true, "reason": "承认 report 可以成立，同时说明 send an update 在简短进展场景更自然。" },
+    "explain-en-scope": { "pass": true, "reason": "准确说明 project scope 的固定搭配与工作边界含义。" },
+    "explain-en-feedback": { "pass": true, "reason": "承认 comment 可以使用，并准确说明 feedback 更覆盖整体修改建议；未出现可数性错误。" },
+    "explain-en-follow-up": { "pass": true, "reason": "准确区分一般联系与持续跟进，例句包含 follow up with。" },
+    "explain-en-review": { "pass": true, "reason": "准确说明 review 在职场审阅文件场景比 look 更精准正式。" },
+    "explain-fr-savoir": { "pass": true, "reason": "人称、直陈式现在时及 savoir + 不定式均与词书事实一致。" },
+    "explain-fr-pouvoir": { "pass": true, "reason": "Pouvez-vous 倒装、连字符与人称信息均正确。" },
+    "explain-fr-vouloir": { "pass": true, "reason": "准确解释 voudrais 的条件式和礼貌语用。" },
+    "explain-fr-prendre": { "pass": true, "reason": "准确解释 avoir + pris 及不规则过去分词。" }
+  }
+}
