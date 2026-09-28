@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://jialecai0308.github.io/shide-pickup/sitemap.xml
+Sitemap: https://lingograb-dpf7t83661vq.edgeone.dev/sitemap.xml

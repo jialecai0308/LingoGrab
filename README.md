@@ -2,7 +2,7 @@
 
 > 把读过的东西，变成记得住的东西。
 
-**在线 Demo** 👉 https://jialecai0308.github.io/shide-pickup/
+**在线 Demo** 👉 https://lingograb-dpf7t83661vq.edgeone.dev/
 
 这是一个以职场人持续学习为核心、兼顾日常与旅行场景的英法语言学习 MVP（数据为演示用）。它把「结构化课程 → 情境填空 → 错题解析 → 个人拾取 → 间隔复习」做成一条可以持续体验的闭环。
 
