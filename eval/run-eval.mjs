@@ -72,9 +72,7 @@ function percentile(values, p) {
 
 function currentCodeVersion() {
   try {
-    const hash = execFileSync('git', ['rev-parse', '--short', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim()
-    const dirty = execFileSync('git', ['status', '--porcelain'], { cwd: root, encoding: 'utf8' }).trim()
-    return `${hash}${dirty ? '+working-tree' : ''}`
+    return execFileSync('git', ['rev-parse', '--short', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim()
   } catch {
     return 'unknown'
   }
