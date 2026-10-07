@@ -62,7 +62,7 @@ const staticChecks = [
   ['首次体验缩短', html.includes('直接练 3 道题') && html.includes('从示例材料拾取')],
   ['反馈点赞点踩', html.includes('data-reaction="like"') && html.includes('data-reaction="dislike"') && html.includes("accountPost('/feedback'")],
   ['匿名产品埋点', html.includes("e:'lg_visit'") && html.includes("e:'lg_session_complete'") && !html.includes('userAnswer:val')],
-  ['LingoGrab 产品看板', adminHtml.includes('LingoGrab 产品看板') && adminHtml.includes('/lingograb-analytics') && adminHtml.includes('/lingograb-feedback-list')],
+  ['LingoGrab 产品看板', adminHtml.includes('LingoGrab 产品看板') && adminHtml.includes('/lingograb-analytics') && adminHtml.includes('data.feedback?.items')],
 ]
 for (const [name, pass] of staticChecks) check('产品闭环', name, pass, pass ? '存在对应实现' : '缺少实现')
 
@@ -172,9 +172,9 @@ try {
     ],
     judgments: [{ level: 'info', title: '样本量较小', detail: '当前数据只能作为方向性线索。' }],
     trend: [{ day: '2026-10-08', visits: 10, studyStarts: 6, completes: 4, cards: 12, likes: 2, dislikes: 1 }],
+    feedback: { items: [{ createdAt: '2026-10-08T08:00:00.000Z', content: '学习反馈：没帮助', meta: { rating: 'dislike', area: 'answer_feedback', cardId: 'en-clarify', answerResult: 'wrong' } }] },
   }
   await adminPage.route('**/api/lingograb-analytics', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(analyticsFixture) }))
-  await adminPage.route('**/api/lingograb-feedback-list', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, items: [{ createdAt: '2026-10-08T08:00:00.000Z', content: '学习反馈：没帮助', meta: { rating: 'dislike', area: 'answer_feedback', cardId: 'en-clarify', answerResult: 'wrong' } }] }) }))
   await adminPage.goto(`http://127.0.0.1:${port}/admin.html`, { waitUntil: 'networkidle' })
   await adminPage.locator('#key').fill('test-key')
   await adminPage.locator('#load').click()
