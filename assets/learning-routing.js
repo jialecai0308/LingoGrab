@@ -74,6 +74,28 @@
     return !!route && ['semantic', 'complex'].includes(route.kind)
   }
 
+  function gradeAnswer(value, card) {
+    const answer = norm(value)
+    const target = norm(card && card.target)
+    if (!answer) return { kind: 'empty', correct: false, answer, target }
+    if (answer === target) return { kind: 'target', correct: true, answer, target }
+    const accepted = Array.isArray(card && card.acceptedAnswers)
+      ? card.acceptedAnswers.map(norm).filter(Boolean)
+      : []
+    if (accepted.includes(answer)) return { kind: 'acceptable', correct: true, answer, target }
+    return { kind: 'wrong', correct: false, answer, target }
+  }
+
+  function nextReview({ previousInterval = 0, correct = false, firstTry = false, today = new Date() } = {}) {
+    const base = new Date(today)
+    base.setHours(12, 0, 0, 0)
+    const current = Math.max(0, Number(previousInterval) || 0)
+    const interval = !correct ? 1 : firstTry ? ([1, 3, 7, 14, 30, 60].find(days => days > current) || 90) : 1
+    base.setDate(base.getDate() + interval)
+    const due = `${base.getFullYear()}-${String(base.getMonth() + 1).padStart(2, '0')}-${String(base.getDate()).padStart(2, '0')}`
+    return { interval, due }
+  }
+
   root.LingoGrabRouting = {
     norm,
     withoutMarks,
@@ -82,5 +104,7 @@
     looksLikeNoise,
     classifyMistake,
     shouldAutoExplain,
+    gradeAnswer,
+    nextReview,
   }
 })(typeof globalThis !== 'undefined' ? globalThis : window)

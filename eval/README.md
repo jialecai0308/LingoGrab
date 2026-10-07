@@ -5,6 +5,7 @@
 1. `routing.jsonl`：本地规则是否把输入分到拼写、相似词、复杂题或其他错误，并据此正确决定是否自动调用 AI。
 2. `explanations.jsonl`：真实线上接口是否围绕题目、用户错误答案和词书事实生成有效讲解。
 3. `extraction.jsonl`：从合成的会议、邮件和旅行材料中推荐表达时，格式、相关性、原文溯源和隐私边界是否通过。
+4. `run-product-experience.mjs`：多答案公平性、复习排期、首次体验、个人拾取闭环、完成页和移动端关键路径是否可用。
 
 运行纯本地分流评测：
 
@@ -27,3 +28,18 @@ node eval/run-eval.mjs --live
 ```bash
 node eval/run-eval.mjs --rescore eval/reports/lingograb-eval-YYYY-MM-DD.json --review eval/reviews/human-review.json
 ```
+
+运行产品闭环评测：
+
+```bash
+NODE_PATH=/path/to/node_modules node eval/run-product-experience.mjs
+```
+
+该脚本会启动临时本地服务器和无头浏览器，验证两步新手引导、可接受答案、三题完成页、学习记录、复习日期、个人拾取立即练习和 390 像素移动端视口。报告固定写入：
+
+- `eval/reports/lingograb-product-optimization-evaluation.md`
+- `eval/reports/lingograb-product-optimization-evaluation.json`
+
+## 评测如何自评
+
+每份产品闭环报告同时写明评测能说明什么和不能说明什么。当前自动化可以证明关键实现与浏览器旅程符合预期，但不能证明 D1 / D7 留存、长期记忆效果、语言事实的专家一致性或真实设备兼容性。上线答辩时应分别表述自动规则结果、浏览器旅程结果、AI 判官结果、人工复核结果和真实用户指标，不能把它们合并成一个“准确率”。
