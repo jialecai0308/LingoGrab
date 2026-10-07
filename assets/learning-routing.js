@@ -99,7 +99,7 @@
   const EVENT_PROPERTY_KEYS = new Set([
     'language', 'path', 'source', 'result', 'retry', 'answerKind', 'mistakeKind',
     'cardKey', 'interval', 'due', 'total', 'firstTryCorrect', 'retried', 'scheduledReviews', 'delayedRecallRate', 'count',
-    'textLengthBucket', 'mode', 'sessionId',
+    'textLengthBucket', 'mode', 'sessionId', 'rating', 'area', 'screen',
   ])
 
   function eventId(prefix = 'event', now = new Date()) {

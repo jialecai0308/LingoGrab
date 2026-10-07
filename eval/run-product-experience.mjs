@@ -50,6 +50,7 @@ for (const [name, input, interval, due] of scheduleCases) {
 }
 
 const html = await fs.readFile(path.join(root, 'index.html'), 'utf8')
+const adminHtml = await fs.readFile(path.join(root, 'admin.html'), 'utf8')
 const staticChecks = [
   ['真实连续天数', html.includes('id="streakCount"') && html.includes('function streak()')],
   ['每日完成页', html.includes('session-complete') && html.includes('这轮练习完成了')],
@@ -59,6 +60,9 @@ const staticChecks = [
   ['学习数据导出', html.includes('id="exportBtn"') && html.includes('lingograb-learning-data.json')],
   ['词书数量口径', html.includes('可练习卡') && !html.includes('${d.size.toLocaleString(\'en-US\')} WORDS')],
   ['首次体验缩短', html.includes('直接练 3 道题') && html.includes('从示例材料拾取')],
+  ['反馈点赞点踩', html.includes('data-reaction="like"') && html.includes('data-reaction="dislike"') && html.includes("accountPost('/feedback'")],
+  ['匿名产品埋点', html.includes("e:'lg_visit'") && html.includes("e:'lg_session_complete'") && !html.includes('userAnswer:val')],
+  ['LingoGrab 产品看板', adminHtml.includes('LingoGrab 产品看板') && adminHtml.includes('/lingograb-analytics') && adminHtml.includes('/lingograb-feedback-list')],
 ]
 for (const [name, pass] of staticChecks) check('产品闭环', name, pass, pass ? '存在对应实现' : '缺少实现')
 
@@ -91,6 +95,7 @@ let browser
 try {
   browser = await chromium.launch({ headless: true })
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } })
+  await page.route('**/api/track', route => route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' }))
   const pageErrors = []
   page.on('pageerror', error => pageErrors.push(String(error)))
   await page.goto(`http://127.0.0.1:${port}`, { waitUntil: 'networkidle' })
@@ -107,7 +112,7 @@ try {
     await page.locator('#answer').fill(answer)
     await page.locator('#checkBtn').click()
     const feedback = await page.locator('#feedback h3').innerText()
-    check('浏览器旅程', `可接受答案 ${answer}`, feedback.includes('这个答案也成立'), feedback)
+    check('浏览器旅程', `可接受答案 ${answer}`, feedback.includes('也可以这样说'), feedback)
     await page.locator('#nextBtn').click()
   }
   check('浏览器旅程', '完成三题进入总结页', await page.locator('.session-complete').isVisible(), await page.locator('.session-complete').innerText())
@@ -124,6 +129,8 @@ try {
   check('浏览器旅程', '页面无运行时错误', pageErrors.length === 0, pageErrors.join(' | '))
 
   const retryPage = await browser.newPage({ viewport: { width: 1280, height: 900 } })
+  await retryPage.route('**/api/track', route => route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' }))
+  await retryPage.route('**/api/feedback', route => route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true,"id":"feedback-test"}' }))
   await retryPage.goto(`http://127.0.0.1:${port}`, { waitUntil: 'networkidle' })
   await retryPage.evaluate(() => localStorage.clear())
   await retryPage.reload({ waitUntil: 'networkidle' })
@@ -131,13 +138,53 @@ try {
   await retryPage.locator('#guideQuickPractice').click()
   await retryPage.locator('#answer').fill('banana')
   await retryPage.locator('#checkBtn').click()
-  check('浏览器旅程', '真正错误必须重输', !(await retryPage.locator('#nextBtn').count()) && (await retryPage.locator('#checkBtn').innerText()) === '重新检查', await retryPage.locator('#feedback h3').innerText())
+  const retryFeedback = await retryPage.locator('#feedback').innerText()
+  check('浏览器旅程', '真正错误必须重输', !(await retryPage.locator('#nextBtn').count()) && (await retryPage.locator('#checkBtn').innerText()) === '提交答案', await retryPage.locator('#feedback h3').innerText())
+  check('浏览器旅程', '错误反馈先给答案和动作', (await retryPage.locator('#feedback h3').innerText()) === '正确答案是 clarify' && retryFeedback.includes('输入 clarify，再提交一次'), retryFeedback)
+  check('浏览器旅程', '学习页不暴露系统分层', !/语义相似分析|词书缓存|实时 AI|本地判断/.test(retryFeedback), retryFeedback)
+  check('浏览器旅程', '更多解释默认收起', !(await retryPage.locator('.feedback-details').getAttribute('open')) && !(await retryPage.locator('#aiExplainBtn').isVisible()), '详细解释和 AI 入口未抢占主流程')
+  await retryPage.locator('[data-reaction="like"]').click()
+  await retryPage.locator('#reactionStatus').waitFor({ state: 'visible' })
+  await retryPage.waitForFunction(() => document.querySelector('#reactionStatus')?.textContent === '已收到，谢谢')
+  check('浏览器旅程', '点赞反馈成功上传', (await retryPage.locator('#reactionStatus').innerText()) === '已收到，谢谢', await retryPage.locator('#reactionStatus').innerText())
   await retryPage.locator('#answer').fill('clarify')
   await retryPage.locator('#checkBtn').click()
   const retryState = await retryPage.evaluate(() => JSON.parse(localStorage.getItem('pickup-mvp-state')))
   check('浏览器旅程', '重输通过记录为待巩固', Object.values(retryState.studyRecords)[0].lastResult === 'retried' && retryState.wrong.includes('en-clarify'), JSON.stringify(retryState.studyRecords))
 
+  await retryPage.locator('.side-nav [data-screen="settings"]').click()
+  check('设置页', '默认只显示三个核心区域', await retryPage.getByText('每天学多少', { exact: true }).isVisible() && await retryPage.getByText('账号同步', { exact: true }).isVisible() && await retryPage.getByText('学习概览', { exact: true }).isVisible(), '每日学习量、账号同步、学习概览')
+  check('设置页', '高级功能默认收起', (await retryPage.locator('.settings-details[open], .tech-details[open]').count()) === 0, '更多设置、帮助和技术说明均默认收起')
+
+  const adminPage = await browser.newPage({ viewport: { width: 1280, height: 900 } })
+  const analyticsFixture = {
+    ok: true,
+    range: { from: '2026-10-01', to: '2026-10-08' },
+    dataHealth: { sampleStatus: 'small' },
+    overview: { visits: 10, returningRate: 20, studyStarts: 6, sessionCompletes: 4, completionRate: 66.7, cardsCompleted: 12, activationRate: 40 },
+    quality: { firstTryRate: 75, firstTry: 9, delayedRecallRate: null, delayedSamples: 0, retryRate: 25, retried: 3, wrong: 2, submitted: 14 },
+    content: { pickupSuccessRate: 50, pickupExtracts: 4, pickupPracticeRate: 50, pickupPractices: 1 },
+    sentiment: { likeRate: 66.7, ratings: 3, dislikes: 1, writtenFeedback: 1 },
+    funnel: [
+      { label: '访问', count: 10, rateFromPrevious: null },
+      { label: '开始学习', count: 6, rateFromPrevious: 60 },
+      { label: '完成学习轮次', count: 4, rateFromPrevious: 66.7 },
+    ],
+    judgments: [{ level: 'info', title: '样本量较小', detail: '当前数据只能作为方向性线索。' }],
+    trend: [{ day: '2026-10-08', visits: 10, studyStarts: 6, completes: 4, cards: 12, likes: 2, dislikes: 1 }],
+  }
+  await adminPage.route('**/api/lingograb-analytics', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(analyticsFixture) }))
+  await adminPage.route('**/api/lingograb-feedback-list', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, items: [{ createdAt: '2026-10-08T08:00:00.000Z', content: '学习反馈：没帮助', meta: { rating: 'dislike', area: 'answer_feedback', cardId: 'en-clarify', answerResult: 'wrong' } }] }) }))
+  await adminPage.goto(`http://127.0.0.1:${port}/admin.html`, { waitUntil: 'networkidle' })
+  await adminPage.locator('#key').fill('test-key')
+  await adminPage.locator('#load').click()
+  await adminPage.waitForFunction(() => document.querySelector('#stamp')?.textContent.includes('小样本'))
+  check('产品看板', '核心指标和事件漏斗可读', (await adminPage.locator('#overview').innerText()).includes('10') && (await adminPage.locator('#funnel').innerText()).includes('完成学习轮次'), await adminPage.locator('#funnel').innerText())
+  check('产品看板', '小样本判断明确标注', (await adminPage.locator('#judgments').innerText()).includes('样本量较小') && (await adminPage.locator('#stamp').innerText()).includes('小样本'), await adminPage.locator('#judgments').innerText())
+  check('产品看板', '点踩明细可定位到学习卡', (await adminPage.locator('#feedback').innerText()).includes('en-clarify') && (await adminPage.locator('#feedback').innerText()).includes('没帮助'), await adminPage.locator('#feedback').innerText())
+
   const mobile = await browser.newPage({ viewport: { width: 390, height: 844 } })
+  await mobile.route('**/api/track', route => route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' }))
   await mobile.goto(`http://127.0.0.1:${port}`, { waitUntil: 'networkidle' })
   await mobile.evaluate(() => localStorage.clear())
   await mobile.reload({ waitUntil: 'networkidle' })

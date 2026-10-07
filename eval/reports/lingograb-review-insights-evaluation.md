@@ -1,6 +1,6 @@
 # LingoGrab 复习解释层评测报告
 
-生成时间：2026-10-07T15:01:02.643Z
+生成时间：2026-10-07T19:00:12.707Z
 
 ## 结论
 
@@ -43,7 +43,7 @@
 | 设置页显示真实延迟回忆率 | 通过 | 67% |
 | 完成页区分两次到期复习 | 通过 | 2,100%,2,100% |
 | 到期复习首次正确显示 100% | 通过 | 2,100%,2,100% |
-| 完成事件保留到期复习口径 | 通过 | {"id":"event-1791385261482-6y4tqt6","name":"session_complete","timestamp":"2026-10-07T15:01:01.482Z","schemaVersion":1,"properties":{"sessionId":"session-1791385260966-rnmf4","total":2,"firstTryCorrect":2,"retried":0,"scheduledReviews":2,"delayedRecallRate":100,"source":"study"}} |
+| 完成事件保留到期复习口径 | 通过 | {"id":"event-1791399611056-9rv11zp","name":"session_complete","timestamp":"2026-10-07T19:00:11.056Z","schemaVersion":1,"properties":{"sessionId":"session-1791399610244-rzs6s","total":2,"firstTryCorrect":2,"retried":0,"scheduledReviews":2,"delayedRecallRate":100,"source":"study"}} |
 | 页面无运行时错误 | 通过 |  |
 
 ## 移动端

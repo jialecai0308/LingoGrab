@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-07T15:01:16.293Z",
+  "generatedAt": "2026-10-07T19:00:07.936Z",
   "summary": {
     "passed": 25,
     "total": 25,
@@ -54,7 +54,7 @@
       "group": "隐私与数据结构",
       "name": "复习事件可回放",
       "pass": true,
-      "evidence": "{\"id\":\"review-1791363600000-whqimfp\",\"cardKey\":\"deck:en-b1:en-clarify\",\"reviewedAt\":\"2026-10-07T09:00:00.000Z\",\"result\":\"acceptable\",\"firstTry\":true,\"previousInterval\":1,\"scheduledInterval\":3,\"due\":\"2026-10-10\",\"source\":\"deck\",\"sessionId\":\"session-test\",\"schemaVersion\":1}"
+      "evidence": "{\"id\":\"review-1791363600000-nl5z3su\",\"cardKey\":\"deck:en-b1:en-clarify\",\"reviewedAt\":\"2026-10-07T09:00:00.000Z\",\"result\":\"acceptable\",\"firstTry\":true,\"previousInterval\":1,\"scheduledInterval\":3,\"due\":\"2026-10-10\",\"source\":\"deck\",\"sessionId\":\"session-test\",\"schemaVersion\":1}"
     },
     {
       "group": "隐私与数据结构",
@@ -126,13 +126,13 @@
       "group": "浏览器证据链",
       "name": "可接受答案保留分类但不保留答案文本",
       "pass": true,
-      "evidence": "[{\"id\":\"review-1791385274202-6adtsmn\",\"cardKey\":\"deck:en-b1:en-clarify\",\"reviewedAt\":\"2026-10-07T15:01:14.202Z\",\"result\":\"acceptable\",\"firstTry\":true,\"previousInterval\":0,\"scheduledInterval\":1,\"due\":\"2026-10-08\",\"source\":\"deck\",\"sessionId\":\"session-1791385273819-ztf3a\",\"schemaVersion\":1},{\"id\":\"review-1791385274283-j25kxcz\",\"cardKey\":\"deck:en-b1:en-update\",\"reviewedAt\":\"2026-10-07T15:01:14.283Z\",\"result\":\"acceptable\",\"firstTry\":true,\"previousInterval\":0,\"scheduledInterval\":1,\"due\":\"2026-10-08\",\"source\":\"deck\",\"sessionId\":\"session-1791385273819-ztf3a\",\"schemaVersion\":1},{\"id\":\"review-1791385274350-37ru08v\",\"cardKey\":\"deck:en-b1:en-feedback\",\"reviewedAt\":\"2026-10-07T15:01:14.350Z\",\"result\":\"acceptable\",\"firstTry\":true,\"previousInterval\":0,\"scheduledInterval\":1,\"due\":\"2026-10-08\",\"source\":\"deck\",\"sessionId\":\"session-1791385273819-ztf3a\",\"schemaVersion\":1}]"
+      "evidence": "[{\"id\":\"review-1791399604312-l2dfbf6\",\"cardKey\":\"deck:en-b1:en-clarify\",\"reviewedAt\":\"2026-10-07T19:00:04.312Z\",\"result\":\"acceptable\",\"firstTry\":true,\"previousInterval\":0,\"scheduledInterval\":1,\"due\":\"2026-10-09\",\"source\":\"deck\",\"sessionId\":\"session-1791399603914-plnga\",\"schemaVersion\":1},{\"id\":\"review-1791399604607-r55ryfr\",\"cardKey\":\"deck:en-b1:en-update\",\"reviewedAt\":\"2026-10-07T19:00:04.607Z\",\"result\":\"acceptable\",\"firstTry\":true,\"previousInterval\":0,\"scheduledInterval\":1,\"due\":\"2026-10-09\",\"source\":\"deck\",\"sessionId\":\"session-1791399603914-plnga\",\"schemaVersion\":1},{\"id\":\"review-1791399605113-vq2ws1c\",\"cardKey\":\"deck:en-b1:en-feedback\",\"reviewedAt\":\"2026-10-07T19:00:05.113Z\",\"result\":\"acceptable\",\"firstTry\":true,\"previousInterval\":0,\"scheduledInterval\":1,\"due\":\"2026-10-09\",\"source\":\"deck\",\"sessionId\":\"session-1791399603914-plnga\",\"schemaVersion\":1}]"
     },
     {
       "group": "浏览器证据链",
       "name": "新手路径与完成事件写入日志",
       "pass": true,
-      "evidence": "onboarding_complete, study_submit, study_submit, study_submit, session_complete"
+      "evidence": "study_start, screen_view, onboarding_complete, study_submit, study_submit, study_submit, session_complete"
     },
     {
       "group": "浏览器证据链",
@@ -168,7 +168,7 @@
       "group": "浏览器证据链",
       "name": "一次错误与重输形成两条历史",
       "pass": true,
-      "evidence": "[{\"id\":\"review-1791385276017-gzmfsdf\",\"cardKey\":\"deck:en-b1:en-clarify\",\"reviewedAt\":\"2026-10-07T15:01:16.017Z\",\"result\":\"wrong\",\"firstTry\":false,\"previousInterval\":0,\"scheduledInterval\":0,\"due\":\"\",\"source\":\"deck\",\"sessionId\":\"session-1791385275634-jkdtq\",\"schemaVersion\":1},{\"id\":\"review-1791385276265-0azhjs6\",\"cardKey\":\"deck:en-b1:en-clarify\",\"reviewedAt\":\"2026-10-07T15:01:16.265Z\",\"result\":\"retried\",\"firstTry\":false,\"previousInterval\":0,\"scheduledInterval\":1,\"due\":\"2026-10-08\",\"source\":\"deck\",\"sessionId\":\"session-1791385275634-jkdtq\",\"schemaVersion\":1}]"
+      "evidence": "[{\"id\":\"review-1791399607652-57ltd4w\",\"cardKey\":\"deck:en-b1:en-clarify\",\"reviewedAt\":\"2026-10-07T19:00:07.652Z\",\"result\":\"wrong\",\"firstTry\":false,\"previousInterval\":0,\"scheduledInterval\":0,\"due\":\"\",\"source\":\"deck\",\"sessionId\":\"session-1791399607270-4rucm\",\"schemaVersion\":1},{\"id\":\"review-1791399607896-soy9yob\",\"cardKey\":\"deck:en-b1:en-clarify\",\"reviewedAt\":\"2026-10-07T19:00:07.896Z\",\"result\":\"retried\",\"firstTry\":false,\"previousInterval\":0,\"scheduledInterval\":1,\"due\":\"2026-10-09\",\"source\":\"deck\",\"sessionId\":\"session-1791399607270-4rucm\",\"schemaVersion\":1}]"
     },
     {
       "group": "浏览器证据链",

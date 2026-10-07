@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-07T15:01:02.643Z",
+  "generatedAt": "2026-10-07T19:00:12.707Z",
   "summary": {
     "passed": 21,
     "total": 21,
@@ -140,7 +140,7 @@
       "group": "浏览器旅程",
       "name": "完成事件保留到期复习口径",
       "pass": true,
-      "evidence": "{\"id\":\"event-1791385261482-6y4tqt6\",\"name\":\"session_complete\",\"timestamp\":\"2026-10-07T15:01:01.482Z\",\"schemaVersion\":1,\"properties\":{\"sessionId\":\"session-1791385260966-rnmf4\",\"total\":2,\"firstTryCorrect\":2,\"retried\":0,\"scheduledReviews\":2,\"delayedRecallRate\":100,\"source\":\"study\"}}"
+      "evidence": "{\"id\":\"event-1791399611056-9rv11zp\",\"name\":\"session_complete\",\"timestamp\":\"2026-10-07T19:00:11.056Z\",\"schemaVersion\":1,\"properties\":{\"sessionId\":\"session-1791399610244-rzs6s\",\"total\":2,\"firstTryCorrect\":2,\"retried\":0,\"scheduledReviews\":2,\"delayedRecallRate\":100,\"source\":\"study\"}}"
     },
     {
       "group": "浏览器旅程",

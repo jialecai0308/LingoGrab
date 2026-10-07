@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-10-07T15:01:17.603Z",
+  "generatedAt": "2026-10-07T19:00:01.450Z",
   "summary": {
-    "passed": 39,
-    "total": 39,
+    "passed": 51,
+    "total": 51,
     "failed": 0
   },
   "groups": {
@@ -15,12 +15,20 @@
       "total": 5
     },
     "产品闭环": {
-      "passed": 8,
-      "total": 8
+      "passed": 11,
+      "total": 11
     },
     "浏览器旅程": {
-      "passed": 13,
-      "total": 13
+      "passed": 17,
+      "total": 17
+    },
+    "设置页": {
+      "passed": 2,
+      "total": 2
+    },
+    "产品看板": {
+      "passed": 3,
+      "total": 3
     },
     "移动端": {
       "passed": 2,
@@ -173,6 +181,24 @@
       "evidence": "存在对应实现"
     },
     {
+      "group": "产品闭环",
+      "name": "反馈点赞点踩",
+      "pass": true,
+      "evidence": "存在对应实现"
+    },
+    {
+      "group": "产品闭环",
+      "name": "匿名产品埋点",
+      "pass": true,
+      "evidence": "存在对应实现"
+    },
+    {
+      "group": "产品闭环",
+      "name": "LingoGrab 产品看板",
+      "pass": true,
+      "evidence": "存在对应实现"
+    },
+    {
       "group": "浏览器旅程",
       "name": "首次进入先选语言",
       "pass": true,
@@ -194,19 +220,19 @@
       "group": "浏览器旅程",
       "name": "可接受答案 explain",
       "pass": true,
-      "evidence": "这个答案也成立 · explain"
+      "evidence": "也可以这样说：explain"
     },
     {
       "group": "浏览器旅程",
       "name": "可接受答案 report",
       "pass": true,
-      "evidence": "这个答案也成立 · report"
+      "evidence": "也可以这样说：report"
     },
     {
       "group": "浏览器旅程",
       "name": "可接受答案 comment",
       "pass": true,
-      "evidence": "这个答案也成立 · comment"
+      "evidence": "也可以这样说：comment"
     },
     {
       "group": "浏览器旅程",
@@ -224,7 +250,7 @@
       "group": "浏览器旅程",
       "name": "三题均生成下次复习日期",
       "pass": true,
-      "evidence": "{\"deck:en-b1:en-clarify\":{\"interval\":1,\"due\":\"2026-10-08\",\"lastReviewed\":\"2026-10-07\",\"lastResult\":\"first_try\"},\"deck:en-b1:en-update\":{\"interval\":1,\"due\":\"2026-10-08\",\"lastReviewed\":\"2026-10-07\",\"lastResult\":\"first_try\"},\"deck:en-b1:en-feedback\":{\"interval\":1,\"due\":\"2026-10-08\",\"lastReviewed\":\"2026-10-07\",\"lastResult\":\"first_try\"}}"
+      "evidence": "{\"deck:en-b1:en-clarify\":{\"interval\":1,\"due\":\"2026-10-09\",\"lastReviewed\":\"2026-10-08\",\"lastResult\":\"first_try\"},\"deck:en-b1:en-update\":{\"interval\":1,\"due\":\"2026-10-09\",\"lastReviewed\":\"2026-10-08\",\"lastResult\":\"first_try\"},\"deck:en-b1:en-feedback\":{\"interval\":1,\"due\":\"2026-10-09\",\"lastReviewed\":\"2026-10-08\",\"lastResult\":\"first_try\"}}"
     },
     {
       "group": "浏览器旅程",
@@ -242,13 +268,67 @@
       "group": "浏览器旅程",
       "name": "真正错误必须重输",
       "pass": true,
-      "evidence": "这次没答对 · clarify"
+      "evidence": "正确答案是 clarify"
+    },
+    {
+      "group": "浏览器旅程",
+      "name": "错误反馈先给答案和动作",
+      "pass": true,
+      "evidence": "正确答案是 clarify\n\n你写的是 banana。clarify 和 explain 在这里都成立；clarify 更强调消除目标或要求中的歧义，词书重点练习这个职场意图。\n\n输入 clarify，再提交一次。\n\n这条反馈有帮助吗？\n👍\n👎\n想看更多解释"
+    },
+    {
+      "group": "浏览器旅程",
+      "name": "学习页不暴露系统分层",
+      "pass": true,
+      "evidence": "正确答案是 clarify\n\n你写的是 banana。clarify 和 explain 在这里都成立；clarify 更强调消除目标或要求中的歧义，词书重点练习这个职场意图。\n\n输入 clarify，再提交一次。\n\n这条反馈有帮助吗？\n👍\n👎\n想看更多解释"
+    },
+    {
+      "group": "浏览器旅程",
+      "name": "更多解释默认收起",
+      "pass": true,
+      "evidence": "详细解释和 AI 入口未抢占主流程"
+    },
+    {
+      "group": "浏览器旅程",
+      "name": "点赞反馈成功上传",
+      "pass": true,
+      "evidence": "已收到，谢谢"
     },
     {
       "group": "浏览器旅程",
       "name": "重输通过记录为待巩固",
       "pass": true,
-      "evidence": "{\"deck:en-b1:en-clarify\":{\"interval\":1,\"due\":\"2026-10-08\",\"lastReviewed\":\"2026-10-07\",\"lastResult\":\"retried\"}}"
+      "evidence": "{\"deck:en-b1:en-clarify\":{\"interval\":1,\"due\":\"2026-10-09\",\"lastReviewed\":\"2026-10-08\",\"lastResult\":\"retried\"}}"
+    },
+    {
+      "group": "设置页",
+      "name": "默认只显示三个核心区域",
+      "pass": true,
+      "evidence": "每日学习量、账号同步、学习概览"
+    },
+    {
+      "group": "设置页",
+      "name": "高级功能默认收起",
+      "pass": true,
+      "evidence": "更多设置、帮助和技术说明均默认收起"
+    },
+    {
+      "group": "产品看板",
+      "name": "核心指标和事件漏斗可读",
+      "pass": true,
+      "evidence": "访问\n10\n开始学习\n6 · 60.0%\n完成学习轮次\n4 · 66.7%"
+    },
+    {
+      "group": "产品看板",
+      "name": "小样本判断明确标注",
+      "pass": true,
+      "evidence": "样本量较小\n\n当前数据只能作为方向性线索。"
+    },
+    {
+      "group": "产品看板",
+      "name": "点踩明细可定位到学习卡",
+      "pass": true,
+      "evidence": "2026/10/8 16:00:00\t👎 没帮助\t学习反馈：没帮助\tanswer_feedback\ten-clarify\twrong"
     },
     {
       "group": "移动端",
