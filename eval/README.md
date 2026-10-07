@@ -6,6 +6,7 @@
 2. `explanations.jsonl`：真实线上接口是否围绕题目、用户错误答案和词书事实生成有效讲解。
 3. `extraction.jsonl`：从合成的会议、邮件和旅行材料中推荐表达时，格式、相关性、原文溯源和隐私边界是否通过。
 4. `run-product-experience.mjs`：多答案公平性、复习排期、首次体验、个人拾取闭环、完成页和移动端关键路径是否可用。
+5. `run-learning-evidence.mjs`：逐次复习历史、事件隐私白名单、跨设备去重、研究数据包和用户学习指标是否形成完整证据链。
 
 运行纯本地分流评测：
 
@@ -39,6 +40,17 @@ NODE_PATH=/path/to/node_modules node eval/run-product-experience.mjs
 
 - `eval/reports/lingograb-product-optimization-evaluation.md`
 - `eval/reports/lingograb-product-optimization-evaluation.json`
+
+运行学习证据底座评测：
+
+```bash
+NODE_PATH=/path/to/node_modules node eval/run-learning-evidence.mjs
+```
+
+该脚本会主动注入原始答案、导入文本和联系方式，检查这些字段不会进入事件日志；同时在真实浏览器中验证错误后重输会形成两条可回放历史、研究包不含作答内容、设置页指标正确且移动端无横向溢出。报告固定写入：
+
+- `eval/reports/lingograb-learning-evidence-evaluation.md`
+- `eval/reports/lingograb-learning-evidence-evaluation.json`
 
 ## 评测如何自评
 

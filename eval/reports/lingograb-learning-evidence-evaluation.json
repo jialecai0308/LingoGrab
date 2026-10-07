@@ -1,0 +1,200 @@
+{
+  "generatedAt": "2026-10-07T09:24:33.405Z",
+  "summary": {
+    "passed": 25,
+    "total": 25,
+    "failed": 0
+  },
+  "groups": {
+    "隐私与数据结构": {
+      "passed": 5,
+      "total": 5
+    },
+    "同步与容量": {
+      "passed": 2,
+      "total": 2
+    },
+    "学习指标": {
+      "passed": 3,
+      "total": 3
+    },
+    "静态实现": {
+      "passed": 4,
+      "total": 4
+    },
+    "浏览器证据链": {
+      "passed": 10,
+      "total": 10
+    },
+    "移动端": {
+      "passed": 1,
+      "total": 1
+    }
+  },
+  "checks": [
+    {
+      "group": "隐私与数据结构",
+      "name": "事件白名单过滤原始答案",
+      "pass": true,
+      "evidence": "{\"language\":\"en\",\"result\":\"wrong\"}"
+    },
+    {
+      "group": "隐私与数据结构",
+      "name": "事件白名单过滤导入原文",
+      "pass": true,
+      "evidence": "{\"language\":\"en\",\"result\":\"wrong\"}"
+    },
+    {
+      "group": "隐私与数据结构",
+      "name": "事件白名单过滤联系方式",
+      "pass": true,
+      "evidence": "{\"language\":\"en\",\"result\":\"wrong\"}"
+    },
+    {
+      "group": "隐私与数据结构",
+      "name": "复习事件可回放",
+      "pass": true,
+      "evidence": "{\"id\":\"review-1791363600000-1zwz2qn\",\"cardKey\":\"deck:en-b1:en-clarify\",\"reviewedAt\":\"2026-10-07T09:00:00.000Z\",\"result\":\"acceptable\",\"firstTry\":true,\"previousInterval\":1,\"scheduledInterval\":3,\"due\":\"2026-10-10\",\"source\":\"deck\",\"sessionId\":\"session-test\",\"schemaVersion\":1}"
+    },
+    {
+      "group": "隐私与数据结构",
+      "name": "复习事件不含输入文本字段",
+      "pass": true,
+      "evidence": "id, cardKey, reviewedAt, result, firstTry, previousInterval, scheduledInterval, due, source, sessionId, schemaVersion"
+    },
+    {
+      "group": "同步与容量",
+      "name": "跨设备合并按事件 ID 去重",
+      "pass": true,
+      "evidence": "[{\"id\":\"b\",\"timestamp\":\"2026-10-07T03:00:00Z\"},{\"id\":\"c\",\"timestamp\":\"2026-10-07T04:00:00Z\"}]"
+    },
+    {
+      "group": "同步与容量",
+      "name": "事件列表遵守容量上限",
+      "pass": true,
+      "evidence": "[{\"id\":\"b\",\"timestamp\":\"2026-10-07T03:00:00Z\"},{\"id\":\"c\",\"timestamp\":\"2026-10-07T04:00:00Z\"}]"
+    },
+    {
+      "group": "学习指标",
+      "name": "完成数不把错误尝试算作完成",
+      "pass": true,
+      "evidence": "{\"attempts\":4,\"completed\":3,\"firstTry\":2,\"firstTryRate\":67,\"retried\":1,\"acceptable\":1,\"wrongAttempts\":1}"
+    },
+    {
+      "group": "学习指标",
+      "name": "首次答对率按完成表达计算",
+      "pass": true,
+      "evidence": "{\"attempts\":4,\"completed\":3,\"firstTry\":2,\"firstTryRate\":67,\"retried\":1,\"acceptable\":1,\"wrongAttempts\":1}"
+    },
+    {
+      "group": "学习指标",
+      "name": "重输与可接受答案分开统计",
+      "pass": true,
+      "evidence": "{\"attempts\":4,\"completed\":3,\"firstTry\":2,\"firstTryRate\":67,\"retried\":1,\"acceptable\":1,\"wrongAttempts\":1}"
+    },
+    {
+      "group": "静态实现",
+      "name": "本地状态包含逐次复习历史",
+      "pass": true,
+      "evidence": "reviewHistory + createReviewEvent"
+    },
+    {
+      "group": "静态实现",
+      "name": "云端合并保留两端事件",
+      "pass": true,
+      "evidence": "按 ID 合并，最多 5000 条"
+    },
+    {
+      "group": "静态实现",
+      "name": "研究导出声明隐私边界",
+      "pass": true,
+      "evidence": "三个敏感字段均声明不包含"
+    },
+    {
+      "group": "静态实现",
+      "name": "设置页展示用户自己的指标",
+      "pass": true,
+      "evidence": "四项学习指标"
+    },
+    {
+      "group": "浏览器证据链",
+      "name": "三次完成均写入逐次历史",
+      "pass": true,
+      "evidence": "3 条"
+    },
+    {
+      "group": "浏览器证据链",
+      "name": "可接受答案保留分类但不保留答案文本",
+      "pass": true,
+      "evidence": "[{\"id\":\"review-1791365071621-t6q1fcc\",\"cardKey\":\"deck:en-b1:en-clarify\",\"reviewedAt\":\"2026-10-07T09:24:31.621Z\",\"result\":\"acceptable\",\"firstTry\":true,\"previousInterval\":0,\"scheduledInterval\":1,\"due\":\"2026-10-08\",\"source\":\"deck\",\"sessionId\":\"session-1791365071233-0fc9l\",\"schemaVersion\":1},{\"id\":\"review-1791365071712-7gah4qd\",\"cardKey\":\"deck:en-b1:en-update\",\"reviewedAt\":\"2026-10-07T09:24:31.712Z\",\"result\":\"acceptable\",\"firstTry\":true,\"previousInterval\":0,\"scheduledInterval\":1,\"due\":\"2026-10-08\",\"source\":\"deck\",\"sessionId\":\"session-1791365071233-0fc9l\",\"schemaVersion\":1},{\"id\":\"review-1791365071779-nttqmjn\",\"cardKey\":\"deck:en-b1:en-feedback\",\"reviewedAt\":\"2026-10-07T09:24:31.779Z\",\"result\":\"acceptable\",\"firstTry\":true,\"previousInterval\":0,\"scheduledInterval\":1,\"due\":\"2026-10-08\",\"source\":\"deck\",\"sessionId\":\"session-1791365071233-0fc9l\",\"schemaVersion\":1}]"
+    },
+    {
+      "group": "浏览器证据链",
+      "name": "新手路径与完成事件写入日志",
+      "pass": true,
+      "evidence": "onboarding_complete, study_submit, study_submit, study_submit, session_complete"
+    },
+    {
+      "group": "浏览器证据链",
+      "name": "设置页展示完成数",
+      "pass": true,
+      "evidence": "3"
+    },
+    {
+      "group": "浏览器证据链",
+      "name": "设置页展示首次答对率",
+      "pass": true,
+      "evidence": "100%"
+    },
+    {
+      "group": "浏览器证据链",
+      "name": "研究包给出机器可读隐私声明",
+      "pass": true,
+      "evidence": "{\"containsRawAnswers\":false,\"containsImportedMaterial\":false,\"containsContact\":false}"
+    },
+    {
+      "group": "浏览器证据链",
+      "name": "研究包不含原始作答内容",
+      "pass": true,
+      "evidence": "未发现三个测试答案"
+    },
+    {
+      "group": "浏览器证据链",
+      "name": "页面无运行时错误",
+      "pass": true,
+      "evidence": ""
+    },
+    {
+      "group": "浏览器证据链",
+      "name": "一次错误与重输形成两条历史",
+      "pass": true,
+      "evidence": "[{\"id\":\"review-1791365073114-086y2z5\",\"cardKey\":\"deck:en-b1:en-clarify\",\"reviewedAt\":\"2026-10-07T09:24:33.114Z\",\"result\":\"wrong\",\"firstTry\":false,\"previousInterval\":0,\"scheduledInterval\":0,\"due\":\"\",\"source\":\"deck\",\"sessionId\":\"session-1791365073085-i72ew\",\"schemaVersion\":1},{\"id\":\"review-1791365073379-zs3mm2v\",\"cardKey\":\"deck:en-b1:en-clarify\",\"reviewedAt\":\"2026-10-07T09:24:33.379Z\",\"result\":\"retried\",\"firstTry\":false,\"previousInterval\":0,\"scheduledInterval\":1,\"due\":\"2026-10-08\",\"source\":\"deck\",\"sessionId\":\"session-1791365073085-i72ew\",\"schemaVersion\":1}]"
+    },
+    {
+      "group": "浏览器证据链",
+      "name": "历史记录未泄露错误答案",
+      "pass": true,
+      "evidence": "未发现 banana"
+    },
+    {
+      "group": "移动端",
+      "name": "新增学习记录无横向溢出",
+      "pass": true,
+      "evidence": "390/390"
+    }
+  ],
+  "evaluationAudit": {
+    "strengths": [
+      "规则级检查、浏览器旅程和导出对象检查覆盖了从用户作答到研究数据包的完整证据链。",
+      "测试明确注入原始答案、导入文本和联系方式，验证白名单会排除这些字段。",
+      "错误后重输的两次尝试分别留存，为未来离线回放和 FSRS 参数实验保留信息。"
+    ],
+    "blindSpots": [
+      "本地事件可被用户修改，不能作为审计级或反作弊数据。",
+      "这套评测证明数据结构可用，不证明 D1/D7 留存、长期记忆提升或因果效果。",
+      "当前没有服务端 cohort 看板；研究数据包仍需要用户自愿导出和分享。",
+      "时间戳依赖设备时钟，跨时区与错误系统时间需要在真实研究中单独处理。"
+    ],
+    "decision": "证据底座可以上线收集自愿研究样本，但不得把自动评测表述为真实留存或学习效果。"
+  }
+}

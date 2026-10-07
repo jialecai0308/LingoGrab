@@ -96,6 +96,74 @@
     return { interval, due }
   }
 
+  const EVENT_PROPERTY_KEYS = new Set([
+    'language', 'path', 'source', 'result', 'retry', 'answerKind', 'mistakeKind',
+    'cardKey', 'interval', 'due', 'total', 'firstTryCorrect', 'retried', 'count',
+    'textLengthBucket', 'mode', 'sessionId',
+  ])
+
+  function eventId(prefix = 'event', now = new Date()) {
+    const random = Math.random().toString(36).slice(2, 9)
+    return `${prefix}-${now.getTime()}-${random}`
+  }
+
+  function sanitizeEventProperties(properties = {}) {
+    return Object.fromEntries(Object.entries(properties)
+      .filter(([key, value]) => EVENT_PROPERTY_KEYS.has(key) && ['string', 'number', 'boolean'].includes(typeof value))
+      .map(([key, value]) => [key, typeof value === 'string' ? value.slice(0, 120) : value]))
+  }
+
+  function createLearningEvent(name, properties = {}, now = new Date()) {
+    return {
+      id: eventId('event', now),
+      name: String(name || 'unknown').slice(0, 60),
+      timestamp: now.toISOString(),
+      schemaVersion: 1,
+      properties: sanitizeEventProperties(properties),
+    }
+  }
+
+  function createReviewEvent({ cardKey, result, firstTry, previousInterval = 0, scheduledInterval = 0, due = '', source = 'deck', sessionId = '' } = {}, now = new Date()) {
+    return {
+      id: eventId('review', now),
+      cardKey: String(cardKey || '').slice(0, 160),
+      reviewedAt: now.toISOString(),
+      result: ['target', 'acceptable', 'wrong', 'empty', 'retried'].includes(result) ? result : 'wrong',
+      firstTry: Boolean(firstTry),
+      previousInterval: Math.max(0, Number(previousInterval) || 0),
+      scheduledInterval: Math.max(0, Number(scheduledInterval) || 0),
+      due: /^\d{4}-\d{2}-\d{2}$/.test(due) ? due : '',
+      source: source === 'picked' ? 'picked' : 'deck',
+      sessionId: String(sessionId || '').slice(0, 120),
+      schemaVersion: 1,
+    }
+  }
+
+  function appendCappedUnique(existing = [], incoming = [], limit = 1000) {
+    const byId = new Map()
+    for (const item of [...existing, ...incoming]) {
+      if (item && item.id) byId.set(item.id, item)
+    }
+    return [...byId.values()]
+      .sort((a, b) => String(a.timestamp || a.reviewedAt || '').localeCompare(String(b.timestamp || b.reviewedAt || '')))
+      .slice(-Math.max(1, Number(limit) || 1))
+  }
+
+  function summarizeReviewHistory(history = []) {
+    const rows = Array.isArray(history) ? history : []
+    const completed = rows.filter(item => ['target', 'acceptable', 'retried'].includes(item.result))
+    const firstTry = completed.filter(item => item.firstTry).length
+    return {
+      attempts: rows.length,
+      completed: completed.length,
+      firstTry,
+      firstTryRate: completed.length ? Math.round(firstTry / completed.length * 100) : 0,
+      retried: completed.filter(item => item.result === 'retried').length,
+      acceptable: completed.filter(item => item.result === 'acceptable').length,
+      wrongAttempts: rows.filter(item => ['wrong', 'empty'].includes(item.result)).length,
+    }
+  }
+
   root.LingoGrabRouting = {
     norm,
     withoutMarks,
@@ -106,5 +174,10 @@
     shouldAutoExplain,
     gradeAnswer,
     nextReview,
+    sanitizeEventProperties,
+    createLearningEvent,
+    createReviewEvent,
+    appendCappedUnique,
+    summarizeReviewHistory,
   }
 })(typeof globalThis !== 'undefined' ? globalThis : window)
