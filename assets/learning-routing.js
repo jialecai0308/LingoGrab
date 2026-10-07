@@ -98,7 +98,7 @@
 
   const EVENT_PROPERTY_KEYS = new Set([
     'language', 'path', 'source', 'result', 'retry', 'answerKind', 'mistakeKind',
-    'cardKey', 'interval', 'due', 'total', 'firstTryCorrect', 'retried', 'count',
+    'cardKey', 'interval', 'due', 'total', 'firstTryCorrect', 'retried', 'scheduledReviews', 'delayedRecallRate', 'count',
     'textLengthBucket', 'mode', 'sessionId',
   ])
 
@@ -153,6 +153,13 @@
     const rows = Array.isArray(history) ? history : []
     const completed = rows.filter(item => ['target', 'acceptable', 'retried'].includes(item.result))
     const firstTry = completed.filter(item => item.firstTry).length
+    const delayed = completed.filter(item => (Number(item.previousInterval) || 0) > 0)
+    const delayedFirstTry = delayed.filter(item => item.firstTry).length
+    const completionsByCard = new Map()
+    for (const item of completed) {
+      if (!item.cardKey) continue
+      completionsByCard.set(item.cardKey, (completionsByCard.get(item.cardKey) || 0) + 1)
+    }
     return {
       attempts: rows.length,
       completed: completed.length,
@@ -161,7 +168,32 @@
       retried: completed.filter(item => item.result === 'retried').length,
       acceptable: completed.filter(item => item.result === 'acceptable').length,
       wrongAttempts: rows.filter(item => ['wrong', 'empty'].includes(item.result)).length,
+      delayedReviews: delayed.length,
+      delayedFirstTry,
+      delayedRecallRate: delayed.length ? Math.round(delayedFirstTry / delayed.length * 100) : null,
+      repeatCards: [...completionsByCard.values()].filter(count => count >= 2).length,
     }
+  }
+
+  function upcomingReviewSchedule(studyRecords = {}, today = new Date(), days = 7) {
+    const length = Math.max(1, Math.min(31, Number(days) || 7))
+    const start = new Date(today)
+    start.setHours(12, 0, 0, 0)
+    const dateKey = date => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+    const rows = Array.from({ length }, (_, offset) => {
+      const date = new Date(start)
+      date.setDate(start.getDate() + offset)
+      return { date: dateKey(date), offset, count: 0 }
+    })
+    for (const record of Object.values(studyRecords && typeof studyRecords === 'object' ? studyRecords : {})) {
+      if (!record || !/^\d{4}-\d{2}-\d{2}$/.test(record.due || '')) continue
+      const dueDate = new Date(`${record.due}T12:00:00`)
+      if (Number.isNaN(dueDate.getTime())) continue
+      const offset = Math.round((dueDate.getTime() - start.getTime()) / 86400000)
+      if (offset < 0) rows[0].count += 1
+      else if (offset < rows.length) rows[offset].count += 1
+    }
+    return rows
   }
 
   root.LingoGrabRouting = {
@@ -179,5 +211,6 @@
     createReviewEvent,
     appendCappedUnique,
     summarizeReviewHistory,
+    upcomingReviewSchedule,
   }
 })(typeof globalThis !== 'undefined' ? globalThis : window)

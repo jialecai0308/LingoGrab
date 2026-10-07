@@ -7,6 +7,7 @@
 3. `extraction.jsonl`：从合成的会议、邮件和旅行材料中推荐表达时，格式、相关性、原文溯源和隐私边界是否通过。
 4. `run-product-experience.mjs`：多答案公平性、复习排期、首次体验、个人拾取闭环、完成页和移动端关键路径是否可用。
 5. `run-learning-evidence.mjs`：逐次复习历史、事件隐私白名单、跨设备去重、研究数据包和用户学习指标是否形成完整证据链。
+6. `run-review-insights.mjs`：未来 7 天排期、逾期合并、延迟回忆口径、完成页解释和移动端布局是否一致。
 
 运行纯本地分流评测：
 
@@ -52,6 +53,17 @@ NODE_PATH=/path/to/node_modules node eval/run-learning-evidence.mjs
 - `eval/reports/lingograb-learning-evidence-evaluation.md`
 - `eval/reports/lingograb-learning-evidence-evaluation.json`
 
+运行复习解释层评测：
+
+```bash
+NODE_PATH=/path/to/node_modules node eval/run-review-insights.mjs
+```
+
+该脚本固定日期验证 7 天排期边界，并在浏览器注入包含逾期、今日、未来和窗口外记录的学习状态，检查日历、延迟回忆、完成页和事件口径一致。报告固定写入：
+
+- `eval/reports/lingograb-review-insights-evaluation.md`
+- `eval/reports/lingograb-review-insights-evaluation.json`
+
 ## 评测如何自评
 
-每份产品闭环报告同时写明评测能说明什么和不能说明什么。当前自动化可以证明关键实现与浏览器旅程符合预期，但不能证明 D1 / D7 留存、长期记忆效果、语言事实的专家一致性或真实设备兼容性。上线答辩时应分别表述自动规则结果、浏览器旅程结果、AI 判官结果、人工复核结果和真实用户指标，不能把它们合并成一个“准确率”。
+每份产品闭环报告同时写明评测能说明什么和不能说明什么。当前自动化可以证明关键实现与浏览器旅程符合预期，但不能证明 D1 / D7 留存、长期记忆效果、语言事实的专家一致性或真实设备兼容性。7 天日历只是当前排期，不是记忆概率预测；延迟回忆率是本机样本描述，不是因果结论。上线答辩时应分别表述自动规则结果、浏览器旅程结果、AI 判官结果、人工复核结果和真实用户指标，不能把它们合并成一个“准确率”。
