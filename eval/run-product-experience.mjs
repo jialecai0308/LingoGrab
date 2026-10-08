@@ -62,7 +62,9 @@ const staticChecks = [
   ['首次体验缩短', html.includes('直接练 3 道题') && html.includes('从示例材料拾取')],
   ['反馈点赞点踩', html.includes('data-reaction="like"') && html.includes('data-reaction="dislike"') && html.includes("accountPost('/feedback'")],
   ['匿名产品埋点', html.includes("e:'lg_visit'") && html.includes("e:'lg_session_complete'") && !html.includes('userAnswer:val')],
-  ['LingoGrab 产品看板', adminHtml.includes('LingoGrab 产品看板') && adminHtml.includes('/lingograb-analytics') && adminHtml.includes('data.feedback?.items') && adminHtml.includes('demoData')],
+  ['LingoGrab 用户运营看板', adminHtml.includes('LingoGrab 用户运营看板') && adminHtml.includes('/lingograb-analytics') && adminHtml.includes('feedbackItems') && adminHtml.includes('demoData')],
+  ['看板不混入学习质量', adminHtml.includes('UV') && adminHtml.includes('访问来源') && adminHtml.includes('稳定性') && !adminHtml.includes('一次答对率') && !adminHtml.includes('延迟回忆表现')],
+  ['产品内学习质量', html.includes('我的学习质量')],
   ['三条内容路线导航', html.includes('data-screen="library"') && html.includes('data-screen="smart"') && html.includes('data-screen="import"')],
   ['点赞点踩默认弱化', html.includes('class="reaction-details"') && html.includes('<summary>反馈这段解释</summary>')],
 ]
@@ -156,7 +158,7 @@ try {
   check('浏览器旅程', '重输通过记录为待巩固', Object.values(retryState.studyRecords)[0].lastResult === 'retried' && retryState.wrong.includes('en-clarify'), JSON.stringify(retryState.studyRecords))
 
   await retryPage.locator('.side-nav [data-screen="settings"]').click()
-  check('设置页', '默认只显示三个核心区域', await retryPage.getByText('每天学多少', { exact: true }).isVisible() && await retryPage.getByText('账号同步', { exact: true }).isVisible() && await retryPage.getByText('学习概览', { exact: true }).isVisible(), '每日学习量、账号同步、学习概览')
+  check('设置页', '默认只显示三个核心区域', await retryPage.getByText('每天学多少', { exact: true }).isVisible() && await retryPage.getByText('账号同步', { exact: true }).isVisible() && await retryPage.getByText('我的学习质量', { exact: true }).isVisible(), '每日学习量、账号同步、我的学习质量')
   check('设置页', '高级功能默认收起', (await retryPage.locator('.settings-details[open], .tech-details[open]').count()) === 0, '更多设置、帮助和技术说明均默认收起')
 
   await retryPage.locator('.side-nav [data-screen="smart"]').click()
@@ -169,30 +171,37 @@ try {
   const analyticsFixture = {
     ok: true,
     range: { from: '2026-10-01', to: '2026-10-08' },
-    dataHealth: { sampleStatus: 'small' },
-    overview: { visits: 10, returningRate: 20, studyStarts: 6, sessionCompletes: 4, completionRate: 66.7, cardsCompleted: 12, activationRate: 40 },
-    quality: { firstTryRate: 75, firstTry: 9, delayedRecallRate: null, delayedSamples: 0, retryRate: 25, retried: 3, wrong: 2, submitted: 14 },
-    content: { pickupSuccessRate: 50, pickupExtracts: 4, pickupPracticeRate: 50, pickupPractices: 1 },
-    sentiment: { likeRate: 66.7, ratings: 3, dislikes: 1, writtenFeedback: 1 },
-    funnel: [
-      { label: '访问', count: 10, rateFromPrevious: null },
-      { label: '开始学习', count: 6, rateFromPrevious: 60 },
-      { label: '完成学习轮次', count: 4, rateFromPrevious: 66.7 },
-    ],
-    judgments: [{ level: 'info', title: '样本量较小', detail: '当前数据只能作为方向性线索。' }],
-    trend: [{ day: '2026-10-08', visits: 10, studyStarts: 6, completes: 4, cards: 12, likes: 2, dislikes: 1 }],
+    dataHealth: { sampleStatus: 'small', strictFunnel: true },
+    overview: { uv: 11, uvHumans: 10, uvPeople: 9, loggedInAccounts: 2, pv: 28, sessions: 12, newVisitorsHumans: 7, avgDwellSec: 93, avgDwellSecHumans: 101, avgPvPerVisitor: 2.5, avgPvPerVisitorHumans: 2.8, bounceRatePct: 40, bounceRatePctHumans: 30, errors: 1, errorRatePer100Sessions: 8.3 },
+    funnelByMode: Object.fromEntries(['all', 'humans', 'people'].map(mode => [mode, [
+      { label: '访问产品', count: mode === 'all' ? 11 : mode === 'humans' ? 10 : 9, rateFromVisit: 100 },
+      { label: '浏览内容路线', count: 8, rateFromVisit: 80 },
+      { label: '开始学习', count: 6, rateFromVisit: 60 },
+      { label: '完成一轮', count: 4, rateFromVisit: 40 },
+    ]])),
+    views: [{ view: 'today', pv: 12, dwellSec: 720, avgDwellSec: 60 }],
+    sources: [{ label: 'direct', count: 8 }, { label: 'google.com', count: 4 }],
+    campaigns: [{ label: 'portfolio', count: 3 }],
+    devices: [{ label: 'desktop', count: 8 }, { label: 'mobile', count: 4 }],
+    geo: [{ label: 'CN', count: 12 }], errors: [{ label: 'ai_request', count: 1 }],
+    performance: [{ metric: 'page_load', avgMs: 980, samples: 10 }],
+    feedbackSummary: { likes: 2, dislikes: 1, writtenFeedback: 1, likeRate: 66.7, ratings: 3 },
+    retention: { avgD1Pct: 20 },
+    judgments: [{ level: 'info', title: '样本量较小', detail: '当前数据只能作为方向性线索。', evidence: '真人 UV 为 10。', confidence: '低', validationPlan: '累计至少 30 个真人 UV。' }],
+    trend: [{ day: '2026-10-08', uvHumans: 10, pv: 28, sessions: 12, avgDwellSec: 101, studyStarts: 6, completes: 4, errors: 1 }],
     feedback: { items: [{ createdAt: '2026-10-08T08:00:00.000Z', content: '学习反馈：没帮助', meta: { rating: 'dislike', area: 'answer_feedback', cardId: 'en-clarify', answerResult: 'wrong' } }] },
   }
   await adminPage.route('**/api/lingograb-analytics', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(analyticsFixture) }))
   await adminPage.goto(`http://127.0.0.1:${port}/admin.html`, { waitUntil: 'networkidle' })
-  check('产品看板', '未填 Key 展示完整演示数据', (await adminPage.locator('#mode').innerText()) === '演示数据' && (await adminPage.locator('#overview').innerText()).includes('86') && (await adminPage.locator('#feedback').innerText()).includes('演示反馈'), await adminPage.locator('#notice').innerText())
+  check('用户运营看板', '未填 Key 展示完整演示数据', (await adminPage.locator('#mode').innerText()) === '演示数据' && (await adminPage.locator('#overview').innerText()).includes('126') && (await adminPage.locator('#sources').innerText()).includes('直接访问') && (await adminPage.locator('#feedback').innerText()).includes('演示反馈'), await adminPage.locator('#notice').innerText())
   await adminPage.locator('#key').fill('test-key')
   await adminPage.locator('#load').click()
   await adminPage.waitForFunction(() => document.querySelector('#stamp')?.textContent.includes('小样本'))
-  check('产品看板', '有效 Key 切换为真实数据', (await adminPage.locator('#mode').innerText()) === '真实数据' && (await adminPage.locator('#notice').innerText()).includes('真实埋点'), await adminPage.locator('#notice').innerText())
-  check('产品看板', '核心指标和事件漏斗可读', (await adminPage.locator('#overview').innerText()).includes('10') && (await adminPage.locator('#funnel').innerText()).includes('完成学习轮次'), await adminPage.locator('#funnel').innerText())
-  check('产品看板', '小样本判断明确标注', (await adminPage.locator('#judgments').innerText()).includes('样本量较小') && (await adminPage.locator('#stamp').innerText()).includes('小样本'), await adminPage.locator('#judgments').innerText())
-  check('产品看板', '点踩明细可定位到学习卡', (await adminPage.locator('#feedback').innerText()).includes('en-clarify') && (await adminPage.locator('#feedback').innerText()).includes('没帮助'), await adminPage.locator('#feedback').innerText())
+  check('用户运营看板', '有效 Key 切换为真实数据', (await adminPage.locator('#mode').innerText()) === '真实数据' && (await adminPage.locator('#notice').innerText()).includes('真实用户'), await adminPage.locator('#notice').innerText())
+  check('用户运营看板', 'UV、来源、停留和去重漏斗可读', (await adminPage.locator('#overview').innerText()).includes('10') && (await adminPage.locator('#sources').innerText()).includes('google.com') && (await adminPage.locator('#views').innerText()).includes('1 分') && (await adminPage.locator('#funnel').innerText()).includes('完成一轮'), await adminPage.locator('#funnel').innerText())
+  check('用户运营看板', '错误率与性能数据可读', (await adminPage.locator('#overview').innerText()).includes('每百会话错误') && (await adminPage.locator('#reliability').innerText()).includes('980 ms'), await adminPage.locator('#reliability').innerText())
+  check('用户运营看板', '小样本判断有证据和验证方案', (await adminPage.locator('#judgments').innerText()).includes('样本量较小') && (await adminPage.locator('#judgments').innerText()).includes('证据') && (await adminPage.locator('#judgments').innerText()).includes('验证'), await adminPage.locator('#judgments').innerText())
+  check('用户运营看板', '点踩明细可定位到学习卡', (await adminPage.locator('#feedback').innerText()).includes('en-clarify') && (await adminPage.locator('#feedback').innerText()).includes('没帮助'), await adminPage.locator('#feedback').innerText())
 
   const mobile = await browser.newPage({ viewport: { width: 390, height: 844 } })
   await mobile.route('**/api/track', route => route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' }))

@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-10-08T08:03:38.874Z",
+  "generatedAt": "2026-10-08T08:55:41.971Z",
   "summary": {
-    "passed": 57,
-    "total": 57,
+    "passed": 60,
+    "total": 60,
     "failed": 0
   },
   "groups": {
@@ -15,8 +15,8 @@
       "total": 5
     },
     "产品闭环": {
-      "passed": 13,
-      "total": 13
+      "passed": 15,
+      "total": 15
     },
     "浏览器旅程": {
       "passed": 17,
@@ -30,9 +30,9 @@
       "passed": 2,
       "total": 2
     },
-    "产品看板": {
-      "passed": 5,
-      "total": 5
+    "用户运营看板": {
+      "passed": 6,
+      "total": 6
     },
     "移动端": {
       "passed": 2,
@@ -198,7 +198,19 @@
     },
     {
       "group": "产品闭环",
-      "name": "LingoGrab 产品看板",
+      "name": "LingoGrab 用户运营看板",
+      "pass": true,
+      "evidence": "存在对应实现"
+    },
+    {
+      "group": "产品闭环",
+      "name": "看板不混入学习质量",
+      "pass": true,
+      "evidence": "存在对应实现"
+    },
+    {
+      "group": "产品闭环",
+      "name": "产品内学习质量",
       "pass": true,
       "evidence": "存在对应实现"
     },
@@ -320,7 +332,7 @@
       "group": "设置页",
       "name": "默认只显示三个核心区域",
       "pass": true,
-      "evidence": "每日学习量、账号同步、学习概览"
+      "evidence": "每日学习量、账号同步、我的学习质量"
     },
     {
       "group": "设置页",
@@ -341,34 +353,40 @@
       "evidence": "不上传，直接找表达"
     },
     {
-      "group": "产品看板",
+      "group": "用户运营看板",
       "name": "未填 Key 展示完整演示数据",
       "pass": true,
-      "evidence": "当前为演示数据，用来预览指标和漏斗；填写有效 Key 后切换为真实数据。"
+      "evidence": "当前是演示数据；填写有效 Key 后整页切换为真实数据。"
     },
     {
-      "group": "产品看板",
+      "group": "用户运营看板",
       "name": "有效 Key 切换为真实数据",
       "pass": true,
-      "evidence": "已通过管理员 Key 加载真实埋点与反馈。"
+      "evidence": "已加载真实用户与产品数据。"
     },
     {
-      "group": "产品看板",
-      "name": "核心指标和事件漏斗可读",
+      "group": "用户运营看板",
+      "name": "UV、来源、停留和去重漏斗可读",
       "pass": true,
-      "evidence": "访问\n10\n开始学习\n6 · 60.0%\n完成学习轮次\n4 · 66.7%"
+      "evidence": "访问产品\n10 · 总转化 100.0%\n浏览内容路线\n8 · 总转化 80.0%\n开始学习\n6 · 总转化 60.0%\n完成一轮\n4 · 总转化 40.0%"
     },
     {
-      "group": "产品看板",
-      "name": "小样本判断明确标注",
+      "group": "用户运营看板",
+      "name": "错误率与性能数据可读",
       "pass": true,
-      "evidence": "样本量较小置信度 未标注\n\n当前数据只能作为方向性线索。\n\n证据\n暂无\n验证\n继续观察"
+      "evidence": "错误 · ai_request\t1 次\t—\n性能 · page_load\t980 ms\t10 次"
     },
     {
-      "group": "产品看板",
+      "group": "用户运营看板",
+      "name": "小样本判断有证据和验证方案",
+      "pass": true,
+      "evidence": "样本量较小置信度 低\n\n当前数据只能作为方向性线索。\n\n证据\n真人 UV 为 10。\n验证\n累计至少 30 个真人 UV。"
+    },
+    {
+      "group": "用户运营看板",
       "name": "点踩明细可定位到学习卡",
       "pass": true,
-      "evidence": "2026/10/8 16:00:00\t👎 没帮助\t学习反馈：没帮助\tanswer_feedback\ten-clarify\twrong"
+      "evidence": "2026/10/8 16:00:00\t👎 没帮助\t学习反馈：没帮助\tanswer_feedback\ten-clarify"
     },
     {
       "group": "移动端",
