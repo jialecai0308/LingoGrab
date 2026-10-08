@@ -1,0 +1,11 @@
+{
+  "name": "lingograb-evaluation",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "fsrs:shadow": "node run-fsrs-shadow.mjs"
+  },
+  "dependencies": {
+    "ts-fsrs": "5.4.2"
+  }
+}

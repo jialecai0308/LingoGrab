@@ -1,6 +1,6 @@
 # LingoGrab 学习证据底座评测报告
 
-生成时间：2026-10-07T19:00:07.936Z
+生成时间：2026-10-08T08:03:42.136Z
 
 ## 结论
 
@@ -13,7 +13,7 @@
 | 事件白名单过滤原始答案 | 通过 | {"language":"en","result":"wrong"} |
 | 事件白名单过滤导入原文 | 通过 | {"language":"en","result":"wrong"} |
 | 事件白名单过滤联系方式 | 通过 | {"language":"en","result":"wrong"} |
-| 复习事件可回放 | 通过 | {"id":"review-1791363600000-nl5z3su","cardKey":"deck:en-b1:en-clarify","reviewedAt":"2026-10-07T09:00:00.000Z","result":"acceptable","firstTry":true,"previousInterval":1,"scheduledInterval":3,"due":"2026-10-10","source":"deck","sessionId":"session-test","schemaVersion":1} |
+| 复习事件可回放 | 通过 | {"id":"review-1791363600000-ad9ndm3","cardKey":"deck:en-b1:en-clarify","reviewedAt":"2026-10-07T09:00:00.000Z","result":"acceptable","firstTry":true,"previousInterval":1,"scheduledInterval":3,"due":"2026-10-10","source":"deck","sessionId":"session-test","schemaVersion":1} |
 | 复习事件不含输入文本字段 | 通过 | id, cardKey, reviewedAt, result, firstTry, previousInterval, scheduledInterval, due, source, sessionId, schemaVersion |
 
 ## 同步与容量
@@ -45,14 +45,14 @@
 | 检查项 | 结果 | 证据 |
 |---|:---:|---|
 | 三次完成均写入逐次历史 | 通过 | 3 条 |
-| 可接受答案保留分类但不保留答案文本 | 通过 | [{"id":"review-1791399604312-l2dfbf6","cardKey":"deck:en-b1:en-clarify","reviewedAt":"2026-10-07T19:00:04.312Z","result":"acceptable","firstTry":true,"previousInterval":0,"scheduledInterval":1,"due":"2026-10-09","source":"deck","sessionId":"session-1791399603914-plnga","schemaVersion":1},{"id":"review-1791399604607-r55ryfr","cardKey":"deck:en-b1:en-update","reviewedAt":"2026-10-07T19:00:04.607Z","result":"acceptable","firstTry":true,"previousInterval":0,"scheduledInterval":1,"due":"2026-10-09","source":"deck","sessionId":"session-1791399603914-plnga","schemaVersion":1},{"id":"review-1791399605113-vq2ws1c","cardKey":"deck:en-b1:en-feedback","reviewedAt":"2026-10-07T19:00:05.113Z","result":"acceptable","firstTry":true,"previousInterval":0,"scheduledInterval":1,"due":"2026-10-09","source":"deck","sessionId":"session-1791399603914-plnga","schemaVersion":1}] |
+| 可接受答案保留分类但不保留答案文本 | 通过 | [{"id":"review-1791446616653-gv3gist","cardKey":"deck:en-b1:en-clarify","reviewedAt":"2026-10-08T08:03:36.653Z","result":"acceptable","firstTry":true,"previousInterval":0,"scheduledInterval":1,"due":"2026-10-09","source":"deck","sessionId":"session-1791446616621-l43o5","schemaVersion":1},{"id":"review-1791446617269-g8puy6v","cardKey":"deck:en-b1:en-update","reviewedAt":"2026-10-08T08:03:37.269Z","result":"acceptable","firstTry":true,"previousInterval":0,"scheduledInterval":1,"due":"2026-10-09","source":"deck","sessionId":"session-1791446616621-l43o5","schemaVersion":1},{"id":"review-1791446617771-rfx1szs","cardKey":"deck:en-b1:en-feedback","reviewedAt":"2026-10-08T08:03:37.771Z","result":"acceptable","firstTry":true,"previousInterval":0,"scheduledInterval":1,"due":"2026-10-09","source":"deck","sessionId":"session-1791446616621-l43o5","schemaVersion":1}] |
 | 新手路径与完成事件写入日志 | 通过 | study_start, screen_view, onboarding_complete, study_submit, study_submit, study_submit, session_complete |
 | 设置页展示完成数 | 通过 | 3 |
 | 设置页展示首次答对率 | 通过 | 100% |
 | 研究包给出机器可读隐私声明 | 通过 | {"containsRawAnswers":false,"containsImportedMaterial":false,"containsContact":false} |
 | 研究包不含原始作答内容 | 通过 | 未发现三个测试答案 |
 | 页面无运行时错误 | 通过 |  |
-| 一次错误与重输形成两条历史 | 通过 | [{"id":"review-1791399607652-57ltd4w","cardKey":"deck:en-b1:en-clarify","reviewedAt":"2026-10-07T19:00:07.652Z","result":"wrong","firstTry":false,"previousInterval":0,"scheduledInterval":0,"due":"","source":"deck","sessionId":"session-1791399607270-4rucm","schemaVersion":1},{"id":"review-1791399607896-soy9yob","cardKey":"deck:en-b1:en-clarify","reviewedAt":"2026-10-07T19:00:07.896Z","result":"retried","firstTry":false,"previousInterval":0,"scheduledInterval":1,"due":"2026-10-09","source":"deck","sessionId":"session-1791399607270-4rucm","schemaVersion":1}] |
+| 一次错误与重输形成两条历史 | 通过 | [{"id":"review-1791446621860-vi6pe5m","cardKey":"deck:en-b1:en-clarify","reviewedAt":"2026-10-08T08:03:41.860Z","result":"wrong","firstTry":false,"previousInterval":0,"scheduledInterval":0,"due":"","source":"deck","sessionId":"session-1791446621474-3dgxn","schemaVersion":1},{"id":"review-1791446622106-2vyq4jc","cardKey":"deck:en-b1:en-clarify","reviewedAt":"2026-10-08T08:03:42.106Z","result":"retried","firstTry":false,"previousInterval":0,"scheduledInterval":1,"due":"2026-10-09","source":"deck","sessionId":"session-1791446621474-3dgxn","schemaVersion":1}] |
 | 历史记录未泄露错误答案 | 通过 | 未发现 banana |
 
 ## 移动端

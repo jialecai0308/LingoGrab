@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-10-07T19:00:12.707Z",
+  "generatedAt": "2026-10-08T08:03:41.069Z",
   "summary": {
-    "passed": 21,
-    "total": 21,
+    "passed": 22,
+    "total": 22,
     "failed": 0
   },
   "groups": {
@@ -19,8 +19,8 @@
       "total": 3
     },
     "浏览器旅程": {
-      "passed": 8,
-      "total": 8
+      "passed": 9,
+      "total": 9
     },
     "移动端": {
       "passed": 1,
@@ -96,9 +96,9 @@
     },
     {
       "group": "静态实现",
-      "name": "完成页区分到期复习",
+      "name": "完成页用白话区分旧题复习",
       "pass": true,
-      "evidence": "到期复习 + scheduledReviews"
+      "evidence": "旧题复习 + 隔天仍记得"
     },
     {
       "group": "浏览器旅程",
@@ -128,19 +128,25 @@
       "group": "浏览器旅程",
       "name": "完成页区分两次到期复习",
       "pass": true,
-      "evidence": "2,100%,2,100%"
+      "evidence": "2,100%,2,2/2"
     },
     {
       "group": "浏览器旅程",
-      "name": "到期复习首次正确显示 100%",
+      "name": "旧题复习显示答对数与样本数",
       "pass": true,
-      "evidence": "2,100%,2,100%"
+      "evidence": "2,100%,2,2/2"
+    },
+    {
+      "group": "浏览器旅程",
+      "name": "完成页可展开查看指标解释",
+      "pass": true,
+      "evidence": "这两个数是什么意思？\n\n“旧题复习”是本轮里以前学过、今天回来复习的题数；“隔天仍记得”显示这些旧题中第一次就答对的数量，例如 1/1。样本少时只是本轮记录，不代表能力已稳定。"
     },
     {
       "group": "浏览器旅程",
       "name": "完成事件保留到期复习口径",
       "pass": true,
-      "evidence": "{\"id\":\"event-1791399611056-9rv11zp\",\"name\":\"session_complete\",\"timestamp\":\"2026-10-07T19:00:11.056Z\",\"schemaVersion\":1,\"properties\":{\"sessionId\":\"session-1791399610244-rzs6s\",\"total\":2,\"firstTryCorrect\":2,\"retried\":0,\"scheduledReviews\":2,\"delayedRecallRate\":100,\"source\":\"study\"}}"
+      "evidence": "{\"id\":\"event-1791446617670-ptp8lo5\",\"name\":\"session_complete\",\"timestamp\":\"2026-10-08T08:03:37.670Z\",\"schemaVersion\":1,\"properties\":{\"sessionId\":\"session-1791446616785-rmtpz\",\"total\":2,\"firstTryCorrect\":2,\"retried\":0,\"scheduledReviews\":2,\"delayedRecallRate\":100,\"source\":\"study\"}}"
     },
     {
       "group": "浏览器旅程",
@@ -165,7 +171,7 @@
       "7 天日历是当前排期的确定性展示，不是对记忆概率的预测。",
       "延迟回忆率来自本机小样本，不能证明长期学习效果或产品因果增益。",
       "日期计算依赖设备时钟和本地时区；跨时区真实设备仍需补测。",
-      "本轮没有将现有间隔规则与 FSRS 做离线对照，因此不支持宣称算法已最优。"
+      "FSRS 与现有间隔规则的离线影子对照已拆分为独立评测；在真实跨日样本不足前，仍不支持宣称算法已最优。"
     ],
     "decision": "复习解释层可以上线；对外只能表述为真实排期与作答证据，不得表述为记忆预测或学习效果证明。"
   }

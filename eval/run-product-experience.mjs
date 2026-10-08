@@ -54,7 +54,7 @@ const adminHtml = await fs.readFile(path.join(root, 'admin.html'), 'utf8')
 const staticChecks = [
   ['真实连续天数', html.includes('id="streakCount"') && html.includes('function streak()')],
   ['每日完成页', html.includes('session-complete') && html.includes('这轮练习完成了')],
-  ['拾取后一键练习', html.includes('pickAllPracticeBtn') && html.includes('startPickedPractice')],
+  ['拾取后可选全部加入或立即练习', html.includes('data-add-all') && html.includes('data-add-practice') && html.includes('startPickedPractice')],
   ['个人表达进入学习队列', html.includes("type:'picked'") && html.includes('pickedToCard')],
   ['学习记录与到期日', html.includes('studyRecords') && html.includes('lastReviewed')],
   ['学习数据导出', html.includes('id="exportBtn"') && html.includes('lingograb-learning-data.json')],
@@ -62,7 +62,9 @@ const staticChecks = [
   ['首次体验缩短', html.includes('直接练 3 道题') && html.includes('从示例材料拾取')],
   ['反馈点赞点踩', html.includes('data-reaction="like"') && html.includes('data-reaction="dislike"') && html.includes("accountPost('/feedback'")],
   ['匿名产品埋点', html.includes("e:'lg_visit'") && html.includes("e:'lg_session_complete'") && !html.includes('userAnswer:val')],
-  ['LingoGrab 产品看板', adminHtml.includes('LingoGrab 产品看板') && adminHtml.includes('/lingograb-analytics') && adminHtml.includes('data.feedback?.items')],
+  ['LingoGrab 产品看板', adminHtml.includes('LingoGrab 产品看板') && adminHtml.includes('/lingograb-analytics') && adminHtml.includes('data.feedback?.items') && adminHtml.includes('demoData')],
+  ['三条内容路线导航', html.includes('data-screen="library"') && html.includes('data-screen="smart"') && html.includes('data-screen="import"')],
+  ['点赞点踩默认弱化', html.includes('class="reaction-details"') && html.includes('<summary>反馈这段解释</summary>')],
 ]
 for (const [name, pass] of staticChecks) check('产品闭环', name, pass, pass ? '存在对应实现' : '缺少实现')
 
@@ -124,7 +126,7 @@ try {
 
   await page.locator('#goPickupBtn').click()
   await page.locator('#analyseBtn').click()
-  await page.locator('#pickAllPracticeBtn').click()
+  await page.locator('#candidates [data-add-practice]').click()
   check('浏览器旅程', '本地拾取后立即进入个人表达练习', (await page.locator('#studyDeck').innerText()) === '我的真实表达', await page.locator('#studyDeck').innerText())
   check('浏览器旅程', '页面无运行时错误', pageErrors.length === 0, pageErrors.join(' | '))
 
@@ -143,6 +145,7 @@ try {
   check('浏览器旅程', '错误反馈先给答案和动作', (await retryPage.locator('#feedback h3').innerText()) === '正确答案是 clarify' && retryFeedback.includes('输入 clarify，再提交一次'), retryFeedback)
   check('浏览器旅程', '学习页不暴露系统分层', !/语义相似分析|词书缓存|实时 AI|本地判断/.test(retryFeedback), retryFeedback)
   check('浏览器旅程', '更多解释默认收起', !(await retryPage.locator('.feedback-details').getAttribute('open')) && !(await retryPage.locator('#aiExplainBtn').isVisible()), '详细解释和 AI 入口未抢占主流程')
+  await retryPage.locator('.reaction-details summary').click()
   await retryPage.locator('[data-reaction="like"]').click()
   await retryPage.locator('#reactionStatus').waitFor({ state: 'visible' })
   await retryPage.waitForFunction(() => document.querySelector('#reactionStatus')?.textContent === '已收到，谢谢')
@@ -156,7 +159,13 @@ try {
   check('设置页', '默认只显示三个核心区域', await retryPage.getByText('每天学多少', { exact: true }).isVisible() && await retryPage.getByText('账号同步', { exact: true }).isVisible() && await retryPage.getByText('学习概览', { exact: true }).isVisible(), '每日学习量、账号同步、学习概览')
   check('设置页', '高级功能默认收起', (await retryPage.locator('.settings-details[open], .tech-details[open]').count()) === 0, '更多设置、帮助和技术说明均默认收起')
 
+  await retryPage.locator('.side-nav [data-screen="smart"]').click()
+  check('内容路线', '智能精选有独立可达页面', await retryPage.locator('#smart').isVisible() && await retryPage.locator('#smartRecommendBtn').isVisible(), '左侧导航 → 智能精选')
+  await retryPage.locator('.side-nav [data-screen="import"]').click()
+  check('内容路线', '个人拾取不再暴露本地规则黑话', !(await retryPage.locator('#import').innerText()).includes('本地规则') && (await retryPage.locator('#analyseBtn').innerText()).includes('不上传'), await retryPage.locator('#analyseBtn').innerText())
+
   const adminPage = await browser.newPage({ viewport: { width: 1280, height: 900 } })
+  await adminPage.addInitScript(() => localStorage.removeItem('lingograb_admin_key'))
   const analyticsFixture = {
     ok: true,
     range: { from: '2026-10-01', to: '2026-10-08' },
@@ -176,9 +185,11 @@ try {
   }
   await adminPage.route('**/api/lingograb-analytics', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(analyticsFixture) }))
   await adminPage.goto(`http://127.0.0.1:${port}/admin.html`, { waitUntil: 'networkidle' })
+  check('产品看板', '未填 Key 展示完整演示数据', (await adminPage.locator('#mode').innerText()) === '演示数据' && (await adminPage.locator('#overview').innerText()).includes('86') && (await adminPage.locator('#feedback').innerText()).includes('演示反馈'), await adminPage.locator('#notice').innerText())
   await adminPage.locator('#key').fill('test-key')
   await adminPage.locator('#load').click()
   await adminPage.waitForFunction(() => document.querySelector('#stamp')?.textContent.includes('小样本'))
+  check('产品看板', '有效 Key 切换为真实数据', (await adminPage.locator('#mode').innerText()) === '真实数据' && (await adminPage.locator('#notice').innerText()).includes('真实埋点'), await adminPage.locator('#notice').innerText())
   check('产品看板', '核心指标和事件漏斗可读', (await adminPage.locator('#overview').innerText()).includes('10') && (await adminPage.locator('#funnel').innerText()).includes('完成学习轮次'), await adminPage.locator('#funnel').innerText())
   check('产品看板', '小样本判断明确标注', (await adminPage.locator('#judgments').innerText()).includes('样本量较小') && (await adminPage.locator('#stamp').innerText()).includes('小样本'), await adminPage.locator('#judgments').innerText())
   check('产品看板', '点踩明细可定位到学习卡', (await adminPage.locator('#feedback').innerText()).includes('en-clarify') && (await adminPage.locator('#feedback').innerText()).includes('没帮助'), await adminPage.locator('#feedback').innerText())

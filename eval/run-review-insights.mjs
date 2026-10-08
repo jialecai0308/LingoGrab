@@ -46,7 +46,7 @@ check('延迟回忆指标', '无隔日样本时返回空值而非 0%', emptySumm
 const html = await fs.readFile(path.join(root, 'index.html'), 'utf8')
 check('静态实现', '今天页包含 7 天复习日历', html.includes('id="reviewForecast"') && html.includes('未来 7 天复习'), 'reviewForecast')
 check('静态实现', '学习记录包含延迟回忆指标', html.includes('id="evidenceDelayedRecall"') && html.includes('样本不足时显示“—”'), 'evidenceDelayedRecall')
-check('静态实现', '完成页区分到期复习', html.includes('<span>到期复习</span>') && html.includes('scheduledReviews'), '到期复习 + scheduledReviews')
+check('静态实现', '完成页用白话区分旧题复习', html.includes('<span>旧题复习</span>') && html.includes('<span>隔天仍记得</span>') && html.includes('scheduledReviews'), '旧题复习 + 隔天仍记得')
 
 function contentType(file) {
   if (file.endsWith('.html')) return 'text/html; charset=utf-8'
@@ -141,7 +141,9 @@ try {
   await page.locator('#nextBtn').click()
   const sessionValues = await page.locator('.session-summary b').allInnerTexts()
   check('浏览器旅程', '完成页区分两次到期复习', sessionValues[0] === '2' && sessionValues[2] === '2', sessionValues.join(','))
-  check('浏览器旅程', '到期复习首次正确显示 100%', sessionValues[3] === '100%', sessionValues.join(','))
+  check('浏览器旅程', '旧题复习显示答对数与样本数', sessionValues[3] === '2/2', sessionValues.join(','))
+  await page.locator('.metric-help summary').click()
+  check('浏览器旅程', '完成页可展开查看指标解释', await page.locator('.metric-help summary').isVisible() && (await page.locator('.metric-help').innerText()).includes('样本少时'), await page.locator('.metric-help').innerText())
   const completedState = await page.evaluate(() => JSON.parse(localStorage.getItem('pickup-mvp-state')))
   const completeEvent = completedState.eventLog.find(item => item.name === 'session_complete')
   check('浏览器旅程', '完成事件保留到期复习口径', completeEvent?.properties?.scheduledReviews === 2 && completeEvent?.properties?.delayedRecallRate === 100, JSON.stringify(completeEvent))
@@ -182,7 +184,7 @@ const report = {
       '7 天日历是当前排期的确定性展示，不是对记忆概率的预测。',
       '延迟回忆率来自本机小样本，不能证明长期学习效果或产品因果增益。',
       '日期计算依赖设备时钟和本地时区；跨时区真实设备仍需补测。',
-      '本轮没有将现有间隔规则与 FSRS 做离线对照，因此不支持宣称算法已最优。',
+      'FSRS 与现有间隔规则的离线影子对照已拆分为独立评测；在真实跨日样本不足前，仍不支持宣称算法已最优。',
     ],
     decision: failed.length ? '复习解释层存在阻断问题，不应上线。' : '复习解释层可以上线；对外只能表述为真实排期与作答证据，不得表述为记忆预测或学习效果证明。',
   },
