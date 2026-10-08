@@ -63,6 +63,7 @@ const staticChecks = [
   ['反馈点赞点踩', html.includes('data-reaction="like"') && html.includes('data-reaction="dislike"') && html.includes("accountPost('/feedback'")],
   ['匿名产品埋点', html.includes("e:'lg_visit'") && html.includes("e:'lg_session_complete'") && !html.includes('userAnswer:val')],
   ['LingoGrab 用户运营看板', adminHtml.includes('LingoGrab 用户运营看板') && adminHtml.includes('/lingograb-analytics') && adminHtml.includes('feedbackItems') && adminHtml.includes('demoData')],
+  ['看板标注数据起点和北京时间', adminHtml.includes('2026-10-08 16:59') && adminHtml.includes('北京时间，UTC+8') && adminHtml.includes('beijingDay')],
   ['看板不混入学习质量', adminHtml.includes('UV') && adminHtml.includes('访问来源') && adminHtml.includes('稳定性') && !adminHtml.includes('一次答对率') && !adminHtml.includes('延迟回忆表现')],
   ['产品内学习质量', html.includes('我的学习质量')],
   ['三条内容路线导航', html.includes('data-screen="library"') && html.includes('data-screen="smart"') && html.includes('data-screen="import"')],
@@ -193,6 +194,8 @@ try {
   }
   await adminPage.route('**/api/lingograb-analytics', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(analyticsFixture) }))
   await adminPage.goto(`http://127.0.0.1:${port}/admin.html`, { waitUntil: 'networkidle' })
+  check('用户运营看板', '北京时间不会在凌晨少一天', await adminPage.evaluate(() => beijingDay(Date.UTC(2026, 9, 8, 17)) === '2026-10-09'), 'UTC 10月8日 17:00 应归属北京时间 10月9日')
+  check('用户运营看板', '页面直接说明真实数据起点', (await adminPage.locator('.data-start').innerText()).includes('2026-10-08 16:59') && (await adminPage.locator('.data-start').innerText()).includes('无法回填历史 UV'), await adminPage.locator('.data-start').innerText())
   check('用户运营看板', '未填 Key 展示完整演示数据', (await adminPage.locator('#mode').innerText()) === '演示数据' && (await adminPage.locator('#overview').innerText()).includes('126') && (await adminPage.locator('#sources').innerText()).includes('直接访问') && (await adminPage.locator('#feedback').innerText()).includes('演示反馈'), await adminPage.locator('#notice').innerText())
   await adminPage.locator('#key').fill('test-key')
   await adminPage.locator('#load').click()
