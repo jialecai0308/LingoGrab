@@ -45,18 +45,22 @@ const firstWrong = routing.nextReview({ correct: false, firstTry: false, today: 
 check('复习排期', '答错记为 Again', firstWrong.algorithm === 'fsrs-6' && firstWrong.rating === 'Again' && firstWrong.interval > 0, JSON.stringify(firstWrong))
 const corrected = routing.nextReview({ record: firstWrong, correct: true, firstTry: false, today: base })
 check('复习排期', '改正后记为 Hard', corrected.algorithm === 'fsrs-6' && corrected.rating === 'Hard' && corrected.fsrsCard?.reps === 2, JSON.stringify(corrected))
+const migratedLegacy = routing.nextReview({ record: { interval: 7, due: '2026-10-07', lastReviewed: '2026-09-30', lastResult: 'first_try' }, correct: true, firstTry: true, today: base })
+check('复习排期', '旧固定排期迁移后延续既有进度', migratedLegacy.algorithm === 'fsrs-6' && migratedLegacy.rating === 'Good' && migratedLegacy.fsrsCard?.reps === 2 && migratedLegacy.interval > 1, JSON.stringify(migratedLegacy))
 
 const html = await fs.readFile(path.join(root, 'index.html'), 'utf8')
 const adminHtml = await fs.readFile(path.join(root, 'admin.html'), 'utf8')
 const staticChecks = [
   ['真实连续天数', html.includes('id="streakCount"') && html.includes('function streak()')],
   ['每日完成页', html.includes('session-complete') && html.includes('这轮练习完成了')],
-  ['拾取后可选全部加入或立即练习', html.includes('data-add-all') && html.includes('data-add-practice') && html.includes('startPickedPractice')],
-  ['个人表达进入学习队列', html.includes("type:'picked'") && html.includes('pickedToCard')],
+  ['拾取后可选全部制卡或立即练习', html.includes('data-add-all') && html.includes('data-add-practice') && html.includes('startPickedPractice')],
+  ['个人拾取以完整练习卡保存', html.includes("cardType:'practice'") && html.includes('cardVersion:2') && html.includes('normalizePickedCard') && html.includes('pickedToCard')],
+  ['拾取卡保留原句并校验溯源', html.includes('sourceSentenceFor') && html.includes('requireTrace:true') && html.includes("example.replace(pattern,'$1___')")],
+  ['拾取卡题面转义后再渲染', html.includes('function clozeMarkup') && html.includes('clozeMarkup(c.cloze)') && !html.includes("c.cloze.replace('___'")],
   ['学习记录与到期日', html.includes('studyRecords') && html.includes('lastReviewed')],
   ['学习数据导出', html.includes('id="exportBtn"') && html.includes('lingograb-learning-data.json')],
   ['词书数量口径', html.includes('已校验练习卡') && !html.includes('${d.size.toLocaleString(\'en-US\')} WORDS')],
-  ['首次体验包含每日目标', html.includes('data-onboard-goal="3"') && html.includes('data-onboard-goal="12"') && html.includes('先添加自己的表达')],
+  ['首次体验包含每日目标', html.includes('data-onboard-goal="3"') && html.includes('data-onboard-goal="12"') && html.includes('先生成自己的练习卡')],
   ['英语词库扩展为百张卡', html.includes('data/en-curated-cards.js') && html.includes('FSRS-6')],
   ['反馈点赞点踩', html.includes('data-reaction="like"') && html.includes('data-reaction="dislike"') && html.includes("accountPost('/feedback'")],
   ['匿名产品埋点', html.includes("e:'lg_visit'") && html.includes("e:'lg_session_complete'") && !html.includes('userAnswer:val')],
@@ -105,6 +109,34 @@ try {
   await page.evaluate(() => localStorage.clear())
   await page.reload({ waitUntil: 'networkidle' })
 
+  const traceRules = await page.evaluate(() => ({
+    substringRejected: sourceSentenceFor('The report was updated yesterday.', 'update') === '',
+    exactAccepted: sourceSentenceFor('Please update the report today.', 'update').includes('Please update'),
+    tracedCandidate: validCandidate({ target: 'align', meaning: '达成一致', lang: 'en', level: 'B2', example: 'Invented example.', cloze: 'Invented ___ card.' }, { sourceText: 'We should align before the meeting.', requireTrace: true }),
+  }))
+  check('拾取制卡规则', '目标表达按完整词或短语匹配', traceRules.substringRejected && traceRules.exactAccepted, JSON.stringify(traceRules))
+  check('拾取制卡规则', 'AI 题面强制从来源原句重建', traceRules.tracedCandidate?.example === 'We should align before the meeting.' && traceRules.tracedCandidate?.cloze === '', JSON.stringify(traceRules.tracedCandidate))
+
+  const mergedDuplicate = await page.evaluate(() => mergeLearnerState(
+    {
+      updatedAt: 20,
+      activeDeck: 'en-b1', preferredLang: 'en', settings: { dailyGoal: 3 },
+      picked: [{ id: 'picked-local', target: 'align', meaning: '本机语境', example: 'Please align today.', lang: 'en', level: 'B2' }],
+      studyRecords: { 'picked:picked-local': { interval: 3, lastReviewed: '2026-10-10' } },
+      dailyActivity: { '2026-10-10': { reviewed: ['picked:picked-local'], firstTryCorrect: 1, retried: 0 } },
+      reviewHistory: [{ id: 'review-local', cardKey: 'picked:picked-local', reviewedAt: '2026-10-10T12:00:00.000Z' }],
+    },
+    {
+      updatedAt: 10,
+      activeDeck: 'en-b1', preferredLang: 'en', settings: { dailyGoal: 3 },
+      picked: [{ id: 'picked-remote', target: 'align', meaning: '云端语境', example: 'We align weekly.', lang: 'en', level: 'B2' }],
+      studyRecords: { 'picked:picked-remote': { interval: 7, lastReviewed: '2026-10-11' } },
+      dailyActivity: { '2026-10-11': { reviewed: ['picked:picked-remote'], firstTryCorrect: 1, retried: 0 } },
+      reviewHistory: [{ id: 'review-remote', cardKey: 'picked:picked-remote', reviewedAt: '2026-10-11T12:00:00.000Z' }],
+    },
+  ))
+  check('数据同步', '跨设备重复卡合并并迁移复习引用', mergedDuplicate.picked.length === 1 && mergedDuplicate.picked[0].id === 'picked-local' && mergedDuplicate.studyRecords['picked:picked-local']?.interval === 7 && !mergedDuplicate.studyRecords['picked:picked-remote'] && Object.values(mergedDuplicate.dailyActivity).every(day => day.reviewed.every(key => key === 'picked:picked-local')) && mergedDuplicate.reviewHistory.every(item => item.cardKey === 'picked:picked-local'), JSON.stringify(mergedDuplicate))
+
   check('浏览器旅程', '首次进入先选语言', await page.locator('[data-onboard-lang="en"]').isVisible(), '新手引导第 1 步')
   check('浏览器旅程', '新用户连续天数从零开始', (await page.locator('#streakCount').innerText()) === '0', await page.locator('#streakCount').innerText())
   await page.locator('[data-onboard-lang="en"]').click()
@@ -129,8 +161,24 @@ try {
 
   await page.locator('#goPickupBtn').click()
   await page.locator('#analyseBtn').click()
+  const cardPreview = await page.locator('#candidates .candidate').first().innerText()
+  check('浏览器旅程', '本地拾取使用原文生成挖空卡', cardPreview.includes('Before the project starts') && cardPreview.includes('___'), cardPreview)
   await page.locator('#candidates [data-add-practice]').click()
-  check('浏览器旅程', '本地拾取后立即进入个人表达练习', (await page.locator('#studyDeck').innerText()) === '我的真实表达', await page.locator('#studyDeck').innerText())
+  check('浏览器旅程', '本地拾取后立即进入个人练习卡', (await page.locator('#studyDeck').innerText()) === '我的练习卡', await page.locator('#studyDeck').innerText())
+  const pickedState = await page.evaluate(() => JSON.parse(localStorage.getItem('pickup-mvp-state')))
+  const alignCard = pickedState.picked.find(item => item.target === 'align')
+  check('浏览器旅程', '拾取内容已持久化为完整练习卡', alignCard?.cardType === 'practice' && alignCard?.cardVersion === 2 && alignCard?.cloze.includes('___') && alignCard?.example.includes("let's align") && alignCard?.translation && alignCard?.explanation, JSON.stringify(alignCard))
+  await page.locator('#answer').fill('align')
+  await page.locator('#checkBtn').click()
+  const pickedReviewedState = await page.evaluate(() => JSON.parse(localStorage.getItem('pickup-mvp-state')))
+  const pickedRecord = pickedReviewedState.studyRecords[`picked:${alignCard.id}`]
+  check('浏览器旅程', '拾取卡作答进入 FSRS-6 排期', pickedRecord?.algorithm === 'fsrs-6' && pickedRecord?.due && pickedRecord?.fsrsCard?.reps === 1, JSON.stringify(pickedRecord))
+  const pickedCountBeforeDuplicate = pickedReviewedState.picked.length
+  await page.locator('.side-nav [data-screen="import"]').click()
+  await page.locator('#analyseBtn').click()
+  await page.locator('#candidates [data-add-all]').click()
+  const deduplicatedState = await page.evaluate(() => JSON.parse(localStorage.getItem('pickup-mvp-state')))
+  check('浏览器旅程', '重复制卡更新语境但不增加重复卡', deduplicatedState.picked.length === pickedCountBeforeDuplicate && deduplicatedState.picked.find(item => item.target === 'align')?.id === alignCard.id && deduplicatedState.studyRecords[`picked:${alignCard.id}`]?.algorithm === 'fsrs-6', JSON.stringify(deduplicatedState.picked))
   check('浏览器旅程', '页面无运行时错误', pageErrors.length === 0, pageErrors.join(' | '))
 
   const retryPage = await browser.newPage({ viewport: { width: 1280, height: 900 } })
@@ -167,6 +215,52 @@ try {
   check('内容路线', '智能精选有独立可达页面', await retryPage.locator('#smart').isVisible() && await retryPage.locator('#smartRecommendBtn').isVisible(), '左侧导航 → 智能精选')
   await retryPage.locator('.side-nav [data-screen="import"]').click()
   check('内容路线', '个人拾取不再暴露本地规则黑话', !(await retryPage.locator('#import').innerText()).includes('本地规则') && (await retryPage.locator('#analyseBtn').innerText()).includes('不上传'), await retryPage.locator('#analyseBtn').innerText())
+
+  const legacyPage = await browser.newPage({ viewport: { width: 1280, height: 900 } })
+  await legacyPage.route('**/api/track', route => route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' }))
+  await legacyPage.goto(`http://127.0.0.1:${port}`, { waitUntil: 'networkidle' })
+  await legacyPage.evaluate(() => {
+    localStorage.clear()
+    localStorage.setItem('lingograb-onboarding-v2', '1')
+    localStorage.setItem('lingograb-daily-goal-chosen-v1', '1')
+    localStorage.setItem('pickup-mvp-state', JSON.stringify({
+      activeDeck: 'en-b1',
+      preferredLang: 'en',
+      picked: [{ id: 'picked-existing', target: 'touch base', meaning: '联系确认', example: '<img src=x onerror="window.__pickedXss=1"> I would like to touch base with the team before the meeting.', lang: 'en', level: 'B1', source: '旧拾取' }],
+      studyRecords: { 'picked:picked-existing': { due: '2026-10-12', interval: 1, lastReviewed: '2026-10-11', lastResult: 'first_try' } },
+      settings: { dailyGoal: 3, aiEnabled: true },
+    }))
+  })
+  await legacyPage.reload({ waitUntil: 'networkidle' })
+  const migratedState = await legacyPage.evaluate(() => JSON.parse(localStorage.getItem('pickup-mvp-state')))
+  const migratedCard = migratedState.picked[0]
+  check('安全边界', '拾取题面按纯文本渲染', await legacyPage.locator('#cloze img').count() === 0 && await legacyPage.evaluate(() => window.__pickedXss !== 1) && (await legacyPage.locator('#cloze').innerText()).includes('<img'), await legacyPage.locator('#cloze').innerText())
+  check('数据迁移', '加载后立即持久化完整练习卡', migratedCard.id === 'picked-existing' && migratedCard.cardVersion === 2 && migratedCard.cloze.includes('___') && migratedCard.example.includes('touch base'), JSON.stringify(migratedCard))
+  check('数据迁移', '旧拾取的复习记录不丢失', migratedState.studyRecords['picked:picked-existing']?.interval === 1, JSON.stringify(migratedState.studyRecords))
+  await legacyPage.locator('.side-nav [data-screen="library"]').click()
+  await legacyPage.locator('[data-scope="picked"]').click()
+  check('数据迁移', '我的词书显示卡片和单卡练习入口', (await legacyPage.locator('#libraryCount').innerText()).includes('1 张练习卡') && await legacyPage.locator('[data-practice-picked="picked-existing"]').isVisible(), await legacyPage.locator('#termList').innerText())
+  await legacyPage.locator('[data-practice-picked="picked-existing"]').click()
+  await legacyPage.locator('#answer').fill('touch base')
+  await legacyPage.locator('#checkBtn').click()
+  const migratedReviewedState = await legacyPage.evaluate(() => JSON.parse(localStorage.getItem('pickup-mvp-state')))
+  const migratedRecord = migratedReviewedState.studyRecords['picked:picked-existing']
+  check('数据迁移', '旧排期首次复习后延续为 FSRS 状态', migratedRecord.algorithm === 'fsrs-6' && migratedRecord.fsrsCard?.reps === 2 && migratedRecord.interval > 1, JSON.stringify(migratedRecord))
+
+  const frenchPage = await browser.newPage({ viewport: { width: 1280, height: 900 } })
+  await frenchPage.route('**/api/track', route => route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' }))
+  await frenchPage.goto(`http://127.0.0.1:${port}`, { waitUntil: 'networkidle' })
+  await frenchPage.evaluate(() => localStorage.clear())
+  await frenchPage.reload({ waitUntil: 'networkidle' })
+  await frenchPage.locator('[data-onboard-lang="fr"]').click()
+  await frenchPage.locator('[data-onboard-goal="3"]').click()
+  await frenchPage.locator('#guideTryPickup').click()
+  await frenchPage.locator('#analyseBtn').click()
+  const frenchCandidates = await frenchPage.locator('#candidates .candidate').count()
+  check('法语制卡', '法语材料可在浏览器本地生成练习卡', frenchCandidates >= 4 && (await frenchPage.locator('#candidates').innerText()).includes('___'), await frenchPage.locator('#candidates').innerText())
+  await frenchPage.locator('#candidates [data-add-all]').click()
+  const frenchState = await frenchPage.evaluate(() => JSON.parse(localStorage.getItem('pickup-mvp-state')))
+  check('法语制卡', '法语拾取以完整卡片保存', frenchState.picked.length === frenchCandidates && frenchState.picked.every(item => item.lang === 'fr' && item.cardType === 'practice' && item.cloze.includes('___')), JSON.stringify(frenchState.picked))
 
   const adminPage = await browser.newPage({ viewport: { width: 1280, height: 900 } })
   await adminPage.addInitScript(() => localStorage.removeItem('lingograb_admin_key'))
@@ -262,7 +356,7 @@ const markdown = [
   '',
   ...groups.flatMap(group => {
     const rows = checks.filter(item => item.group === group)
-    return [`## ${group}`, '', '| 检查项 | 结果 | 证据 |', '|---|:---:|---|', ...rows.map(item => `| ${item.name} | ${item.pass ? '通过' : '失败'} | ${String(item.evidence).replace(/\|/g, '\\|').replace(/\n/g, ' ')} |`), '']
+    return [`## ${group}`, '', '| 检查项 | 结果 | 证据 |', '|---|:---:|---|', ...rows.map(item => `| ${item.name} | ${item.pass ? '通过' : '失败'} | ${String(item.evidence).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\|/g, '\\|').replace(/\n/g, ' ')} |`), '']
   }),
   '## 评测自评',
   '',

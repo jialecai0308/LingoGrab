@@ -96,6 +96,32 @@
     return { interval, due, algorithm: 'fixed-fallback' }
   }
 
+  function legacyFsrsCard(record, reviewedAt) {
+    const interval = Math.max(1, Number(record && record.interval) || 1)
+    const parsedLastReview = /^\d{4}-\d{2}-\d{2}$/.test(record && record.lastReviewed || '')
+      ? new Date(`${record.lastReviewed}T12:00:00`)
+      : new Date(reviewedAt.getTime() - interval * 86400000)
+    const lastReview = Number.isNaN(parsedLastReview.getTime())
+      ? new Date(reviewedAt.getTime() - interval * 86400000)
+      : parsedLastReview
+    const parsedDue = /^\d{4}-\d{2}-\d{2}$/.test(record && record.due || '')
+      ? new Date(`${record.due}T12:00:00`)
+      : new Date(reviewedAt)
+    const elapsed = Math.max(1, Math.round((reviewedAt.getTime() - lastReview.getTime()) / 86400000))
+    return {
+      due: Number.isNaN(parsedDue.getTime()) ? new Date(reviewedAt) : parsedDue,
+      stability: interval,
+      difficulty: 5,
+      elapsed_days: elapsed,
+      scheduled_days: interval,
+      reps: 1,
+      lapses: record && record.lastResult === 'wrong' ? 1 : 0,
+      learning_steps: 0,
+      state: root.FSRS.State && root.FSRS.State.Review != null ? root.FSRS.State.Review : 2,
+      last_review: lastReview,
+    }
+  }
+
   function nextReview({ record = {}, previousInterval = 0, correct = false, firstTry = false, today = new Date() } = {}) {
     if (!root.FSRS || typeof root.FSRS.fsrs !== 'function') {
       return fixedNextReview({ previousInterval: record.interval || previousInterval, correct, firstTry, today })
@@ -115,6 +141,8 @@
         due: new Date(record.fsrsCard.due),
         last_review: record.fsrsCard.last_review ? new Date(record.fsrsCard.last_review) : undefined,
       }
+    } else if (Number(record.interval) > 0) {
+      card = legacyFsrsCard(record, reviewedAt)
     } else {
       card = root.FSRS.createEmptyCard(reviewedAt)
     }

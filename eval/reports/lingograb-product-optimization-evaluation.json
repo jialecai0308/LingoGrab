@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-10-11T18:03:52.465Z",
+  "generatedAt": "2026-10-11T18:30:56.690Z",
   "summary": {
-    "passed": 63,
-    "total": 63,
+    "passed": 80,
+    "total": 80,
     "failed": 0
   },
   "groups": {
@@ -11,22 +11,42 @@
       "total": 11
     },
     "复习排期": {
-      "passed": 3,
-      "total": 3
+      "passed": 4,
+      "total": 4
     },
     "产品闭环": {
-      "passed": 17,
-      "total": 17
+      "passed": 19,
+      "total": 19
+    },
+    "拾取制卡规则": {
+      "passed": 2,
+      "total": 2
+    },
+    "数据同步": {
+      "passed": 1,
+      "total": 1
     },
     "浏览器旅程": {
-      "passed": 18,
-      "total": 18
+      "passed": 22,
+      "total": 22
     },
     "设置页": {
       "passed": 2,
       "total": 2
     },
     "内容路线": {
+      "passed": 2,
+      "total": 2
+    },
+    "安全边界": {
+      "passed": 1,
+      "total": 1
+    },
+    "数据迁移": {
+      "passed": 4,
+      "total": 4
+    },
+    "法语制卡": {
       "passed": 2,
       "total": 2
     },
@@ -125,6 +145,12 @@
       "evidence": "{\"interval\":2,\"due\":\"2026-10-09\",\"algorithm\":\"fsrs-6\",\"rating\":\"Hard\",\"fsrsCard\":{\"due\":\"2026-10-09T04:00:00.000Z\",\"stability\":0.212,\"difficulty\":7.60420977,\"elapsed_days\":0,\"scheduled_days\":2,\"reps\":2,\"lapses\":0,\"learning_steps\":0,\"state\":2,\"last_review\":\"2026-10-07T04:00:00.000Z\"}}"
     },
     {
+      "group": "复习排期",
+      "name": "旧固定排期迁移后延续既有进度",
+      "pass": true,
+      "evidence": "{\"interval\":23,\"due\":\"2026-10-30\",\"algorithm\":\"fsrs-6\",\"rating\":\"Good\",\"fsrsCard\":{\"due\":\"2026-10-30T04:00:00.000Z\",\"stability\":23.36269083,\"difficulty\":4.99022837,\"elapsed_days\":7,\"scheduled_days\":23,\"reps\":2,\"lapses\":0,\"learning_steps\":0,\"state\":2,\"last_review\":\"2026-10-07T04:00:00.000Z\"}}"
+    },
+    {
       "group": "产品闭环",
       "name": "真实连续天数",
       "pass": true,
@@ -138,13 +164,25 @@
     },
     {
       "group": "产品闭环",
-      "name": "拾取后可选全部加入或立即练习",
+      "name": "拾取后可选全部制卡或立即练习",
       "pass": true,
       "evidence": "存在对应实现"
     },
     {
       "group": "产品闭环",
-      "name": "个人表达进入学习队列",
+      "name": "个人拾取以完整练习卡保存",
+      "pass": true,
+      "evidence": "存在对应实现"
+    },
+    {
+      "group": "产品闭环",
+      "name": "拾取卡保留原句并校验溯源",
+      "pass": true,
+      "evidence": "存在对应实现"
+    },
+    {
+      "group": "产品闭环",
+      "name": "拾取卡题面转义后再渲染",
       "pass": true,
       "evidence": "存在对应实现"
     },
@@ -227,6 +265,24 @@
       "evidence": "存在对应实现"
     },
     {
+      "group": "拾取制卡规则",
+      "name": "目标表达按完整词或短语匹配",
+      "pass": true,
+      "evidence": "{\"substringRejected\":true,\"exactAccepted\":true,\"tracedCandidate\":{\"target\":\"align\",\"meaning\":\"达成一致\",\"example\":\"We should align before the meeting.\",\"reason\":\"\",\"lang\":\"en\",\"level\":\"B2\",\"translation\":\"\",\"cloze\":\"\",\"explanation\":\"\",\"grammar\":[],\"acceptedAnswers\":[]}}"
+    },
+    {
+      "group": "拾取制卡规则",
+      "name": "AI 题面强制从来源原句重建",
+      "pass": true,
+      "evidence": "{\"target\":\"align\",\"meaning\":\"达成一致\",\"example\":\"We should align before the meeting.\",\"reason\":\"\",\"lang\":\"en\",\"level\":\"B2\",\"translation\":\"\",\"cloze\":\"\",\"explanation\":\"\",\"grammar\":[],\"acceptedAnswers\":[]}"
+    },
+    {
+      "group": "数据同步",
+      "name": "跨设备重复卡合并并迁移复习引用",
+      "pass": true,
+      "evidence": "{\"activeDeck\":\"en-b1\",\"preferredLang\":\"en\",\"index\":{\"fr-daily-a1\":0,\"fr-travel-a2\":0,\"fr-work-a2\":0,\"en-b1\":0,\"en-b2\":0},\"mastered\":[],\"wrong\":[],\"picked\":[{\"id\":\"picked-local\",\"target\":\"align\",\"meaning\":\"本机语境\",\"example\":\"Please align today.\",\"lang\":\"en\",\"level\":\"B2\",\"lemma\":\"align\",\"cloze\":\"Please ___ today.\",\"translation\":\"本机语境\",\"grammar\":[\"个人拾取\",\"真实材料\"],\"explanation\":\"本机语境\",\"acceptedAnswers\":[],\"source\":\"真实材料\",\"addedAt\":\"\",\"cardType\":\"practice\",\"cardVersion\":2}],\"studyRecords\":{\"picked:picked-local\":{\"interval\":7,\"lastReviewed\":\"2026-10-11\"}},\"reviewHistory\":[{\"id\":\"review-local\",\"cardKey\":\"picked:picked-local\",\"reviewedAt\":\"2026-10-10T12:00:00.000Z\"},{\"id\":\"review-remote\",\"cardKey\":\"picked:picked-local\",\"reviewedAt\":\"2026-10-11T12:00:00.000Z\"}],\"eventLog\":[],\"dailyActivity\":{\"2026-10-11\":{\"reviewed\":[\"picked:picked-local\"],\"firstTryCorrect\":1,\"retried\":0},\"2026-10-10\":{\"reviewed\":[\"picked:picked-local\"],\"firstTryCorrect\":1,\"retried\":0}},\"activityDates\":[],\"settings\":{\"dailyGoal\":3,\"aiEnabled\":true},\"updatedAt\":20}"
+    },
+    {
       "group": "浏览器旅程",
       "name": "首次进入先选语言",
       "pass": true,
@@ -272,7 +328,7 @@
       "group": "浏览器旅程",
       "name": "完成三题进入总结页",
       "pass": true,
-      "evidence": "✓\n这轮练习完成了\n\n本轮 3 个由每日目标决定；职场英语 B1共 50 个，其他内容会在后续轮次出现。\n\n3\n本轮完成\n100%\n第一次就答对\n0\n旧题复习\n—\n隔天仍记得\n这两个数是什么意思？\n回到今天\n添加新表达"
+      "evidence": "✓\n这轮练习完成了\n\n本轮 3 个由每日目标决定；职场英语 B1共 50 张，其他卡片会在后续轮次出现。\n\n3\n本轮完成\n100%\n第一次就答对\n0\n旧题复习\n—\n隔天仍记得\n这两个数是什么意思？\n回到今天\n生成新练习卡"
     },
     {
       "group": "浏览器旅程",
@@ -284,13 +340,37 @@
       "group": "浏览器旅程",
       "name": "三题均生成下次复习日期",
       "pass": true,
-      "evidence": "{\"deck:en-b1:en-clarify\":{\"interval\":3,\"due\":\"2026-10-15\",\"algorithm\":\"fsrs-6\",\"rating\":\"Good\",\"fsrsCard\":{\"due\":\"2026-10-14T18:03:47.278Z\",\"stability\":2.3065,\"difficulty\":2.11810397,\"elapsed_days\":0,\"scheduled_days\":3,\"reps\":1,\"lapses\":0,\"learning_steps\":0,\"state\":2,\"last_review\":\"2026-10-11T18:03:47.278Z\"},\"lastReviewed\":\"2026-10-12\",\"lastResult\":\"first_try\"},\"deck:en-b1:en-update\":{\"interval\":3,\"due\":\"2026-10-15\",\"algorithm\":\"fsrs-6\",\"rating\":\"Good\",\"fsrsCard\":{\"due\":\"2026-10-14T18:03:47.577Z\",\"stability\":2.3065,\"difficulty\":2.11810397,\"elapsed_days\":0,\"scheduled_days\":3,\"reps\":1,\"lapses\":0,\"learning_steps\":0,\"state\":2,\"last_review\":\"2026-10-11T18:03:47.577Z\"},\"lastReviewed\":\"2026-10-12\",\"lastResult\":\"first_try\"},\"deck:en-b1:en-feedback\":{\"interval\":3,\"due\":\"2026-10-15\",\"algorithm\":\"fsrs-6\",\"rating\":\"Good\",\"fsrsCard\":{\"due\":\"2026-10-14T18:03:47.959Z\",\"stability\":2.3065,\"difficulty\":2.11810397,\"elapsed_days\":0,\"scheduled_days\":3,\"reps\":1,\"lapses\":0,\"learning_steps\":0,\"state\":2,\"last_review\":\"2026-10-11T18:03:47.959Z\"},\"lastReviewed\":\"2026-10-12\",\"lastResult\":\"first_try\"}}"
+      "evidence": "{\"deck:en-b1:en-clarify\":{\"interval\":3,\"due\":\"2026-10-15\",\"algorithm\":\"fsrs-6\",\"rating\":\"Good\",\"fsrsCard\":{\"due\":\"2026-10-14T18:30:46.539Z\",\"stability\":2.3065,\"difficulty\":2.11810397,\"elapsed_days\":0,\"scheduled_days\":3,\"reps\":1,\"lapses\":0,\"learning_steps\":0,\"state\":2,\"last_review\":\"2026-10-11T18:30:46.539Z\"},\"lastReviewed\":\"2026-10-12\",\"lastResult\":\"first_try\"},\"deck:en-b1:en-update\":{\"interval\":3,\"due\":\"2026-10-15\",\"algorithm\":\"fsrs-6\",\"rating\":\"Good\",\"fsrsCard\":{\"due\":\"2026-10-14T18:30:47.060Z\",\"stability\":2.3065,\"difficulty\":2.11810397,\"elapsed_days\":0,\"scheduled_days\":3,\"reps\":1,\"lapses\":0,\"learning_steps\":0,\"state\":2,\"last_review\":\"2026-10-11T18:30:47.060Z\"},\"lastReviewed\":\"2026-10-12\",\"lastResult\":\"first_try\"},\"deck:en-b1:en-feedback\":{\"interval\":3,\"due\":\"2026-10-15\",\"algorithm\":\"fsrs-6\",\"rating\":\"Good\",\"fsrsCard\":{\"due\":\"2026-10-14T18:30:47.357Z\",\"stability\":2.3065,\"difficulty\":2.11810397,\"elapsed_days\":0,\"scheduled_days\":3,\"reps\":1,\"lapses\":0,\"learning_steps\":0,\"state\":2,\"last_review\":\"2026-10-11T18:30:47.357Z\"},\"lastReviewed\":\"2026-10-12\",\"lastResult\":\"first_try\"}}"
     },
     {
       "group": "浏览器旅程",
-      "name": "本地拾取后立即进入个人表达练习",
+      "name": "本地拾取使用原文生成挖空卡",
       "pass": true,
-      "evidence": "我的真实表达"
+      "evidence": "align\n就目标或优先级达成一致 · B2\n挖空正面 Before the project starts, let's ___ on the priorities and clarify the scope.\n＋ 制成卡片"
+    },
+    {
+      "group": "浏览器旅程",
+      "name": "本地拾取后立即进入个人练习卡",
+      "pass": true,
+      "evidence": "我的练习卡"
+    },
+    {
+      "group": "浏览器旅程",
+      "name": "拾取内容已持久化为完整练习卡",
+      "pass": true,
+      "evidence": "{\"target\":\"align\",\"lang\":\"en\",\"meaning\":\"就目标或优先级达成一致\",\"example\":\"Before the project starts, let's align on the priorities and clarify the scope.\",\"level\":\"B2\",\"id\":\"picked-en-align-1u5g21p\",\"source\":\"个人拾取\",\"addedAt\":\"2026-10-12\",\"lemma\":\"align\",\"cloze\":\"Before the project starts, let's ___ on the priorities and clarify the scope.\",\"translation\":\"就目标或优先级达成一致\",\"grammar\":[\"个人拾取\"],\"explanation\":\"就目标或优先级达成一致\",\"acceptedAnswers\":[],\"cardType\":\"practice\",\"cardVersion\":2}"
+    },
+    {
+      "group": "浏览器旅程",
+      "name": "拾取卡作答进入 FSRS-6 排期",
+      "pass": true,
+      "evidence": "{\"interval\":3,\"due\":\"2026-10-15\",\"algorithm\":\"fsrs-6\",\"rating\":\"Good\",\"fsrsCard\":{\"due\":\"2026-10-14T18:30:48.461Z\",\"stability\":2.3065,\"difficulty\":2.11810397,\"elapsed_days\":0,\"scheduled_days\":3,\"reps\":1,\"lapses\":0,\"learning_steps\":0,\"state\":2,\"last_review\":\"2026-10-11T18:30:48.461Z\"},\"lastReviewed\":\"2026-10-12\",\"lastResult\":\"first_try\"}"
+    },
+    {
+      "group": "浏览器旅程",
+      "name": "重复制卡更新语境但不增加重复卡",
+      "pass": true,
+      "evidence": "[{\"target\":\"priorities\",\"lang\":\"en\",\"meaning\":\"优先事项\",\"example\":\"Before the project starts, let's align on the priorities and clarify the scope.\",\"level\":\"B1\",\"id\":\"picked-en-priorities-1yum5b0\",\"source\":\"个人拾取\",\"addedAt\":\"2026-10-12\",\"lemma\":\"priorities\",\"cloze\":\"Before the project starts, let's align on the ___ and clarify the scope.\",\"translation\":\"优先事项\",\"grammar\":[\"个人拾取\"],\"explanation\":\"优先事项\",\"acceptedAnswers\":[],\"cardType\":\"practice\",\"cardVersion\":2},{\"target\":\"update\",\"lang\":\"en\",\"meaning\":\"进展说明\",\"example\":\"I will follow up with the supplier after the meeting and send a brief update to the team.\",\"level\":\"B1\",\"id\":\"picked-en-update-1mik6kx\",\"source\":\"个人拾取\",\"addedAt\":\"2026-10-12\",\"lemma\":\"update\",\"cloze\":\"I will follow up with the supplier after the meeting and send a brief ___ to the team.\",\"translation\":\"进展说明\",\"grammar\":[\"个人拾取\"],\"explanation\":\"进展说明\",\"acceptedAnswers\":[],\"cardType\":\"practice\",\"cardVersion\":2},{\"target\":\"follow up\",\"lang\":\"en\",\"meaning\":\"继续跟进\",\"example\":\"I will follow up with the supplier after the meeting and send a brief update to the team.\",\"level\":\"B1\",\"id\":\"picked-en-follow-up-1371t2a\",\"source\":\"个人拾取\",\"addedAt\":\"2026-10-12\",\"lemma\":\"follow up\",\"cloze\":\"I will ___ with the supplier after the meeting and send a brief update to the team.\",\"translation\":\"继续跟进\",\"grammar\":[\"个人拾取\"],\"explanation\":\"继续跟进\",\"acceptedAnswers\":[],\"cardType\":\"practice\",\"cardVersion\":2},{\"target\":\"scope\",\"lang\":\"en\",\"meaning\":\"项目范围 / 边界\",\"example\":\"Before the project starts, let's align on the priorities and clarify the scope.\",\"level\":\"B2\",\"id\":\"picked-en-scope-wbcqxg\",\"source\":\"个人拾取\",\"addedAt\":\"2026-10-12\",\"lemma\":\"scope\",\"cloze\":\"Before the project starts, let's align on the priorities and clarify the ___.\",\"translation\":\"项目范围 / 边界\",\"grammar\":[\"个人拾取\"],\"explanation\":\"项目范围 / 边界\",\"acceptedAnswers\":[],\"cardType\":\"practice\",\"cardVersion\":2},{\"target\":\"clarify\",\"lang\":\"en\",\"meaning\":\"澄清、说明清楚\",\"example\":\"Before the project starts, let's align on the priorities and clarify the scope.\",\"level\":\"B1\",\"id\":\"picked-en-clarify-1uauaaa\",\"source\":\"个人拾取\",\"addedAt\":\"2026-10-12\",\"lemma\":\"clarify\",\"cloze\":\"Before the project starts, let's align on the priorities and ___ the scope.\",\"translation\":\"澄清、说明清楚\",\"grammar\":[\"个人拾取\"],\"explanation\":\"澄清、说明清楚\",\"acceptedAnswers\":[],\"cardType\":\"practice\",\"cardVersion\":2},{\"target\":\"align\",\"lang\":\"en\",\"meaning\":\"就目标或优先级达成一致\",\"example\":\"Before the project starts, let's align on the priorities and clarify the scope.\",\"level\":\"B2\",\"id\":\"picked-en-align-1u5g21p\",\"source\":\"个人拾取\",\"addedAt\":\"2026-10-12\",\"lemma\":\"align\",\"cloze\":\"Before the project starts, let's ___ on the priorities and clarify the scope.\",\"translation\":\"就目标或优先级达成一致\",\"grammar\":[\"个人拾取\"],\"explanation\":\"就目标或优先级达成一致\",\"acceptedAnswers\":[],\"cardType\":\"practice\",\"cardVersion\":2}]"
     },
     {
       "group": "浏览器旅程",
@@ -332,7 +412,7 @@
       "group": "浏览器旅程",
       "name": "重输通过记录为待巩固",
       "pass": true,
-      "evidence": "{\"deck:en-b1:en-clarify\":{\"interval\":2,\"due\":\"2026-10-14\",\"algorithm\":\"fsrs-6\",\"rating\":\"Hard\",\"fsrsCard\":{\"due\":\"2026-10-13T18:03:50.491Z\",\"stability\":0.212,\"difficulty\":7.60420977,\"elapsed_days\":0,\"scheduled_days\":2,\"reps\":2,\"lapses\":0,\"learning_steps\":0,\"state\":2,\"last_review\":\"2026-10-11T18:03:50.491Z\"},\"lastReviewed\":\"2026-10-12\",\"lastResult\":\"retried\"}}"
+      "evidence": "{\"deck:en-b1:en-clarify\":{\"interval\":2,\"due\":\"2026-10-14\",\"algorithm\":\"fsrs-6\",\"rating\":\"Hard\",\"fsrsCard\":{\"due\":\"2026-10-13T18:30:50.938Z\",\"stability\":0.212,\"difficulty\":7.60420977,\"elapsed_days\":0,\"scheduled_days\":2,\"reps\":2,\"lapses\":0,\"learning_steps\":0,\"state\":2,\"last_review\":\"2026-10-11T18:30:50.938Z\"},\"lastReviewed\":\"2026-10-12\",\"lastResult\":\"retried\"}}"
     },
     {
       "group": "设置页",
@@ -356,7 +436,49 @@
       "group": "内容路线",
       "name": "个人拾取不再暴露本地规则黑话",
       "pass": true,
-      "evidence": "不上传，直接找表达"
+      "evidence": "不上传，直接制卡"
+    },
+    {
+      "group": "安全边界",
+      "name": "拾取题面按纯文本渲染",
+      "pass": true,
+      "evidence": "<img src=x onerror=\"window.__pickedXss=1\"> I would like to ? with the team before the meeting."
+    },
+    {
+      "group": "数据迁移",
+      "name": "加载后立即持久化完整练习卡",
+      "pass": true,
+      "evidence": "{\"id\":\"picked-existing\",\"target\":\"touch base\",\"meaning\":\"联系确认\",\"example\":\"<img src=x onerror=\\\"window.__pickedXss=1\\\"> I would like to touch base with the team before the meeting.\",\"lang\":\"en\",\"level\":\"B1\",\"source\":\"旧拾取\",\"lemma\":\"touch base\",\"cloze\":\"<img src=x onerror=\\\"window.__pickedXss=1\\\"> I would like to ___ with the team before the meeting.\",\"translation\":\"联系确认\",\"grammar\":[\"个人拾取\",\"旧拾取\"],\"explanation\":\"联系确认\",\"acceptedAnswers\":[],\"addedAt\":\"\",\"cardType\":\"practice\",\"cardVersion\":2}"
+    },
+    {
+      "group": "数据迁移",
+      "name": "旧拾取的复习记录不丢失",
+      "pass": true,
+      "evidence": "{\"picked:picked-existing\":{\"due\":\"2026-10-12\",\"interval\":1,\"lastReviewed\":\"2026-10-11\",\"lastResult\":\"first_try\"}}"
+    },
+    {
+      "group": "数据迁移",
+      "name": "我的词书显示卡片和单卡练习入口",
+      "pass": true,
+      "evidence": "我的英语练习卡\n1 张卡 · 新卡优先、到期优先、最久未练优先\n＋ 生成新卡\n练习下一组 1 张\ntouch base\n练习卡 · B1\n联系确认\n挖空正面\n<img src=x onerror=\"window.__pickedXss=1\"> I would like to ___ with the team before the meeting.\n今天到期 · 旧拾取\n练这张卡"
+    },
+    {
+      "group": "数据迁移",
+      "name": "旧排期首次复习后延续为 FSRS 状态",
+      "pass": true,
+      "evidence": "{\"interval\":3,\"due\":\"2026-10-15\",\"algorithm\":\"fsrs-6\",\"rating\":\"Good\",\"fsrsCard\":{\"due\":\"2026-10-14T18:30:53.079Z\",\"stability\":1,\"difficulty\":4.99022837,\"elapsed_days\":0,\"scheduled_days\":3,\"reps\":2,\"lapses\":0,\"learning_steps\":0,\"state\":2,\"last_review\":\"2026-10-11T18:30:53.079Z\"},\"lastReviewed\":\"2026-10-12\",\"lastResult\":\"first_try\"}"
+    },
+    {
+      "group": "法语制卡",
+      "name": "法语材料可在浏览器本地生成练习卡",
+      "pass": true,
+      "evidence": "clarifier\n澄清、说明清楚 · A2\n挖空正面 Avant la réunion, nous devons ___ les priorités et faire le point sur le projet.\n＋ 制成卡片\npriorités\n优先事项 · A2\n挖空正面 Avant la réunion, nous devons clarifier les ___ et faire le point sur le projet.\n＋ 制成卡片\nfaire le point\n梳理或同步当前进展 · B1\n挖空正面 Avant la réunion, nous devons clarifier les priorités et ___ sur le projet.\n＋ 制成卡片\ncompte rendu\n会议纪要、报告 · A2\n挖空正面 Je viens de terminer le ___ et je voudrais proposer une autre solution.\n＋ 制成卡片\nproposer\n提出、建议 · A2\n挖空正面 Je viens de terminer le compte rendu et je voudrais ___ une autre solution.\n＋ 制成卡片\n全部制成卡片\n全部制卡并练习"
+    },
+    {
+      "group": "法语制卡",
+      "name": "法语拾取以完整卡片保存",
+      "pass": true,
+      "evidence": "[{\"target\":\"proposer\",\"lang\":\"fr\",\"meaning\":\"提出、建议\",\"example\":\"Je viens de terminer le compte rendu et je voudrais proposer une autre solution.\",\"level\":\"A2\",\"id\":\"picked-fr-proposer-vcvap5\",\"source\":\"个人拾取\",\"addedAt\":\"2026-10-12\",\"lemma\":\"proposer\",\"cloze\":\"Je viens de terminer le compte rendu et je voudrais ___ une autre solution.\",\"translation\":\"提出、建议\",\"grammar\":[\"个人拾取\"],\"explanation\":\"提出、建议\",\"acceptedAnswers\":[],\"cardType\":\"practice\",\"cardVersion\":2},{\"target\":\"compte rendu\",\"lang\":\"fr\",\"meaning\":\"会议纪要、报告\",\"example\":\"Je viens de terminer le compte rendu et je voudrais proposer une autre solution.\",\"level\":\"A2\",\"id\":\"picked-fr-compte-rendu-yef1pz\",\"source\":\"个人拾取\",\"addedAt\":\"2026-10-12\",\"lemma\":\"compte rendu\",\"cloze\":\"Je viens de terminer le ___ et je voudrais proposer une autre solution.\",\"translation\":\"会议纪要、报告\",\"grammar\":[\"个人拾取\"],\"explanation\":\"会议纪要、报告\",\"acceptedAnswers\":[],\"cardType\":\"practice\",\"cardVersion\":2},{\"target\":\"faire le point\",\"lang\":\"fr\",\"meaning\":\"梳理或同步当前进展\",\"example\":\"Avant la réunion, nous devons clarifier les priorités et faire le point sur le projet.\",\"level\":\"B1\",\"id\":\"picked-fr-faire-le-point-21qupb\",\"source\":\"个人拾取\",\"addedAt\":\"2026-10-12\",\"lemma\":\"faire le point\",\"cloze\":\"Avant la réunion, nous devons clarifier les priorités et ___ sur le projet.\",\"translation\":\"梳理或同步当前进展\",\"grammar\":[\"个人拾取\"],\"explanation\":\"梳理或同步当前进展\",\"acceptedAnswers\":[],\"cardType\":\"practice\",\"cardVersion\":2},{\"target\":\"priorités\",\"lang\":\"fr\",\"meaning\":\"优先事项\",\"example\":\"Avant la réunion, nous devons clarifier les priorités et faire le point sur le projet.\",\"level\":\"A2\",\"id\":\"picked-fr-priorites-mvp8te\",\"source\":\"个人拾取\",\"addedAt\":\"2026-10-12\",\"lemma\":\"priorités\",\"cloze\":\"Avant la réunion, nous devons clarifier les ___ et faire le point sur le projet.\",\"translation\":\"优先事项\",\"grammar\":[\"个人拾取\"],\"explanation\":\"优先事项\",\"acceptedAnswers\":[],\"cardType\":\"practice\",\"cardVersion\":2},{\"target\":\"clarifier\",\"lang\":\"fr\",\"meaning\":\"澄清、说明清楚\",\"example\":\"Avant la réunion, nous devons clarifier les priorités et faire le point sur le projet.\",\"level\":\"A2\",\"id\":\"picked-fr-clarifier-6319p2\",\"source\":\"个人拾取\",\"addedAt\":\"2026-10-12\",\"lemma\":\"clarifier\",\"cloze\":\"Avant la réunion, nous devons ___ les priorités et faire le point sur le projet.\",\"translation\":\"澄清、说明清楚\",\"grammar\":[\"个人拾取\"],\"explanation\":\"澄清、说明清楚\",\"acceptedAnswers\":[],\"cardType\":\"practice\",\"cardVersion\":2}]"
     },
     {
       "group": "用户运营看板",
