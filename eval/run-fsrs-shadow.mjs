@@ -188,14 +188,14 @@ const result = {
     evidence: [
       `${history.length} 条复习事件，${predictions.length} 个可比的跨日首次作答样本，覆盖 ${crossDayCards} 张卡。`,
       `数据时间跨度 ${rounded(spanDays, 1)} 天；决策门槛预设为 ${decisionThreshold.delayedOutcomeSamples} 个跨日样本、${decisionThreshold.cards} 张卡、${decisionThreshold.spanDays} 天。`,
-      `FSRS 中位建议间隔 ${rounded(median(fsrsDays), 1) ?? '—'} 天，当前固定规则 ${rounded(median(fixedDays), 1) ?? '—'} 天；这只说明排期不同。`,
+      `FSRS 中位建议间隔 ${rounded(median(fsrsDays), 1) ?? '—'} 天，旧固定规则 ${rounded(median(fixedDays), 1) ?? '—'} 天；这只说明排期不同。`,
     ],
     confidence: eligibleForDecision ? '中' : '低',
     validationPlan: [
-      '用真实自愿导出的 reviewHistory 连续做影子排期，线上仍使用现有规则。',
+      '线上使用 FSRS-6 默认权重继续积累真实 reviewHistory，但不把默认权重包装成已经验证的个性化模型。',
       '达到数据门槛后按用户和时间切分训练/验证，避免同一张卡泄漏到两侧。',
       '主指标比较 Brier score 与 log loss，辅指标比较每日复习量、隔天首次答对率和过期率。',
-      '通过离线门槛后先小流量 A/B，设回滚开关；不以模型单次判语替代统计结论。',
+      '达到门槛后再评估个性化参数或 A/B；在此之前保留旧固定规则作为回滚基线。',
     ],
     limitations: [
       loaded.source === 'built-in-contract-fixture' ? '本次默认输入是合约测试数据，不是真实用户样本。' : '输入来自导出文件，仍可能存在自选偏差和设备时钟偏差。',

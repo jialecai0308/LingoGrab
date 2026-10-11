@@ -86,14 +86,53 @@
     return { kind: 'wrong', correct: false, answer, target }
   }
 
-  function nextReview({ previousInterval = 0, correct = false, firstTry = false, today = new Date() } = {}) {
+  function fixedNextReview({ previousInterval = 0, correct = false, firstTry = false, today = new Date() } = {}) {
     const base = new Date(today)
     base.setHours(12, 0, 0, 0)
     const current = Math.max(0, Number(previousInterval) || 0)
     const interval = !correct ? 1 : firstTry ? ([1, 3, 7, 14, 30, 60].find(days => days > current) || 90) : 1
     base.setDate(base.getDate() + interval)
     const due = `${base.getFullYear()}-${String(base.getMonth() + 1).padStart(2, '0')}-${String(base.getDate()).padStart(2, '0')}`
-    return { interval, due }
+    return { interval, due, algorithm: 'fixed-fallback' }
+  }
+
+  function nextReview({ record = {}, previousInterval = 0, correct = false, firstTry = false, today = new Date() } = {}) {
+    if (!root.FSRS || typeof root.FSRS.fsrs !== 'function') {
+      return fixedNextReview({ previousInterval: record.interval || previousInterval, correct, firstTry, today })
+    }
+
+    const reviewedAt = new Date(today)
+    const scheduler = root.FSRS.fsrs({
+      request_retention: 0.9,
+      maximum_interval: 365,
+      enable_fuzz: false,
+      enable_short_term: false,
+    })
+    let card
+    if (record.fsrsCard && typeof record.fsrsCard === 'object') {
+      card = {
+        ...record.fsrsCard,
+        due: new Date(record.fsrsCard.due),
+        last_review: record.fsrsCard.last_review ? new Date(record.fsrsCard.last_review) : undefined,
+      }
+    } else {
+      card = root.FSRS.createEmptyCard(reviewedAt)
+    }
+    const rating = !correct ? root.FSRS.Rating.Again : firstTry ? root.FSRS.Rating.Good : root.FSRS.Rating.Hard
+    const scheduled = scheduler.next(card, reviewedAt, rating).card
+    const dueDate = new Date(scheduled.due)
+    const due = `${dueDate.getFullYear()}-${String(dueDate.getMonth() + 1).padStart(2, '0')}-${String(dueDate.getDate()).padStart(2, '0')}`
+    return {
+      interval: Math.max(1, Number(scheduled.scheduled_days) || 1),
+      due,
+      algorithm: 'fsrs-6',
+      rating: root.FSRS.Rating[rating],
+      fsrsCard: {
+        ...scheduled,
+        due: dueDate.toISOString(),
+        last_review: scheduled.last_review ? new Date(scheduled.last_review).toISOString() : null,
+      },
+    }
   }
 
   const EVENT_PROPERTY_KEYS = new Set([

@@ -1,6 +1,6 @@
 # LingoGrab 产品优化评测报告
 
-生成时间：2026-10-08T16:17:37.327Z
+生成时间：2026-10-11T18:03:52.465Z
 
 ## 结论
 
@@ -26,11 +26,9 @@
 
 | 检查项 | 结果 | 证据 |
 |---|:---:|---|
-| 首次答对 | 通过 | 1 天 · 2026-10-08 |
-| 第二次首次答对 | 通过 | 3 天 · 2026-10-10 |
-| 连续掌握 | 通过 | 7 天 · 2026-10-14 |
-| 重输通过 | 通过 | 1 天 · 2026-10-08 |
-| 答错重排 | 通过 | 1 天 · 2026-10-08 |
+| 首次答对进入 FSRS-6 | 通过 | {"interval":3,"due":"2026-10-10","algorithm":"fsrs-6","rating":"Good","fsrsCard":{"due":"2026-10-10T04:00:00.000Z","stability":2.3065,"difficulty":2.11810397,"elapsed_days":0,"scheduled_days":3,"reps":1,"lapses":0,"learning_steps":0,"state":2,"last_review":"2026-10-07T04:00:00.000Z"}} |
+| 答错记为 Again | 通过 | {"interval":1,"due":"2026-10-08","algorithm":"fsrs-6","rating":"Again","fsrsCard":{"due":"2026-10-08T04:00:00.000Z","stability":0.212,"difficulty":6.4133,"elapsed_days":0,"scheduled_days":1,"reps":1,"lapses":0,"learning_steps":0,"state":2,"last_review":"2026-10-07T04:00:00.000Z"}} |
+| 改正后记为 Hard | 通过 | {"interval":2,"due":"2026-10-09","algorithm":"fsrs-6","rating":"Hard","fsrsCard":{"due":"2026-10-09T04:00:00.000Z","stability":0.212,"difficulty":7.60420977,"elapsed_days":0,"scheduled_days":2,"reps":2,"lapses":0,"learning_steps":0,"state":2,"last_review":"2026-10-07T04:00:00.000Z"}} |
 
 ## 产品闭环
 
@@ -43,7 +41,8 @@
 | 学习记录与到期日 | 通过 | 存在对应实现 |
 | 学习数据导出 | 通过 | 存在对应实现 |
 | 词书数量口径 | 通过 | 存在对应实现 |
-| 首次体验缩短 | 通过 | 存在对应实现 |
+| 首次体验包含每日目标 | 通过 | 存在对应实现 |
+| 英语词库扩展为百张卡 | 通过 | 存在对应实现 |
 | 反馈点赞点踩 | 通过 | 存在对应实现 |
 | 匿名产品埋点 | 通过 | 存在对应实现 |
 | LingoGrab 用户运营看板 | 通过 | 存在对应实现 |
@@ -59,13 +58,14 @@
 |---|:---:|---|
 | 首次进入先选语言 | 通过 | 新手引导第 1 步 |
 | 新用户连续天数从零开始 | 通过 | 0 |
-| 语言选择后出现两条直达路径 | 通过 | 新手引导第 2 步 |
+| 语言选择后设置每日目标 | 通过 | 新手引导第 2 步 |
+| 设置目标后出现两条直达路径 | 通过 | 新手引导第 3 步 |
 | 可接受答案 explain | 通过 | 也可以这样说：explain |
 | 可接受答案 report | 通过 | 也可以这样说：report |
 | 可接受答案 comment | 通过 | 也可以这样说：comment |
-| 完成三题进入总结页 | 通过 | ✓ 这轮练习完成了  你学过的表达已经进入复习排期，下次会按本轮表现出现。  3 完成表达 100% 第一次就答对 0 旧题复习 — 隔天仍记得 这两个数是什么意思？ 回到今天 再拾取真实表达 |
+| 完成三题进入总结页 | 通过 | ✓ 这轮练习完成了  本轮 3 个由每日目标决定；职场英语 B1共 50 个，其他内容会在后续轮次出现。  3 本轮完成 100% 第一次就答对 0 旧题复习 — 隔天仍记得 这两个数是什么意思？ 回到今天 添加新表达 |
 | 每日记录写入本地状态 | 通过 | 3 条 |
-| 三题均生成下次复习日期 | 通过 | {"deck:en-b1:en-clarify":{"interval":1,"due":"2026-10-10","lastReviewed":"2026-10-09","lastResult":"first_try"},"deck:en-b1:en-update":{"interval":1,"due":"2026-10-10","lastReviewed":"2026-10-09","lastResult":"first_try"},"deck:en-b1:en-feedback":{"interval":1,"due":"2026-10-10","lastReviewed":"2026-10-09","lastResult":"first_try"}} |
+| 三题均生成下次复习日期 | 通过 | {"deck:en-b1:en-clarify":{"interval":3,"due":"2026-10-15","algorithm":"fsrs-6","rating":"Good","fsrsCard":{"due":"2026-10-14T18:03:47.278Z","stability":2.3065,"difficulty":2.11810397,"elapsed_days":0,"scheduled_days":3,"reps":1,"lapses":0,"learning_steps":0,"state":2,"last_review":"2026-10-11T18:03:47.278Z"},"lastReviewed":"2026-10-12","lastResult":"first_try"},"deck:en-b1:en-update":{"interval":3,"due":"2026-10-15","algorithm":"fsrs-6","rating":"Good","fsrsCard":{"due":"2026-10-14T18:03:47.577Z","stability":2.3065,"difficulty":2.11810397,"elapsed_days":0,"scheduled_days":3,"reps":1,"lapses":0,"learning_steps":0,"state":2,"last_review":"2026-10-11T18:03:47.577Z"},"lastReviewed":"2026-10-12","lastResult":"first_try"},"deck:en-b1:en-feedback":{"interval":3,"due":"2026-10-15","algorithm":"fsrs-6","rating":"Good","fsrsCard":{"due":"2026-10-14T18:03:47.959Z","stability":2.3065,"difficulty":2.11810397,"elapsed_days":0,"scheduled_days":3,"reps":1,"lapses":0,"learning_steps":0,"state":2,"last_review":"2026-10-11T18:03:47.959Z"},"lastReviewed":"2026-10-12","lastResult":"first_try"}} |
 | 本地拾取后立即进入个人表达练习 | 通过 | 我的真实表达 |
 | 页面无运行时错误 | 通过 |  |
 | 真正错误必须重输 | 通过 | 正确答案是 clarify |
@@ -73,7 +73,7 @@
 | 学习页不暴露系统分层 | 通过 | 正确答案是 clarify  你写的是 banana。clarify 和 explain 在这里都成立；clarify 更强调消除目标或要求中的歧义，词书重点练习这个职场意图。  输入 clarify，再提交一次。  反馈这段解释 想看更多解释 |
 | 更多解释默认收起 | 通过 | 详细解释和 AI 入口未抢占主流程 |
 | 点赞反馈成功上传 | 通过 | 已收到，谢谢 |
-| 重输通过记录为待巩固 | 通过 | {"deck:en-b1:en-clarify":{"interval":1,"due":"2026-10-10","lastReviewed":"2026-10-09","lastResult":"retried"}} |
+| 重输通过记录为待巩固 | 通过 | {"deck:en-b1:en-clarify":{"interval":2,"due":"2026-10-14","algorithm":"fsrs-6","rating":"Hard","fsrsCard":{"due":"2026-10-13T18:03:50.491Z","stability":0.212,"difficulty":7.60420977,"elapsed_days":0,"scheduled_days":2,"reps":2,"lapses":0,"learning_steps":0,"state":2,"last_review":"2026-10-11T18:03:50.491Z"},"lastReviewed":"2026-10-12","lastResult":"retried"}} |
 
 ## 设置页
 
@@ -115,7 +115,7 @@
 
 - 同一套测试同时检查纯规则、静态实现和真实浏览器旅程，能发现只改文案但未打通状态的情况。
 - 多答案用例来自既有人工复核中已经确认的争议案例，目标是降低误判而不是提高表面分数。
-- 复习排期检查具体日期，避免只验证字段存在。
+- 复习排期检查 FSRS-6 算法标记、评级映射与状态递增，避免只验证字段存在。
 
 ### 这套评测不能说明什么
 

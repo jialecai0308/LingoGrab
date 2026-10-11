@@ -10,6 +10,8 @@ const root = path.resolve(here, '..')
 const require = createRequire(import.meta.url)
 const { chromium } = require('playwright')
 
+const fsrsModule = await import(path.join(root, 'assets', 'ts-fsrs.umd.js'))
+globalThis.FSRS = fsrsModule.default || fsrsModule
 await import(path.join(root, 'assets', 'learning-routing.js'))
 const routing = globalThis.LingoGrabRouting
 
@@ -37,17 +39,12 @@ for (const [name, value, card, expected] of answerCases) {
 }
 
 const base = new Date('2026-10-07T12:00:00+08:00')
-const scheduleCases = [
-  ['首次答对', { previousInterval: 0, correct: true, firstTry: true }, 1, '2026-10-08'],
-  ['第二次首次答对', { previousInterval: 1, correct: true, firstTry: true }, 3, '2026-10-10'],
-  ['连续掌握', { previousInterval: 3, correct: true, firstTry: true }, 7, '2026-10-14'],
-  ['重输通过', { previousInterval: 7, correct: true, firstTry: false }, 1, '2026-10-08'],
-  ['答错重排', { previousInterval: 14, correct: false, firstTry: false }, 1, '2026-10-08'],
-]
-for (const [name, input, interval, due] of scheduleCases) {
-  const result = routing.nextReview({ ...input, today: base })
-  check('复习排期', name, result.interval === interval && result.due === due, `${result.interval} 天 · ${result.due}`)
-}
+const firstGood = routing.nextReview({ correct: true, firstTry: true, today: base })
+check('复习排期', '首次答对进入 FSRS-6', firstGood.algorithm === 'fsrs-6' && firstGood.rating === 'Good' && firstGood.interval > 0 && firstGood.fsrsCard?.reps === 1, JSON.stringify(firstGood))
+const firstWrong = routing.nextReview({ correct: false, firstTry: false, today: base })
+check('复习排期', '答错记为 Again', firstWrong.algorithm === 'fsrs-6' && firstWrong.rating === 'Again' && firstWrong.interval > 0, JSON.stringify(firstWrong))
+const corrected = routing.nextReview({ record: firstWrong, correct: true, firstTry: false, today: base })
+check('复习排期', '改正后记为 Hard', corrected.algorithm === 'fsrs-6' && corrected.rating === 'Hard' && corrected.fsrsCard?.reps === 2, JSON.stringify(corrected))
 
 const html = await fs.readFile(path.join(root, 'index.html'), 'utf8')
 const adminHtml = await fs.readFile(path.join(root, 'admin.html'), 'utf8')
@@ -58,8 +55,9 @@ const staticChecks = [
   ['个人表达进入学习队列', html.includes("type:'picked'") && html.includes('pickedToCard')],
   ['学习记录与到期日', html.includes('studyRecords') && html.includes('lastReviewed')],
   ['学习数据导出', html.includes('id="exportBtn"') && html.includes('lingograb-learning-data.json')],
-  ['词书数量口径', html.includes('可练习卡') && !html.includes('${d.size.toLocaleString(\'en-US\')} WORDS')],
-  ['首次体验缩短', html.includes('直接练 3 道题') && html.includes('从示例材料拾取')],
+  ['词书数量口径', html.includes('已校验练习卡') && !html.includes('${d.size.toLocaleString(\'en-US\')} WORDS')],
+  ['首次体验包含每日目标', html.includes('data-onboard-goal="3"') && html.includes('data-onboard-goal="12"') && html.includes('先添加自己的表达')],
+  ['英语词库扩展为百张卡', html.includes('data/en-curated-cards.js') && html.includes('FSRS-6')],
   ['反馈点赞点踩', html.includes('data-reaction="like"') && html.includes('data-reaction="dislike"') && html.includes("accountPost('/feedback'")],
   ['匿名产品埋点', html.includes("e:'lg_visit'") && html.includes("e:'lg_session_complete'") && !html.includes('userAnswer:val')],
   ['LingoGrab 用户运营看板', adminHtml.includes('LingoGrab 用户运营看板') && adminHtml.includes('/lingograb-analytics') && adminHtml.includes('feedbackItems') && adminHtml.includes('demoData')],
@@ -110,7 +108,9 @@ try {
   check('浏览器旅程', '首次进入先选语言', await page.locator('[data-onboard-lang="en"]').isVisible(), '新手引导第 1 步')
   check('浏览器旅程', '新用户连续天数从零开始', (await page.locator('#streakCount').innerText()) === '0', await page.locator('#streakCount').innerText())
   await page.locator('[data-onboard-lang="en"]').click()
-  check('浏览器旅程', '语言选择后出现两条直达路径', await page.locator('#guideQuickPractice').isVisible() && await page.locator('#guideTryPickup').isVisible(), '新手引导第 2 步')
+  check('浏览器旅程', '语言选择后设置每日目标', await page.locator('[data-onboard-goal="3"]').isVisible() && await page.locator('[data-onboard-goal="12"]').isVisible(), '新手引导第 2 步')
+  await page.locator('[data-onboard-goal="3"]').click()
+  check('浏览器旅程', '设置目标后出现两条直达路径', await page.locator('#guideQuickPractice').isVisible() && await page.locator('#guideTryPickup').isVisible(), '新手引导第 3 步')
   await page.locator('#guideQuickPractice').click()
 
   for (const answer of ['explain', 'report', 'comment']) {
@@ -140,6 +140,7 @@ try {
   await retryPage.evaluate(() => localStorage.clear())
   await retryPage.reload({ waitUntil: 'networkidle' })
   await retryPage.locator('[data-onboard-lang="en"]').click()
+  await retryPage.locator('[data-onboard-goal="3"]').click()
   await retryPage.locator('#guideQuickPractice').click()
   await retryPage.locator('#answer').fill('banana')
   await retryPage.locator('#checkBtn').click()
@@ -234,7 +235,7 @@ const report = {
     strengths: [
       '同一套测试同时检查纯规则、静态实现和真实浏览器旅程，能发现只改文案但未打通状态的情况。',
       '多答案用例来自既有人工复核中已经确认的争议案例，目标是降低误判而不是提高表面分数。',
-      '复习排期检查具体日期，避免只验证字段存在。',
+      '复习排期检查 FSRS-6 算法标记、评级映射与状态递增，避免只验证字段存在。',
     ],
     blindSpots: [
       '这套检查不能证明 D1 或 D7 留存，也不能证明长期记忆效果。',
