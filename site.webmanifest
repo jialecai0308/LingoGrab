@@ -4,8 +4,8 @@
   "description": "把真实语料变成今天能学、以后能用的英法语言课。",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#f6f7f3",
-  "theme_color": "#315d52",
+  "background_color": "#eef5f9",
+  "theme_color": "#eaf4fa",
   "lang": "zh-CN",
   "icons": []
 }
