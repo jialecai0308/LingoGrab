@@ -2,7 +2,7 @@
 
 > 把读过的东西，变成记得住的东西。
 
-**在线 Demo** 👉 https://lingograb.getyuli.com/
+**在线 Demo** 👉 https://lingograb.com/
 
 这是一个以职场人持续学习为核心、兼顾日常与旅行场景的英法语言学习 MVP（数据为演示用）。它把「结构化课程 → 情境填空 → 错题解析 → 个人拾取 → 间隔复习」做成一条可以持续体验的闭环。
 
@@ -97,9 +97,9 @@
 
 ## 上线与 SEO
 
-- 当前公开地址仍为 GitHub Pages；`robots.txt`、`sitemap.xml`、canonical、Open Graph 和 Schema.org 元数据已就绪。
-- 域名建议、候选可用性与绑定步骤见 [`资料/上线与域名方案.md`](资料/上线与域名方案.md)。
-- 域名正式绑定后，需要把 canonical、Open Graph URL 与 sitemap 地址从 GitHub Pages 一次性替换成正式域名。
+- 当前正式地址为 `https://lingograb.com/`，由 EdgeOne Makers 监听 GitHub `main` 自动部署。
+- `robots.txt`、`sitemap.xml`、canonical、Open Graph 和 Schema.org 均以正式域名为唯一地址。
+- 旧地址由边缘中间件保留路径和查询参数后永久重定向到正式域名；域名、证书与搜索引擎迁移步骤见 [`资料/上线与域名方案.md`](资料/上线与域名方案.md)。
 
 ## 开源词库数据
 

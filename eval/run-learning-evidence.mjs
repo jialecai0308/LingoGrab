@@ -59,7 +59,7 @@ check('学习指标', '重输与可接受答案分开统计', summary.retried ==
 
 const html = await fs.readFile(path.join(root, 'index.html'), 'utf8')
 check('静态实现', '本地状态包含逐次复习历史', html.includes('reviewHistory:[]') && html.includes('createReviewEvent'), 'reviewHistory + createReviewEvent')
-check('静态实现', '云端合并保留两端事件', html.includes('appendCappedUnique(remote.reviewHistory,local.reviewHistory,5000)'), '按 ID 合并，最多 5000 条')
+check('静态实现', '云端合并保留两端事件', html.includes('reviewHistory:appendCappedUnique(remapCardEvents(remote.reviewHistory,aliases),remapCardEvents(local.reviewHistory,aliases),5000)'), '按 ID 合并、同步去重卡引用，最多 5000 条')
 check('静态实现', '研究导出声明隐私边界', html.includes('containsRawAnswers:false') && html.includes('containsImportedMaterial:false') && html.includes('containsContact:false'), '三个敏感字段均声明不包含')
 check('静态实现', '设置页展示用户自己的指标', ['evidenceCompleted', 'evidenceFirstTry', 'evidenceRetries', 'evidenceAttempts'].every(id => html.includes(`id="${id}"`)), '四项学习指标')
 
@@ -97,6 +97,7 @@ try {
   await page.evaluate(() => localStorage.clear())
   await page.reload({ waitUntil: 'networkidle' })
   await page.locator('[data-onboard-lang="en"]').click()
+  await page.locator('[data-onboard-goal="3"]').click()
   await page.locator('#guideQuickPractice').click()
 
   for (const answer of ['explain', 'report', 'comment']) {
@@ -124,6 +125,7 @@ try {
   await retryPage.evaluate(() => localStorage.clear())
   await retryPage.reload({ waitUntil: 'networkidle' })
   await retryPage.locator('[data-onboard-lang="en"]').click()
+  await retryPage.locator('[data-onboard-goal="3"]').click()
   await retryPage.locator('#guideQuickPractice').click()
   await retryPage.locator('#answer').fill('banana')
   await retryPage.locator('#checkBtn').click()

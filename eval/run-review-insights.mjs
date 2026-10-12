@@ -118,7 +118,8 @@ try {
   }
   await page.evaluate(value => {
     localStorage.clear()
-    localStorage.setItem('pickup-language-onboarding-v1', '1')
+    localStorage.setItem('lingograb-onboarding-v2', '1')
+    localStorage.setItem('lingograb-daily-goal-chosen-v1', '1')
     localStorage.setItem('pickup-mvp-state', JSON.stringify(value))
   }, seeded)
   await page.reload({ waitUntil: 'networkidle' })
@@ -139,8 +140,11 @@ try {
   await page.locator('#answer').fill('review')
   await page.locator('#checkBtn').click()
   await page.locator('#nextBtn').click()
+  await page.locator('#answer').fill('confirm')
+  await page.locator('#checkBtn').click()
+  await page.locator('#nextBtn').click()
   const sessionValues = await page.locator('.session-summary b').allInnerTexts()
-  check('浏览器旅程', '完成页区分两次到期复习', sessionValues[0] === '2' && sessionValues[2] === '2', sessionValues.join(','))
+  check('浏览器旅程', '完成页区分两次到期复习', sessionValues[0] === '3' && sessionValues[2] === '2', sessionValues.join(','))
   check('浏览器旅程', '旧题复习显示答对数与样本数', sessionValues[3] === '2/2', sessionValues.join(','))
   await page.locator('.metric-help summary').click()
   check('浏览器旅程', '完成页可展开查看指标解释', await page.locator('.metric-help summary').isVisible() && (await page.locator('.metric-help').innerText()).includes('样本少时'), await page.locator('.metric-help').innerText())
@@ -152,7 +156,8 @@ try {
   const mobile = await browser.newPage({ viewport: { width: 390, height: 844 } })
   await mobile.goto(`http://127.0.0.1:${port}`, { waitUntil: 'networkidle' })
   await mobile.evaluate(value => {
-    localStorage.setItem('pickup-language-onboarding-v1', '1')
+    localStorage.setItem('lingograb-onboarding-v2', '1')
+    localStorage.setItem('lingograb-daily-goal-chosen-v1', '1')
     localStorage.setItem('pickup-mvp-state', JSON.stringify(value))
   }, seeded)
   await mobile.reload({ waitUntil: 'networkidle' })
