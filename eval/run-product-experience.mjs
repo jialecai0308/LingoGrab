@@ -20,6 +20,12 @@ function check(group, name, pass, evidence = '') {
   checks.push({ group, name, pass: Boolean(pass), evidence })
 }
 
+function deferred() {
+  let resolve
+  const promise = new Promise(done => { resolve = done })
+  return { promise, resolve }
+}
+
 const answerCases = [
   ['目标答案', 'clarify', { target: 'clarify', acceptedAnswers: ['explain'] }, 'target'],
   ['忽略大小写', 'CLARIFY', { target: 'clarify' }, 'target'],
@@ -69,6 +75,12 @@ const staticChecks = [
   ['看板不混入学习质量', adminHtml.includes('UV') && adminHtml.includes('访问来源') && adminHtml.includes('稳定性') && !adminHtml.includes('一次答对率') && !adminHtml.includes('延迟回忆表现')],
   ['产品内学习质量', html.includes('我的学习质量')],
   ['三条内容路线导航', html.includes('data-screen="library"') && html.includes('data-screen="smart"') && html.includes('data-screen="import"')],
+  ['个人拾取示例可轮换且不覆盖真实材料', html.includes('PICKUP_SAMPLES') && html.includes('id="samplePickupBtn"') && html.includes('已保留你的材料')],
+  ['个人拾取可直达智能精选', html.includes('id="goSmartFromPickupBtn"') && html.includes("$('#goSmartFromPickupBtn').onclick=()=>go('smart')")],
+  ['智能精选场景有对应文案', html.includes('SMART_SCENE_COPY') && html.includes('机场改签、酒店入住或问路') && html.includes('约时间、表达近况或提出建议')],
+  ['语言资产按三条内容路线统计', html.includes('<strong>基础词库</strong>') && html.includes('<strong>智能精选</strong>') && html.includes('<strong>个人拾取</strong>')],
+  ['材料或目标变化后会取消旧 AI 响应', html.includes('pickupRequestController') && html.includes('smartRequestController') && html.includes('invalidatePickupRequest') && html.includes('invalidateSmartRequest')],
+  ['智能精选场景暴露明确选中状态', html.includes('data-smart-scene="work" aria-pressed="true"') && html.includes("item.setAttribute('aria-pressed',String(selected))")],
   ['点赞点踩默认弱化', html.includes('class="reaction-details"') && html.includes('<summary>反馈这段解释</summary>')],
 ]
 for (const [name, pass] of staticChecks) check('产品闭环', name, pass, pass ? '存在对应实现' : '缺少实现')
@@ -160,19 +172,29 @@ try {
   check('浏览器旅程', '三题均生成下次复习日期', Object.values(state.studyRecords).length === 3 && Object.values(state.studyRecords).every(item => item.due > today), JSON.stringify(state.studyRecords))
 
   await page.locator('#goPickupBtn').click()
+  check('浏览器旅程', '个人拾取不再固定填充同一段', (await page.locator('#importText').inputValue()) === '', await page.locator('#importText').inputValue())
+  await page.locator('#samplePickupBtn').click()
+  const pickupSampleA = await page.locator('#importText').inputValue()
+  await page.locator('#samplePickupBtn').click()
+  const pickupSampleB = await page.locator('#importText').inputValue()
+  check('浏览器旅程', '换一段示例会切换内容', pickupSampleA.length > 20 && pickupSampleB.length > 20 && pickupSampleA !== pickupSampleB, `${pickupSampleA.slice(0, 30)} → ${pickupSampleB.slice(0, 30)}`)
   await page.locator('#analyseBtn').click()
   const cardPreview = await page.locator('#candidates .candidate').first().innerText()
-  check('浏览器旅程', '本地拾取使用原文生成挖空卡', cardPreview.includes('Before the project starts') && cardPreview.includes('___'), cardPreview)
+  const firstPickupTarget = await page.locator('#candidates .candidate b').first().innerText()
+  check('浏览器旅程', '本地拾取使用当前原文生成挖空卡', pickupSampleB.toLowerCase().includes(firstPickupTarget.toLowerCase()) && cardPreview.includes('___'), cardPreview)
   await page.locator('#candidates [data-add-practice]').click()
   check('浏览器旅程', '本地拾取后立即进入个人练习卡', (await page.locator('#studyDeck').innerText()) === '我的练习卡', await page.locator('#studyDeck').innerText())
   const pickedState = await page.evaluate(() => JSON.parse(localStorage.getItem('pickup-mvp-state')))
   const alignCard = pickedState.picked.find(item => item.target === 'align')
-  check('浏览器旅程', '拾取内容已持久化为完整练习卡', alignCard?.cardType === 'practice' && alignCard?.cardVersion === 2 && alignCard?.cloze.includes('___') && alignCard?.example.includes("let's align") && alignCard?.translation && alignCard?.explanation, JSON.stringify(alignCard))
+  check('浏览器旅程', '拾取内容已持久化为完整练习卡', alignCard?.cardType === 'practice' && alignCard?.cardVersion === 2 && alignCard?.cloze.includes('___') && alignCard?.example.toLowerCase().includes('align') && alignCard?.translation && alignCard?.explanation, JSON.stringify(alignCard))
   await page.locator('#answer').fill('align')
   await page.locator('#checkBtn').click()
   const pickedReviewedState = await page.evaluate(() => JSON.parse(localStorage.getItem('pickup-mvp-state')))
   const pickedRecord = pickedReviewedState.studyRecords[`picked:${alignCard.id}`]
   check('浏览器旅程', '拾取卡作答进入 FSRS-6 排期', pickedRecord?.algorithm === 'fsrs-6' && pickedRecord?.due && pickedRecord?.fsrsCard?.reps === 1, JSON.stringify(pickedRecord))
+  const assetBreakdown = await page.locator('#profileLine').innerText()
+  check('语言资产', '侧栏分开基础词库、智能精选和个人拾取', assetBreakdown.includes('基础词库') && assetBreakdown.includes('智能精选') && assetBreakdown.includes('个人拾取') && !assetBreakdown.includes('5/5'), assetBreakdown)
+  check('语言资产', '拾取制卡后总数和已练数动态更新', /\b1\/\d+\b/.test(assetBreakdown.split('\n').slice(-1)[0]), assetBreakdown)
   const pickedCountBeforeDuplicate = pickedReviewedState.picked.length
   await page.locator('.side-nav [data-screen="import"]').click()
   await page.locator('#analyseBtn').click()
@@ -213,8 +235,85 @@ try {
 
   await retryPage.locator('.side-nav [data-screen="smart"]').click()
   check('内容路线', '智能精选有独立可达页面', await retryPage.locator('#smart').isVisible() && await retryPage.locator('#smartRecommendBtn').isVisible(), '左侧导航 → 智能精选')
+  await retryPage.locator('[data-smart-scene="travel"]').click()
+  check('内容路线', '旅行应急显示对应输入提示', (await retryPage.locator('#smartGoal').getAttribute('placeholder')).includes('机场改签') && (await retryPage.locator('#smartGoalHint').innerText()).includes('住宿'), await retryPage.locator('#smartGoalHint').innerText())
+  check('内容路线', '场景选中状态同步给辅助技术', (await retryPage.locator('[data-smart-scene="travel"]').getAttribute('aria-pressed')) === 'true' && (await retryPage.locator('[data-smart-scene="work"]').getAttribute('aria-pressed')) === 'false', await retryPage.locator('#smartScenes').innerText())
+  await retryPage.locator('[data-smart-scene="daily"]').click()
+  check('内容路线', '日常交流显示对应输入提示', (await retryPage.locator('#smartGoal').getAttribute('placeholder')).includes('约时间') && (await retryPage.locator('#smartGoalHint').innerText()).includes('日常社交'), await retryPage.locator('#smartGoalHint').innerText())
   await retryPage.locator('.side-nav [data-screen="import"]').click()
   check('内容路线', '个人拾取不再暴露本地规则黑话', !(await retryPage.locator('#import').innerText()).includes('本地规则') && (await retryPage.locator('#analyseBtn').innerText()).includes('不上传'), await retryPage.locator('#analyseBtn').innerText())
+  await retryPage.locator('#samplePickupBtn').click()
+  await retryPage.locator('#importText').fill('This is my own material and it must stay here.')
+  await retryPage.locator('#samplePickupBtn').click()
+  check('内容路线', '换示例不覆盖用户真实材料', (await retryPage.locator('#importText').inputValue()) === 'This is my own material and it must stay here.', await retryPage.locator('#importText').inputValue())
+  await retryPage.locator('#goSmartFromPickupBtn').click()
+  check('内容路线', '没有材料可从拾取直达智能精选', await retryPage.locator('#smart').isVisible(), '个人拾取 → 智能精选')
+
+  const stalePage = await browser.newPage({ viewport: { width: 1280, height: 900 } })
+  const extractGate = deferred()
+  const recommendGates = [deferred(), deferred(), deferred()]
+  let recommendIndex = 0
+  await stalePage.route('**/api/track', route => route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' }))
+  await stalePage.route('**/api/pickup', async route => {
+    const task = route.request().postDataJSON()?.task
+    const gate = task === 'extract' ? extractGate : task === 'recommend' ? recommendGates[recommendIndex++] : null
+    if (!gate) return route.abort()
+    const cards = await gate.promise
+    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ content: JSON.stringify(cards) }) })
+  })
+  await stalePage.goto(`http://127.0.0.1:${port}`, { waitUntil: 'networkidle' })
+  await stalePage.evaluate(() => {
+    localStorage.clear()
+    localStorage.setItem('lingograb-onboarding-v2', '1')
+    localStorage.setItem('lingograb-daily-goal-chosen-v1', '1')
+    localStorage.setItem('pickup-mvp-state', JSON.stringify({ activeDeck: 'en-b1', preferredLang: 'en', picked: [], studyRecords: {}, settings: { dailyGoal: 3, aiEnabled: true } }))
+  })
+  await stalePage.reload({ waitUntil: 'networkidle' })
+  await stalePage.locator('.side-nav [data-screen="import"]').click()
+  await stalePage.locator('#importText').fill('We should align before the meeting and clarify the scope.')
+  const extractRequest = stalePage.waitForRequest(request => request.url().endsWith('/api/pickup') && request.postDataJSON()?.task === 'extract')
+  await stalePage.locator('#aiAnalyseBtn').click()
+  await extractRequest
+  await stalePage.locator('#importText').fill('Please update the project status after the client call.')
+  check('异步安全', '材料变化后可立即重新生成', !(await stalePage.locator('#aiAnalyseBtn').isDisabled()), '旧请求已取消，按钮立即恢复')
+  extractGate.resolve([{ target: 'align', meaning: 'STALE_PICKUP_RESULT', example: 'We should align before the meeting and clarify the scope.', lang: 'en', level: 'B1' }])
+  await stalePage.waitForTimeout(50)
+  const stalePickupPreview = await stalePage.locator('#candidates').innerText()
+  check('异步安全', '材料变化后忽略旧的个人拾取结果', !stalePickupPreview.includes('STALE_PICKUP_RESULT') && (await stalePage.locator('#importText').inputValue()).includes('update the project'), stalePickupPreview)
+
+  await stalePage.locator('.side-nav [data-screen="smart"]').click()
+  await stalePage.locator('#smartGoal').fill('prepare a project update')
+  const goalRequest = stalePage.waitForRequest(request => request.url().endsWith('/api/pickup') && request.postDataJSON()?.task === 'recommend')
+  await stalePage.locator('#smartRecommendBtn').click()
+  await goalRequest
+  await stalePage.locator('#smartGoal').fill('prepare a client call')
+  check('异步安全', '练习目标变化后可立即重新生成', !(await stalePage.locator('#smartRecommendBtn').isDisabled()), '旧请求已取消，按钮立即恢复')
+  recommendGates[0].resolve([{ target: 'status check', meaning: 'STALE_GOAL_RESULT', example: 'We need a status check today.', lang: 'en', level: 'B1' }])
+  await stalePage.waitForTimeout(50)
+  const staleGoalPreview = await stalePage.locator('#smartCandidates').innerText()
+  check('异步安全', '练习目标变化后忽略旧推荐', !staleGoalPreview.includes('STALE_GOAL_RESULT') && staleGoalPreview.includes('选一个场景'), staleGoalPreview)
+
+  await stalePage.locator('#smartGoal').fill('keep this goal unchanged')
+  const sceneRequest = stalePage.waitForRequest(request => request.url().endsWith('/api/pickup') && request.postDataJSON()?.task === 'recommend')
+  await stalePage.locator('#smartRecommendBtn').click()
+  await sceneRequest
+  await stalePage.locator('[data-smart-scene="travel"]').click()
+  check('异步安全', '场景变化后可立即重新生成', !(await stalePage.locator('#smartRecommendBtn').isDisabled()), '旧请求已取消，按钮立即恢复')
+  recommendGates[1].resolve([{ target: 'project update', meaning: 'STALE_SCENE_RESULT', example: 'I will give a project update today.', lang: 'en', level: 'B1' }])
+  await stalePage.waitForTimeout(50)
+  const staleScenePreview = await stalePage.locator('#smartCandidates').innerText()
+  check('异步安全', '场景变化后忽略旧推荐', !staleScenePreview.includes('STALE_SCENE_RESULT') && staleScenePreview.includes('选一个场景'), staleScenePreview)
+
+  await stalePage.locator('#smartGoal').fill('keep the language snapshot')
+  const languageRequest = stalePage.waitForRequest(request => request.url().endsWith('/api/pickup') && request.postDataJSON()?.task === 'recommend')
+  await stalePage.locator('#smartRecommendBtn').click()
+  await languageRequest
+  await stalePage.locator('.side-nav [data-screen="library"]').click()
+  await stalePage.locator('[data-filter="fr"]').click()
+  check('异步安全', '切换语言后可立即按新语言生成', !(await stalePage.locator('#smartRecommendBtn').isDisabled()), '旧语言请求已取消')
+  recommendGates[2].resolve([{ target: 'project update', meaning: 'STALE_LANGUAGE_RESULT', example: 'I will give a project update today.', lang: 'en', level: 'B1' }])
+  await stalePage.waitForTimeout(50)
+  check('异步安全', '切换语言后忽略旧语言推荐', !(await stalePage.locator('#smartCandidates').innerText()).includes('STALE_LANGUAGE_RESULT') && (await stalePage.locator('#profileLine').getAttribute('aria-label')).startsWith('法语资产'), await stalePage.locator('#profileLine').getAttribute('aria-label'))
 
   const legacyPage = await browser.newPage({ viewport: { width: 1280, height: 900 } })
   await legacyPage.route('**/api/track', route => route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' }))
@@ -224,9 +323,12 @@ try {
     localStorage.setItem('lingograb-onboarding-v2', '1')
     localStorage.setItem('lingograb-daily-goal-chosen-v1', '1')
     localStorage.setItem('pickup-mvp-state', JSON.stringify({
-      activeDeck: 'en-b1',
+      activeDeck: 'fr-daily-a1',
       preferredLang: 'en',
-      picked: [{ id: 'picked-existing', target: 'touch base', meaning: '联系确认', example: '<img src=x onerror="window.__pickedXss=1"> I would like to touch base with the team before the meeting.', lang: 'en', level: 'B1', source: '旧拾取' }],
+      picked: [
+        { id: 'picked-existing', target: 'touch base', meaning: '联系确认', example: '<img src=x onerror="window.__pickedXss=1"> I would like to touch base with the team before the meeting.', lang: 'en', level: 'B1', source: '旧拾取' },
+        { id: 'picked-smart', target: 'project update', meaning: '项目更新', example: 'I will give a project update today.', lang: 'en', level: 'B1', source: '智能精选' },
+      ],
       studyRecords: { 'picked:picked-existing': { due: '2026-10-12', interval: 1, lastReviewed: '2026-10-11', lastResult: 'first_try' } },
       settings: { dailyGoal: 3, aiEnabled: true },
     }))
@@ -234,12 +336,22 @@ try {
   await legacyPage.reload({ waitUntil: 'networkidle' })
   const migratedState = await legacyPage.evaluate(() => JSON.parse(localStorage.getItem('pickup-mvp-state')))
   const migratedCard = migratedState.picked[0]
+  check('数据迁移', '旧版错位语言状态加载后自动统一', migratedState.preferredLang === 'en' && migratedState.activeDeck === 'en-b1', JSON.stringify({ preferredLang: migratedState.preferredLang, activeDeck: migratedState.activeDeck }))
+  await legacyPage.locator('.side-nav [data-screen="library"]').click()
+  await legacyPage.locator('[data-filter="fr"]').click()
+  const frenchAssetLabel = await legacyPage.locator('#profileLine').getAttribute('aria-label')
+  const frenchLanguageState = await legacyPage.evaluate(() => ({ preferredLang: state.preferredLang, activeDeckLang: DECKS[state.activeDeck].lang, todayDeck: document.querySelector('#deckRow .lang')?.textContent || '', refsMatch: allRefs().every(ref => ref.type === 'deck' ? DECKS[ref.deckId].lang === 'fr' : state.picked.find(item => item.id === ref.id)?.lang === 'fr') }))
+  check('语言资产', '切换学习语言时侧栏与今日队列同步更新', frenchAssetLabel.startsWith('法语资产') && frenchLanguageState.preferredLang === 'fr' && frenchLanguageState.activeDeckLang === 'fr' && frenchLanguageState.todayDeck.includes('FRANÇAIS') && frenchLanguageState.refsMatch, JSON.stringify({ frenchAssetLabel, frenchLanguageState }))
+  await legacyPage.locator('[data-filter="en"]').click()
+  const assetBuckets = await legacyPage.locator('#profileLine > span').evaluateAll(rows => Object.fromEntries(rows.map(row => [row.querySelector('strong').textContent.trim(), row.querySelector('em').textContent.trim()])))
+  const englishSystemTotal = await legacyPage.evaluate(() => Object.values(DECKS).filter(deck => deck.lang === 'en').reduce((sum, deck) => sum + deck.cards.length, 0))
+  check('语言资产', '三类资产使用准确且互斥的已练/可练口径', assetBuckets['基础词库'] === `0/${englishSystemTotal}` && assetBuckets['智能精选'] === '0/1' && assetBuckets['个人拾取'] === '1/1', JSON.stringify(assetBuckets))
   check('安全边界', '拾取题面按纯文本渲染', await legacyPage.locator('#cloze img').count() === 0 && await legacyPage.evaluate(() => window.__pickedXss !== 1) && (await legacyPage.locator('#cloze').innerText()).includes('<img'), await legacyPage.locator('#cloze').innerText())
   check('数据迁移', '加载后立即持久化完整练习卡', migratedCard.id === 'picked-existing' && migratedCard.cardVersion === 2 && migratedCard.cloze.includes('___') && migratedCard.example.includes('touch base'), JSON.stringify(migratedCard))
   check('数据迁移', '旧拾取的复习记录不丢失', migratedState.studyRecords['picked:picked-existing']?.interval === 1, JSON.stringify(migratedState.studyRecords))
   await legacyPage.locator('.side-nav [data-screen="library"]').click()
   await legacyPage.locator('[data-scope="picked"]').click()
-  check('数据迁移', '我的词书显示卡片和单卡练习入口', (await legacyPage.locator('#libraryCount').innerText()).includes('1 张练习卡') && await legacyPage.locator('[data-practice-picked="picked-existing"]').isVisible(), await legacyPage.locator('#termList').innerText())
+  check('数据迁移', '我的词书显示卡片和单卡练习入口', (await legacyPage.locator('#libraryCount').innerText()).includes('2 张练习卡') && await legacyPage.locator('[data-practice-picked="picked-existing"]').isVisible(), await legacyPage.locator('#termList').innerText())
   await legacyPage.locator('[data-practice-picked="picked-existing"]').click()
   await legacyPage.locator('#answer').fill('touch base')
   await legacyPage.locator('#checkBtn').click()
@@ -304,11 +416,22 @@ try {
   const mobile = await browser.newPage({ viewport: { width: 390, height: 844 } })
   await mobile.route('**/api/track', route => route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' }))
   await mobile.goto(`http://127.0.0.1:${port}`, { waitUntil: 'networkidle' })
-  await mobile.evaluate(() => localStorage.clear())
+  await mobile.evaluate(() => {
+    localStorage.clear()
+    localStorage.setItem('lingograb-onboarding-v2', '1')
+    localStorage.setItem('lingograb-daily-goal-chosen-v1', '1')
+    localStorage.setItem('pickup-mvp-state', JSON.stringify({ activeDeck: 'en-b1', preferredLang: 'en', picked: [], studyRecords: {}, settings: { dailyGoal: 3, aiEnabled: true } }))
+  })
   await mobile.reload({ waitUntil: 'networkidle' })
   const width = await mobile.evaluate(() => ({ scroll: document.documentElement.scrollWidth, client: document.documentElement.clientWidth }))
   check('移动端', '无横向溢出', width.scroll <= width.client, `${width.scroll}/${width.client}`)
   check('移动端', '底部导航可见', await mobile.locator('.mobile-nav').isVisible(), '390 × 844')
+  await mobile.locator('.mobile-nav [data-screen="smart"]').click()
+  const smartWidth = await mobile.evaluate(() => ({ scroll: document.documentElement.scrollWidth, client: document.documentElement.clientWidth }))
+  check('移动端', '智能精选页面无横向溢出', smartWidth.scroll <= smartWidth.client && await mobile.locator('#smartRecommendBtn').isVisible(), `${smartWidth.scroll}/${smartWidth.client}`)
+  await mobile.locator('.mobile-nav [data-screen="import"]').click()
+  const importWidth = await mobile.evaluate(() => ({ scroll: document.documentElement.scrollWidth, client: document.documentElement.clientWidth }))
+  check('移动端', '个人拾取页面无横向溢出', importWidth.scroll <= importWidth.client && await mobile.locator('#samplePickupBtn').isVisible() && await mobile.locator('#goSmartFromPickupBtn').isVisible(), `${importWidth.scroll}/${importWidth.client}`)
 } finally {
   if (browser) await browser.close()
   server.close()
