@@ -22,3 +22,11 @@ editorially reviewed.
 Source: https://github.com/hermitdave/FrequencyWords
 
 Content license: https://creativecommons.org/licenses/by-sa/4.0/
+
+## Tatoeba 语境练习卡
+
+`tatoeba-corpus-cards.js` 包含 4,000 张可直接进入练习和 FSRS 复习的四选一卡：英语 2,500 张、法语 1,500 张。它们与现有人工整理的填空卡分开标注，**经过自动筛选，但未逐张人工审校**，也不表示官方 CEFR 等级。每张卡有原句、简体中文对照、挖空项、四个备选词和 Tatoeba 句子编号；法语卡只取 Tatoeba 明确标记为直接互译的法中句对，仍可能有个别译文误差。
+
+- 数据源：[ManyThings 的 Tatoeba 句对快照](https://www.manythings.org/anki/)：`cmn-eng.zip` 与 `fra-eng.zip`，2026-02-13 的导出；法中直接关系来自 [Tatoeba links 导出](https://tatoeba.org/en/downloads)，2026-11-21 快照。句子版权归原贡献者，许可为 [CC BY 2.0 FR](https://creativecommons.org/licenses/by/2.0/fr/)。卡片保存句子编号，产品内可点开每句在 Tatoeba 的贡献者页面。
+- 构建脚本：下载上述两个 zip 和 `links.tar.bz2` 到同一目录，安装 `opencc-python-reimplemented`，先执行 `python3 data/build-direct-pairs.py --source-dir <目录>`，再执行 `python3 data/build-corpus-cards.py --source-dir <目录>`。脚本检查快照 SHA-256，生成可复用的 `fr-zh-direct-pairs.tsv.gz`，转换繁体中文，过滤过短、重复和明显不适合练习的句子，并生成稳定的卡片 ID。
+- 已有人工整理卡的 ID、用户练习记录和个人拾取卡保持原样；语境卡使用独立词书。词频文件仅用于候选词筛选，词频数量不计入练习卡数量。

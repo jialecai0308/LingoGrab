@@ -65,7 +65,7 @@ const staticChecks = [
   ['拾取卡题面转义后再渲染', html.includes('function clozeMarkup') && html.includes('clozeMarkup(c.cloze)') && !html.includes("c.cloze.replace('___'")],
   ['学习记录与到期日', html.includes('studyRecords') && html.includes('lastReviewed')],
   ['学习数据导出', html.includes('id="exportBtn"') && html.includes('lingograb-learning-data.json')],
-  ['词书数量口径', html.includes('已校验练习卡') && !html.includes('${d.size.toLocaleString(\'en-US\')} WORDS')],
+  ['词书数量口径', html.includes('张语料练习') && html.includes('张人工整理') && !html.includes('${d.size.toLocaleString(\'en-US\')} WORDS')],
   ['首次体验包含每日目标', html.includes('data-onboard-goal="3"') && html.includes('data-onboard-goal="12"') && html.includes('先生成自己的练习卡')],
   ['英语词库扩展为百张卡', html.includes('data/en-curated-cards.js') && html.includes('FSRS-6')],
   ['反馈点赞点踩', html.includes('data-reaction="like"') && html.includes('data-reaction="dislike"') && html.includes("accountPost('/feedback'")],
