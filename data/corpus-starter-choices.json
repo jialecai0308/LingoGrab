@@ -1,0 +1,38 @@
+{
+  "en": {
+    "954341": ["secondary", "newest", "seasonal"],
+    "312035": ["violin", "trumpet", "flute"],
+    "256467": ["festival", "semester", "camp"],
+    "7221959": ["proposal", "schedule", "report"],
+    "11207142": ["warm", "awake", "calm"],
+    "46633": ["purple", "green", "white"],
+    "4949477": ["reckless", "patient", "confident"],
+    "25870": ["squirrel", "rabbit", "cat"],
+    "2676772": ["dangerous", "mysterious", "beautiful"],
+    "320956": ["bruise", "rash", "blister"],
+    "843068": ["recovering", "dying", "hiding"],
+    "258818": ["queuing", "signing", "showing"],
+    "319105": ["gambling", "driving", "working"],
+    "618396": ["easy", "exciting", "pleasant"],
+    "26255": ["taught", "studied", "understood"],
+    "26833": ["starts", "continues", "keeps"]
+  },
+  "fr": {
+    "8753": ["impatient", "optimiste", "jaloux"],
+    "336575": ["médecin", "chef", "écrivain"],
+    "181224": ["retards", "frais", "dégâts"],
+    "848708": ["soupçonné", "convaincu", "fier"],
+    "499813": ["lit", "travaille", "mange"],
+    "7236": ["jugé", "payé", "habillé"],
+    "131930": ["accueilli", "adopté", "hébergé"],
+    "795292": ["longer", "quitter", "balayer"],
+    "7668659": ["mardi", "mercredi", "samedi"],
+    "1407161": ["fiancés", "divorcés", "séparés"],
+    "8140": ["pourraient", "voudraient", "préféreraient"],
+    "3661687": ["masquer", "décrire", "expliquer"],
+    "5311608": ["allumes", "ouvres", "emportes"],
+    "11758": ["vanille", "framboise", "fraise"],
+    "468078": ["montre", "broche", "pièce"],
+    "132960": ["photo", "pause", "décision"]
+  }
+}

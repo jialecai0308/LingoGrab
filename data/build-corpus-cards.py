@@ -14,7 +14,6 @@ import csv
 import gzip
 import hashlib
 import io
-import json
 import random
 import re
 import zipfile
@@ -22,6 +21,8 @@ from collections import defaultdict
 from pathlib import Path
 
 from opencc import OpenCC
+
+from corpus_packages import write_packages
 
 
 ROOT = Path(__file__).resolve().parent
@@ -194,10 +195,8 @@ def main():
 
     en = select(candidates("en", english_pairs, frequency("en")), 2500, frequency("en"), "en")
     fr = select(candidates("fr", french_pairs, frequency("fr")), 1500, frequency("fr"), "fr")
-    output = ROOT / "tatoeba-corpus-cards.js"
-    payload = json.dumps({"en": en, "fr": fr}, ensure_ascii=False, separators=(",", ":"))
-    output.write_text("// Tatoeba CC BY 2.0 FR; IDs link to contributor credits at tatoeba.org.\nwindow.LINGOGRAB_CORPUS_CARDS=" + payload + ";\n")
-    print(f"Wrote {len(en)} English and {len(fr)} French choice cards to {output.name}")
+    write_packages({"en": en, "fr": fr})
+    print(f"Wrote {len(en)} English and {len(fr)} French choice cards")
 
 
 if __name__ == "__main__":
