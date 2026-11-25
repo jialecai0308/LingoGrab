@@ -135,6 +135,13 @@
     .settings-feedback #feedbackPrivacy{margin:-2px 0 12px}
     .settings-feedback .feedback-status{margin:8px 0 0;font-size:13px}
     .settings-feedback .feedback-status:empty{margin:0}
+    .experience-feedback{margin:12px 0 16px;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--soft)}
+    .experience-feedback[open]>summary{margin-bottom:8px}
+    .experience-question{border:0;margin:0 0 12px;padding:0;min-inline-size:0}
+    .experience-question legend{padding:0;color:var(--ink);font-size:13px;font-weight:600}
+    .experience-question select,.experience-question textarea{min-width:0}
+    .settings-feedback .experience-question textarea{min-height:58px}
+    .experience-question .field{margin:5px 0}
     .settings-feedback .feedback-status[data-kind="error"]{color:#a44343}
     .settings-feedback textarea:focus-visible{outline:2px solid var(--sage-deep);outline-offset:2px}
     @media(max-width:680px){.settings-feedback .form-row{grid-template-columns:1fr;gap:0}}
@@ -177,8 +184,24 @@
         <div class="panel setting-card"><h3>账号同步</h3><p>不登录也能使用；需要多设备同步时再登录。</p><details class="settings-details"><summary id="accountSummary">登录或注册</summary><div id="accountPanel"></div></details></div>
         <div class="panel setting-card wide"><h3>我的学习质量</h3><p>学习结果留在产品里，运营看板只看用户与产品表现。</p><div class="evidence-grid settings-evidence"><div><b id="evidenceCompleted">0</b><span>练过的表达</span></div><div><b id="evidenceFirstTry">0%</b><span>一次答对</span></div><div><b id="evidenceDelayedRecall">—</b><span>隔天还记得</span></div></div><details class="settings-details"><summary>查看完整记录</summary><div class="setting-row"><span>答错后重输正确</span><span id="evidenceRetries">0</span></div><div class="setting-row"><span>总提交次数</span><span id="evidenceAttempts">0</span></div><div class="evidence-days" id="evidenceDays"><span>还没有学习记录</span></div><p class="microcopy">“隔天还记得”只统计至少间隔一天的复习；样本不足时显示“—”。</p></details></div>
         <div class="panel setting-card wide settings-feedback">
-          <details class="settings-details">
+          <details class="settings-details" id="settingsFeedback">
             <summary>用户反馈</summary>
+            <details class="settings-details experience-feedback" id="experience-feedback">
+              <summary>填写体验反馈</summary>
+              <p>选一项或写一句就能提交。没试过的部分可以跳过。</p>
+              <form id="experienceFeedbackForm">
+                <fieldset id="experienceFeedbackFields">
+                  <legend class="feedback-legend">填写体验反馈</legend>
+                  <div id="experienceQuestions"></div>
+                  <p class="microcopy">请勿填写密码或粘贴敏感材料。</p>
+                  <div class="button-row">
+                    <button type="submit" class="btn dark" id="experienceSubmit">提交体验反馈</button>
+                    <button type="button" class="btn ghost" id="experienceTry">先去体验</button>
+                  </div>
+                </fieldset>
+                <p class="feedback-status" id="experienceStatus" role="status" aria-atomic="true" tabindex="-1"></p>
+              </form>
+            </details>
             <form id="feedbackForm">
               <fieldset id="feedbackFields">
                 <legend class="feedback-legend">填写反馈</legend>
@@ -379,7 +402,25 @@
     function save(options={}){if(options.touch!==false)state.updatedAt=Date.now();localStorage.setItem('pickup-mvp-state',JSON.stringify(state));renderStats();renderSettings();if(options.sync!==false)queueCloudSync()}const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);function esc(value){return String(value??'').replace(/[&<>'"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]))}
     function toast(msg){const el=$('#toast');el.textContent=msg;el.classList.add('show');clearTimeout(el.t);el.t=setTimeout(()=>el.classList.remove('show'),1700)}
     let studyIntent=0;
-    function go(id){studyIntent++;flushTelemetryDwell();activeTelemetryView=id;telemetryViewStartedAt=performance.now();$$('[data-screen]').forEach(b=>b.classList.toggle('on',b.dataset.screen===id||(id==='study'&&b.closest('.mobile-nav')&&b.dataset.screen==='today')));$$('.screen').forEach(s=>s.classList.toggle('on',s.id===id));if(id==='study')renderStudy();if(id==='library')renderLibrary();if(id==='settings')renderSettings();trackEvent('screen_view',{screen:id});window.scrollTo({top:0,behavior:'smooth'})}document.addEventListener('click',event=>{const b=event.target.closest('[data-screen],[data-go]');if(!b)return;const id=b.dataset.screen||b.dataset.go;if(id==='study'&&!studyQueue.length)beginTodaySession(b);else go(id)});document.addEventListener('keydown',event=>{const item=event.target.closest('.source[data-screen]');if(item&&(event.key==='Enter'||event.key===' ')){event.preventDefault();go(item.dataset.screen)}});
+    function go(id,{record=true,scroll=true}={}){
+      studyIntent++;
+      if(record)flushTelemetryDwell();
+      activeTelemetryView=id;
+      telemetryViewStartedAt=performance.now();
+      $$('[data-screen]').forEach(button=>button.classList.toggle('on',button.dataset.screen===id||(id==='study'&&button.closest('.mobile-nav')&&button.dataset.screen==='today')));
+      $$('.screen').forEach(screen=>screen.classList.toggle('on',screen.id===id));
+      if(id==='study')renderStudy();
+      if(id==='library')renderLibrary();
+      if(id==='settings')renderSettings();
+      if(record)trackEvent('screen_view',{screen:id});
+      if(scroll)window.scrollTo({top:0,behavior:'smooth'});
+      if(id!=='settings'&&feedbackLinkActive){
+        feedbackLinkActive=false;
+        if(location.hash===EXPERIENCE_HASH)history.replaceState(null,'',location.pathname+location.search);
+        if(!localStorage.getItem('lingograb-onboarding-v2')||!hasDailyGoal())openGuide();
+      }
+    }
+    document.addEventListener('click',event=>{const b=event.target.closest('[data-screen],[data-go]');if(!b)return;const id=b.dataset.screen||b.dataset.go;if(id==='study'&&!studyQueue.length)beginTodaySession(b);else go(id)});document.addEventListener('keydown',event=>{const item=event.target.closest('.source[data-screen]');if(item&&(event.key==='Enter'||event.key===' ')){event.preventDefault();go(item.dataset.screen)}});
     const ACCOUNT_API='https://www.getyuli.com/api',SYNC_KEY='pickup_state_v1',ACCESS_KEY='pickup_access_token',REFRESH_KEY='pickup_refresh_token',EMAIL_KEY='pickup_account_email',DEVICE_KEY='pickup_device_id',TELEMETRY_SESSION_KEY='lingograb_telemetry_session_v2';let cloudVersions={},cloudTimer=null,cloudBusy=false,cloudStatus='登录后可同步到多设备';
     function deviceId(){let id=localStorage.getItem(DEVICE_KEY);if(!/^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(id||''))id=crypto.randomUUID?crypto.randomUUID():'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0,v=c==='x'?r:(r&3|8);return v.toString(16)});const namespaced='1a6a0000'+id.slice(8);if(id!==namespaced)localStorage.setItem(DEVICE_KEY,namespaced);return namespaced}
     function telemetrySession(){const now=Date.now();let saved={};try{saved=JSON.parse(localStorage.getItem(TELEMETRY_SESSION_KEY)||'{}')}catch(e){}const isNew=!saved.id||now-Number(saved.lastAt||0)>30*60*1000;const value={id:isNew?`lg-${now}-${Math.random().toString(36).slice(2,9)}`:saved.id,lastAt:now};localStorage.setItem(TELEMETRY_SESSION_KEY,JSON.stringify(value));return {...value,isNew}}
@@ -655,6 +696,9 @@
     function closeGuide({restoreFocus=true}={}){
       if(!hasDailyGoal()){toast('请先选择语言并设置每日目标');return}
       localStorage.setItem('lingograb-onboarding-v2','1');
+      dismissGuide(restoreFocus);
+    }
+    function dismissGuide(restoreFocus=false){
       guide.classList.remove('show');
       guideBackground.forEach(element=>element.inert=false);
       if(restoreFocus&&guideOpener?.isConnected)guideOpener.focus({preventScroll:true});
@@ -790,7 +834,135 @@
       }
     });
 
-    function renderAll(){renderStats();renderDecks();renderLibrary();renderSettings()}localStorage.setItem('pickup-mvp-state',JSON.stringify(state));const initialTelemetry=[{e:'lg_visit',l:state.activityDates.length?'returning':'new',n:1},{e:'lg_view',l:'today',n:1},{e:'lg_pv',l:'today',n:1}];if(TELEMETRY_SESSION.isNew){initialTelemetry.push({e:'lg_session',l:'start',n:1},{e:'lg_referrer',l:telemetryReferrer(),n:1});const campaign=telemetryCampaign();if(campaign)initialTelemetry.push({e:'lg_campaign',l:campaign,n:1})}sendTelemetry(initialTelemetry);renderAll();if(!localStorage.getItem('lingograb-onboarding-v2')||!hasDailyGoal())openGuide();if(accountToken())syncNow(true);else renderSettings();
+    const EXPERIENCE_HASH='#experience-feedback';
+    let feedbackLinkActive=false;
+    const accessProblems=new Set(['没打开','跳到了其他网站','出现安全提示']);
+    const triedPractice=new Set(['开始练了，没做完','完成一轮','回来复习过']);
+    const experienceQuestions=[
+      {key:'access',label:'打开网站',title:'首页打开顺利吗？',options:['顺利打开','等了一会儿才打开','没打开','跳到了其他网站','出现安全提示'],note:'可以写怎么打开的、看到什么'},
+      {key:'browser',label:'打开方式',title:'你用什么打开网站？',options:['微信里打开','手机浏览器','电脑浏览器','其他'],note:'可以写设备或浏览器名称',show:values=>accessProblems.has(values.access)},
+      {key:'goal',label:'这次想做的事',title:'你这次最想做什么？',options:['练职场表达','练日常或旅行表达','把自己的材料变成练习','复习学过的词','先看看'],note:'也可以写下你真想练的场景'},
+      {key:'progress',label:'练习进度',title:'你体验到哪一步？',options:['只看了首页','选了语言或每日目标','找了词书，没开始练','开始练了，没做完','完成一轮','回来复习过'],note:'如果中途停了，可以说说原因'},
+      {key:'practice',label:'练习体验',title:'做题时，最有感受的是哪一点？',options:['难度正合适','题目太简单','题目太难','题目或答案有问题','讲解帮我弄懂了','讲解还没说明白'],note:'可以写下具体题目、答案或讲解',show:values=>triedPractice.has(values.progress)},
+      {key:'pickup',label:'用材料制卡',title:'你试过用自己的材料制卡吗？',options:['这次没试','想试，没找到入口','找到了，手头没材料','试了，卡片没生成','生成了，还没练','制卡后练过了'],note:'可以写你想用的材料类型，例如邮件或字幕'},
+      {key:'return_visit',label:'再次使用',title:'什么情况下，你还会再打开？',note:'例如：开会前想练几句，或想复习上次学的内容'},
+      {key:'priority',label:'最想改的地方',title:'如果只改一处，你希望先改哪里？',note:'可以写一个改动，也可以说哪一点希望保留'},
+    ];
+    const experienceForm=$('#experienceFeedbackForm');
+    const experienceStatus=$('#experienceStatus');
+    function renderExperienceQuestions(){
+      $('#experienceQuestions').innerHTML=experienceQuestions.map(question=>`
+        <fieldset class="experience-question" data-experience-question="${question.key}">
+          <legend>${esc(question.title)}</legend>
+          ${question.options?`<div class="field">
+            <select name="${question.key}" aria-label="${esc(question.title)}">
+              <option value="">请选择（选填）</option>
+              ${question.options.map(option=>`<option>${esc(option)}</option>`).join('')}
+            </select>
+          </div>`:''}
+          <div class="field">
+            <textarea name="${question.key}_note" aria-label="${esc(question.title)} 补充说明（选填）" maxlength="100" rows="2" placeholder="${esc(question.note)}"></textarea>
+          </div>
+        </fieldset>`).join('');
+      updateExperienceQuestions();
+    }
+    function experienceValues(){
+      return Object.fromEntries(experienceQuestions.map(({key})=>[key,experienceForm.elements.namedItem(key)?.value||'']));
+    }
+    function updateExperienceQuestions(){
+      const values=experienceValues();
+      const accessBlocked=accessProblems.has(values.access);
+      for(const question of experienceQuestions){
+        const section=experienceForm.querySelector(`[data-experience-question="${question.key}"]`);
+        const accessible=!accessBlocked||question.key==='access'||question.key==='browser';
+        section.hidden=!accessible||(question.show?.(values)===false);
+        section.disabled=section.hidden;
+      }
+    }
+    function buildExperienceFeedback(){
+      const values=experienceValues();
+      const lines=[];
+      const meta={
+        source:'lingograb_web',brand:'lingograb',page:'settings',
+        category:'experience',form:'experience_feedback_v1',
+        entry:feedbackLinkActive?'shared_link':'settings',
+      };
+      for(const question of experienceQuestions){
+        if(experienceForm.querySelector(`[data-experience-question="${question.key}"]`).hidden)continue;
+        const choice=values[question.key];
+        const note=experienceForm.elements.namedItem(question.key+'_note').value.trim().slice(0,100);
+        if(question.options?.includes(choice)){
+          meta[question.key]=choice;
+          lines.push(`${question.label}：${choice}`);
+        }
+        if(note)lines.push(`${question.label}（自填）：${note}`);
+      }
+      if(accessProblems.has(values.access)){
+        meta.area='general';
+        meta.impact='blocked';
+      }else if(values.pickup==='试了，卡片没生成'){
+        meta.area='import';
+        meta.impact='blocked';
+      }
+      return lines.length?{content:lines.join('\n'),meta}:null;
+    }
+    function openExperienceFeedbackLink({initial=false}={}){
+      feedbackLinkActive=true;
+      if(guide.classList.contains('show'))dismissGuide();
+      go('settings',{record:!initial,scroll:false});
+      $('#settingsFeedback').open=true;
+      $('#experience-feedback').open=true;
+      requestAnimationFrame(()=>{
+        if(!feedbackLinkActive)return;
+        const summary=$('#experience-feedback > summary');
+        summary.focus({preventScroll:true});
+        summary.scrollIntoView({block:'start'});
+      });
+    }
+    $('#experienceTry').addEventListener('click',()=>go('today'));
+    experienceForm.addEventListener('change',updateExperienceQuestions);
+    experienceForm.addEventListener('submit',async event=>{
+      event.preventDefault();
+      const fields=$('#experienceFeedbackFields');
+      if(fields.disabled)return;
+      const payload=buildExperienceFeedback();
+      if(!payload){
+        experienceStatus.dataset.kind='error';
+        experienceStatus.textContent='选一个答案或写一句再提交。';
+        experienceStatus.focus();
+        return;
+      }
+      fields.disabled=true;
+      experienceForm.setAttribute('aria-busy','true');
+      experienceStatus.removeAttribute('data-kind');
+      experienceStatus.textContent='正在提交…';
+      try{
+        const result=await accountPost('/feedback',payload);
+        if(result.ok){
+          experienceForm.reset();
+          updateExperienceQuestions();
+          experienceStatus.textContent='已收到体验反馈，谢谢。';
+          trackEvent('feedback_reaction',{rating:'written',area:'settings',result:'submitted'});
+          save({sync:false});
+        }else{
+          experienceStatus.dataset.kind='error';
+          experienceStatus.textContent=result.error==='rate_limited'
+            ?'提交太频繁。内容已保留，请稍后再试。'
+            :'没能提交。内容已保留，可以再试一次。';
+          trackEvent('product_error',{kind:'feedback_submit'});
+        }
+      }finally{
+        fields.disabled=false;
+        experienceForm.removeAttribute('aria-busy');
+      }
+    });
+    window.addEventListener('hashchange',()=>{
+      if(location.hash===EXPERIENCE_HASH)openExperienceFeedbackLink();
+    });
+    renderExperienceQuestions();
+    function renderAll(){renderStats();renderDecks();renderLibrary();renderSettings()}localStorage.setItem('pickup-mvp-state',JSON.stringify(state));const sharedFeedbackEntry=location.hash===EXPERIENCE_HASH;
+    const landingView=sharedFeedbackEntry?'settings':'today';
+    const initialTelemetry=[{e:'lg_visit',l:state.activityDates.length?'returning':'new',n:1},{e:'lg_view',l:landingView,n:1},{e:'lg_pv',l:landingView,n:1}];if(TELEMETRY_SESSION.isNew){initialTelemetry.push({e:'lg_session',l:'start',n:1},{e:'lg_referrer',l:telemetryReferrer(),n:1});const campaign=telemetryCampaign();if(campaign)initialTelemetry.push({e:'lg_campaign',l:campaign,n:1})}sendTelemetry(initialTelemetry);renderAll();if(sharedFeedbackEntry)openExperienceFeedbackLink({initial:true});else if(!localStorage.getItem('lingograb-onboarding-v2')||!hasDailyGoal())openGuide();if(accountToken())syncNow(true);else renderSettings();
   </script>
 </body>
 </html>
