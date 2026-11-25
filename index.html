@@ -145,6 +145,8 @@
     .settings-feedback .feedback-status[data-kind="error"]{color:#a44343}
     .settings-feedback textarea:focus-visible{outline:2px solid var(--sage-deep);outline-offset:2px}
     @media(max-width:680px){.settings-feedback .form-row{grid-template-columns:1fr;gap:0}}
+    .first-preferences-form{width:min(100%,360px);margin:12px auto 0;text-align:left}
+    .first-preferences-form .btn{margin-top:10px}
   </style>
 </head>
 <body>
@@ -180,7 +182,11 @@
       <section class="screen" id="smart"><div class="page"><div class="page-head"><div><div class="date-label">PERSONALIZED PICKS</div><h2>智能精选</h2><p>不用准备材料：选一个场景，结合你的当前难度和待巩固内容生成一组练习卡。</p></div></div><div class="smart-layout"><div class="panel import-box"><h2>今天想练什么？</h2><p>智能精选只使用最少学习记忆，不读取你粘贴过的整段材料。</p><div class="choice-row" id="smartScenes"><button class="on" data-smart-scene="work" aria-pressed="true">职场沟通</button><button data-smart-scene="travel" aria-pressed="false">旅行应急</button><button data-smart-scene="daily" aria-pressed="false">日常交流</button></div><div class="field"><label for="smartGoal">具体想练（可选）</label><input id="smartGoal" maxlength="80" placeholder="例如：汇报项目进展" aria-describedby="smartGoalHint"><span class="microcopy" id="smartGoalHint" aria-live="polite">适合会议、汇报、邮件与跨团队协作。</span></div><button class="btn dark" id="smartRecommendBtn">为我生成 5 张练习卡</button><div class="privacy-note"><b>会发送：</b>选定场景、当前语言/级别和待巩固的表达名。不发送原始作答、整段材料或联系方式。</div></div><div class="panel import-box"><h2>练习卡预览</h2><p>确认后才会加入你的学习和复习队列。</p><div id="smartCandidates"><div class="empty">选一个场景，再点击“为我生成 5 张练习卡”</div></div></div></div></div></section>
       <section class="screen" id="import"><div class="page"><div class="page-head"><div><div class="date-label">GRAB FROM REAL LIFE</div><h2>个人拾取</h2><p>从真实材料中挑出值得记住的表达，确认后直接生成可练习、可复习的卡片。</p></div></div><div class="import-layout"><div class="panel import-box"><h2>贴一段英语或法语</h2><p>文章、会议纪要、邮件或视频字幕都可以。公开演示请勿粘贴敏感信息。</p><textarea id="importText" maxlength="3000" placeholder="粘贴你的真实材料，或先换一段示例。"></textarea><div class="button-row"><button class="btn ghost" id="samplePickupBtn" type="button">换一段示例</button><button class="btn ghost" id="goSmartFromPickupBtn" type="button">没有材料？去智能精选</button></div><div class="button-row"><button class="btn ai-btn" id="aiAnalyseBtn">帮我生成练习卡</button><button class="btn ghost" id="analyseBtn">不上传，直接制卡</button></div><div class="privacy-note"><b>隐私说明：</b>智能挑选会把这段文字发往模型服务；“不上传”只在你的浏览器中匹配表达。示例只用于体验，不会自动覆盖你的材料。</div></div><div class="panel import-box"><h2>练习卡预览</h2><p>每张卡都会保留原句、挖空答案、释义和来源；确认后立即进入你的练习与 FSRS 复习队列。</p><div class="recommendation-note" id="pickupStatus" hidden></div><div id="candidates"><div class="empty">粘贴材料后，选择“智能生成”或“不上传制卡”</div></div></div></div></div></section>
       <section class="screen" id="settings"><div class="page"><div class="page-head"><div><div class="date-label">SETTINGS</div><h2>我的设置</h2><p>平时只需要调整每日学习量，其他选项不用管。</p></div></div><div class="settings-grid">
-        <div class="panel setting-card"><h3>每天学多少</h3><p>每日目标只决定一天练几个，不会限制词书总量。</p><div class="setting-row"><span>当前语言</span><span id="currentLanguageSetting"></span></div><div class="field"><label for="dailyGoalSelect">每日目标</label><select id="dailyGoalSelect"><option value="">请选择每日目标</option><option value="3">3 个 · 约 2 分钟</option><option value="5">5 个 · 轻量</option><option value="8">8 个 · 标准</option><option value="12">12 个 · 进阶</option></select></div><div class="button-row"><button class="btn ghost" id="replayGuideBtn">重新看使用引导</button></div></div>
+        <div class="panel setting-card">
+          <h3>学习偏好</h3>
+          <div class="field"><label for="learningLanguageSelect">学习语言</label><select id="learningLanguageSelect"><option value="en">英语</option><option value="fr">法语</option></select></div>
+          <div class="field"><label for="dailyGoalSelect">每日目标</label><select id="dailyGoalSelect"><option value="3">3 个</option><option value="5">5 个</option><option value="8">8 个</option><option value="12">12 个</option></select></div>
+        </div>
         <div class="panel setting-card"><h3>账号同步</h3><p>不登录也能使用；需要多设备同步时再登录。</p><details class="settings-details"><summary id="accountSummary">登录或注册</summary><div id="accountPanel"></div></details></div>
         <div class="panel setting-card wide"><h3>我的学习质量</h3><p>学习结果留在产品里，运营看板只看用户与产品表现。</p><div class="evidence-grid settings-evidence"><div><b id="evidenceCompleted">0</b><span>练过的表达</span></div><div><b id="evidenceFirstTry">0%</b><span>一次答对</span></div><div><b id="evidenceDelayedRecall">—</b><span>隔天还记得</span></div></div><details class="settings-details"><summary>查看完整记录</summary><div class="setting-row"><span>答错后重输正确</span><span id="evidenceRetries">0</span></div><div class="setting-row"><span>总提交次数</span><span id="evidenceAttempts">0</span></div><div class="evidence-days" id="evidenceDays"><span>还没有学习记录</span></div><p class="microcopy">“隔天还记得”只统计至少间隔一天的复习；样本不足时显示“—”。</p></details></div>
         <div class="panel setting-card wide settings-feedback">
@@ -273,11 +279,6 @@
   </nav>
   <div class="modal-back" id="grammarModal"><div class="modal"><div class="modal-head"><h2>法语动词与时态速查</h2><button id="closeModal" aria-label="关闭">×</button></div><div class="tense-grid" id="tenseGrid"></div></div></div>
   <div class="modal-back" id="deckDetailModal" role="dialog" aria-modal="true" aria-labelledby="deckDetailTitle"><div class="modal"><div class="modal-head"><h2>词书预览</h2><button id="closeDeckDetail" aria-label="关闭">×</button></div><div class="deck-detail-body"><div class="deck-detail-kicker" id="deckDetailLang"></div><h3 id="deckDetailTitle"></h3><p id="deckDetailSubtitle"></p><div class="deck-detail-stats"><div><b id="deckDetailCount"></b><small>可直接练习</small></div><div><b id="deckDetailProgress"></b><small>完成一轮</small></div></div><b>内容词预览</b><div class="deck-samples" id="deckSamples"></div><div class="deck-detail-note" id="deckDetailNote"></div><div class="button-row"><button class="btn dark" id="deckDetailStart">开始学习这本词书</button></div></div></div></div>
-  <div class="modal-back" id="onboardingModal" role="dialog" aria-modal="true" aria-labelledby="guideTitle"><div class="modal guide-modal"><div class="modal-head"><h2 id="guideTitle">第一次使用 LingoGrab</h2><button id="closeGuide" aria-label="关闭使用引导" hidden>×</button></div><div class="guide-body"><div class="guide-progress"><i class="on"></i><i></i><i></i></div>
-    <div class="guide-step on" data-guide-step="1"><h3>你想先练哪种语言？</h3><p>选择后马上体验一次学习闭环，不需要先注册账号。</p><div class="language-choice"><button type="button" data-onboard-lang="en"><em>ENGLISH</em><b>英语</b><span>职场沟通 · B1 / B2</span></button><button type="button" data-onboard-lang="fr"><em>FRANÇAIS</em><b>法语</b><span>日常 · 旅行 · 职场</span></button></div></div>
-    <div class="guide-step" data-guide-step="2"><h3>你每天想练几个？</h3><p>这只是每日练习目标，不是词书大小；词书里的其他内容会在后续轮次继续出现。</p><div class="goal-choice"><button type="button" data-onboard-goal="3"><b>3 个</b><span>约 2 分钟</span></button><button type="button" data-onboard-goal="5"><b>5 个</b><span>轻量开始</span></button><button type="button" data-onboard-goal="8"><b>8 个</b><span>标准节奏</span></button><button type="button" data-onboard-goal="12"><b>12 个</b><span>集中练习</span></button></div><div class="guide-actions"><button class="btn ghost" data-guide-back="1">重新选择语言</button><span></span></div></div>
-    <div class="guide-step" data-guide-step="3"><h3>第一次从哪里开始？</h3><p>两种方式都会在完成后进入复习计划，以后可以随时切换。</p><div class="guide-cards guide-actions-grid"><button class="guide-card guide-action-card" id="guideQuickPractice"><b id="guideQuickPracticeTitle">直接开始练习</b><span id="guideQuickPracticeCopy">从语境练习卡抽取今天的目标。</span></button><button class="guide-card guide-action-card" id="guideTryPickup"><b>先生成自己的练习卡</b><span>从真实材料挑选，立即制卡并进入复习。</span></button></div><div class="guide-actions"><button class="btn ghost" data-guide-back="2">重新设置每日目标</button><span></span></div></div>
-  </div></div></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="data/en-curated-cards.js"></script>
   <script src="data/tatoeba-corpus-starter.js"></script>
@@ -395,14 +396,32 @@
     function sourceSentenceFor(text,target){const pattern=targetPattern(target);if(!pattern)return'';const sentences=String(text||'').match(/[^.!?。！？\n]+(?:[.!?。！？]+|$)/g)||[],sentence=sentences.map(value=>value.trim()).find(value=>pattern.test(value));if(!sentence)return'';if(sentence.length<=240)return sentence;const hit=sentence.match(pattern),targetIndex=(hit?.index||0)+(hit?.[1]?.length||0),start=Math.max(0,Math.min(sentence.length-236,targetIndex-80)),end=Math.min(sentence.length,start+236);return`${start?'…':''}${sentence.slice(start,end)}${end<sentence.length?'…':''}`}
     function clozeFromExample(example,target,fallback){const pattern=targetPattern(target);return pattern&&pattern.test(example)?example.replace(pattern,'$1___'):`表达“${fallback||target}”：___`}
     function normalizePickedCard(item={},index=0,sourceOverride=''){const target=String(item.target||'').trim().slice(0,80),meaning=String(item.meaning||item.translation||'').trim().slice(0,180),example=String(item.example||'').trim().slice(0,240);if(!target)return null;const providedCloze=String(item.cloze||'').trim().slice(0,320),cloze=providedCloze.includes('___')?providedCloze:clozeFromExample(example,target,meaning),source=String(sourceOverride||item.source||'真实材料').trim().slice(0,80),grammarSource=Array.isArray(item.grammar)?item.grammar:[],grammar=[...new Set(['个人拾取',source,...grammarSource.map(value=>String(value||'').trim()).filter(Boolean)])].slice(0,6),acceptedAnswers=(Array.isArray(item.acceptedAnswers)?item.acceptedAnswers:[]).map(value=>String(value||'').trim().slice(0,80)).filter(Boolean).slice(0,6);return {...item,id:String(item.id||`picked-legacy-${index}`).slice(0,120),target,lemma:String(item.lemma||target).trim().slice(0,80),lang:item.lang==='fr'?'fr':'en',level:/^(A1|A2|B1|B2|C1|C2)$/.test(item.level)?item.level:'B1',meaning:meaning||'回忆这个表达',example,cloze,translation:String(item.translation||meaning||'回忆这个表达').trim().slice(0,240),grammar,explanation:String(item.explanation||(item.reason?`${meaning}。${item.reason}`:meaning)||'这是你从真实材料中留下的表达。').trim().slice(0,360),acceptedAnswers,source,addedAt:String(item.addedAt||''),cardType:'practice',cardVersion:2}}
-    const DEFAULT={activeDeck:'fr-daily-a1',preferredLang:'fr',index:{'fr-daily-a1':0,'fr-travel-a2':0,'fr-work-a2':0,'en-b1':0,'en-b2':0,'fr-context':0,'en-context':0},mastered:[],wrong:[],picked:[],studyRecords:{},reviewHistory:[],eventLog:[],dailyActivity:{},activityDates:[],settings:{dailyGoal:null,aiEnabled:true},updatedAt:0};const frequencyIndex={fr:[],en:[]};let state=loadState(),currentFilter=state.preferredLang,currentScope='system',detailDeckId=state.activeDeck,corpusState='loading',studyQueue=[],studyPosition=0,studySessionId='',sessionCompleteLogged=false,sessionStats={answered:0,firstTryCorrect:0,retried:0,scheduledReviews:0,delayedFirstTry:0},onboardingLang=state.preferredLang,smartScene='work',pickupRequestSeq=0,smartRequestSeq=0,pickupRequestController=null,smartRequestController=null;
+    const DEFAULT={activeDeck:'en-context',preferredLang:'en',index:{'fr-daily-a1':0,'fr-travel-a2':0,'fr-work-a2':0,'en-b1':0,'en-b2':0,'fr-context':0,'en-context':0},mastered:[],wrong:[],picked:[],studyRecords:{},reviewHistory:[],eventLog:[],dailyActivity:{},activityDates:[],settings:{dailyGoal:3,aiEnabled:true},updatedAt:0};const frequencyIndex={fr:[],en:[]};let state=loadState(),currentFilter=state.preferredLang,currentScope='system',detailDeckId=state.activeDeck,corpusState='loading',studyQueue=[],studyPosition=0,studySessionId='',sessionCompleteLogged=false,sessionStats={answered:0,firstTryCorrect:0,retried:0,scheduledReviews:0,delayedFirstTry:0},smartScene='work',pickupRequestSeq=0,smartRequestSeq=0,pickupRequestController=null,smartRequestController=null;
     previewWords=d=>d.previewSeeds.slice(0,12);
-    function normalizeState(raw={}){raw={...raw};if(raw.activeDeck==='fr'||raw.activeDeck==='fr-a1')raw.activeDeck='fr-daily-a1';if(raw.activeDeck==='fr-a2')raw.activeDeck='fr-travel-a2';if(raw.activeDeck==='en')raw.activeDeck='en-b1';const merged={...DEFAULT,...raw,index:{...DEFAULT.index,...(raw.index||{})},studyRecords:{...(raw.studyRecords||{})},dailyActivity:{...(raw.dailyActivity||{})},settings:{...DEFAULT.settings,...(raw.settings||{})}};if(!DECKS[merged.activeDeck])merged.activeDeck=DEFAULT.activeDeck;if(!['fr','en'].includes(merged.preferredLang))merged.preferredLang=DECKS[merged.activeDeck].lang;if(DECKS[merged.activeDeck].lang!==merged.preferredLang){const matchingDeck=Object.values(DECKS).find(deck=>deck.lang===merged.preferredLang);if(matchingDeck)merged.activeDeck=matchingDeck.id}merged.mastered=Array.isArray(merged.mastered)?merged.mastered:[];merged.wrong=Array.isArray(merged.wrong)?merged.wrong:[];merged.picked=Array.isArray(merged.picked)?merged.picked.map((item,index)=>normalizePickedCard(item,index)).filter(Boolean):[];merged.reviewHistory=Array.isArray(merged.reviewHistory)?merged.reviewHistory.slice(-5000):[];merged.eventLog=Array.isArray(merged.eventLog)?merged.eventLog.slice(-1000):[];merged.activityDates=Array.isArray(merged.activityDates)?[...new Set(merged.activityDates.filter(Boolean))].sort():[];merged.settings.dailyGoal=[3,5,8,12].includes(Number(merged.settings.dailyGoal))?Number(merged.settings.dailyGoal):null;merged.settings.aiEnabled=merged.settings.aiEnabled!==false;if(!merged.corpusMigrationDone){const active=DECKS[merged.activeDeck],contextId=active.lang+'-context';if(active.origin!=='tatoeba'&&active.cards.length<100&&DECKS[contextId]&&active.cards.every(card=>merged.studyRecords[`deck:${active.id}:${card.id}`])){merged.activeDeck=contextId;merged.corpusMigrationDone=true}}return merged}
+    function normalizeState(raw={}){raw={...raw};if(raw.activeDeck==='fr'||raw.activeDeck==='fr-a1')raw.activeDeck='fr-daily-a1';if(raw.activeDeck==='fr-a2')raw.activeDeck='fr-travel-a2';if(raw.activeDeck==='en')raw.activeDeck='en-b1';const merged={...DEFAULT,...raw,index:{...DEFAULT.index,...(raw.index||{})},studyRecords:{...(raw.studyRecords||{})},dailyActivity:{...(raw.dailyActivity||{})},settings:{...DEFAULT.settings,...(raw.settings||{})}};if(!DECKS[merged.activeDeck])merged.activeDeck=DEFAULT.activeDeck;if(!['fr','en'].includes(raw.preferredLang))merged.preferredLang=DECKS[merged.activeDeck].lang;if(DECKS[merged.activeDeck].lang!==merged.preferredLang){const matchingDeck=Object.values(DECKS).find(deck=>deck.lang===merged.preferredLang);if(matchingDeck)merged.activeDeck=matchingDeck.id}merged.mastered=Array.isArray(merged.mastered)?merged.mastered:[];merged.wrong=Array.isArray(merged.wrong)?merged.wrong:[];merged.picked=Array.isArray(merged.picked)?merged.picked.map((item,index)=>normalizePickedCard(item,index)).filter(Boolean):[];merged.reviewHistory=Array.isArray(merged.reviewHistory)?merged.reviewHistory.slice(-5000):[];merged.eventLog=Array.isArray(merged.eventLog)?merged.eventLog.slice(-1000):[];merged.activityDates=Array.isArray(merged.activityDates)?[...new Set(merged.activityDates.filter(Boolean))].sort():[];merged.settings.dailyGoal=[3,5,8,12].includes(Number(merged.settings.dailyGoal))?Number(merged.settings.dailyGoal):DEFAULT.settings.dailyGoal;merged.settings.aiEnabled=merged.settings.aiEnabled!==false;if(!merged.corpusMigrationDone){const active=DECKS[merged.activeDeck],contextId=active.lang+'-context';if(active.origin!=='tatoeba'&&active.cards.length<100&&DECKS[contextId]&&active.cards.every(card=>merged.studyRecords[`deck:${active.id}:${card.id}`])){merged.activeDeck=contextId;merged.corpusMigrationDone=true}}return merged}
     function loadState(){try{return normalizeState(JSON.parse(localStorage.getItem('pickup-mvp-state')||'{}'))}catch(e){return normalizeState({})}}
     function save(options={}){if(options.touch!==false)state.updatedAt=Date.now();localStorage.setItem('pickup-mvp-state',JSON.stringify(state));renderStats();renderSettings();if(options.sync!==false)queueCloudSync()}const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);function esc(value){return String(value??'').replace(/[&<>'"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]))}
     function toast(msg){const el=$('#toast');el.textContent=msg;el.classList.add('show');clearTimeout(el.t);el.t=setTimeout(()=>el.classList.remove('show'),1700)}
     let studyIntent=0;
+    const FIRST_VISIT_KEY='lingograb-first-entry-v1';
+    const priorEntry=localStorage.getItem(FIRST_VISIT_KEY);
+    let firstVisitAvailable=priorEntry==='feedback_only'||(!priorEntry&&!localStorage.getItem('pickup-mvp-state'));
+    // A visit is claimed before the first card is shown, so reloading never requests setup again.
+    function markLearningEntry(){
+      firstVisitAvailable=false;
+      localStorage.setItem(FIRST_VISIT_KEY,'seen');
+    }
     function go(id,{record=true,scroll=true}={}){
+      if(id!=='settings'&&feedbackLinkActive){
+        feedbackLinkActive=false;
+        if(location.hash===EXPERIENCE_HASH)history.replaceState(null,'',location.pathname+location.search);
+        if(firstVisitAvailable&&(id==='today'||id==='study'))return startFirstPractice({record,scroll});
+        if(firstVisitAvailable){markLearningEntry();save({touch:false,sync:false})}
+      }
+      if(id!=='study'&&roundRoute==='trial'){
+        roundRoute='today';
+        studyQueue=[];
+      }
       studyIntent++;
       if(record)flushTelemetryDwell();
       activeTelemetryView=id;
@@ -414,13 +433,8 @@
       if(id==='settings')renderSettings();
       if(record)trackEvent('screen_view',{screen:id});
       if(scroll)window.scrollTo({top:0,behavior:'smooth'});
-      if(id!=='settings'&&feedbackLinkActive){
-        feedbackLinkActive=false;
-        if(location.hash===EXPERIENCE_HASH)history.replaceState(null,'',location.pathname+location.search);
-        if(!localStorage.getItem('lingograb-onboarding-v2')||!hasDailyGoal())openGuide();
-      }
     }
-    document.addEventListener('click',event=>{const b=event.target.closest('[data-screen],[data-go]');if(!b)return;const id=b.dataset.screen||b.dataset.go;if(id==='study'&&!studyQueue.length)beginTodaySession(b);else go(id)});document.addEventListener('keydown',event=>{const item=event.target.closest('.source[data-screen]');if(item&&(event.key==='Enter'||event.key===' ')){event.preventDefault();go(item.dataset.screen)}});
+    document.addEventListener('click',event=>{const b=event.target.closest('[data-screen],[data-go]');if(!b)return;const id=b.dataset.screen||b.dataset.go;if(id==='study'&&!studyQueue.length&&!(feedbackLinkActive&&firstVisitAvailable))beginTodaySession(b);else go(id)});document.addEventListener('keydown',event=>{const item=event.target.closest('.source[data-screen]');if(item&&(event.key==='Enter'||event.key===' ')){event.preventDefault();go(item.dataset.screen)}});
     const ACCOUNT_API='https://www.getyuli.com/api',SYNC_KEY='pickup_state_v1',ACCESS_KEY='pickup_access_token',REFRESH_KEY='pickup_refresh_token',EMAIL_KEY='pickup_account_email',DEVICE_KEY='pickup_device_id',TELEMETRY_SESSION_KEY='lingograb_telemetry_session_v2';let cloudVersions={},cloudTimer=null,cloudBusy=false,cloudStatus='登录后可同步到多设备';
     function deviceId(){let id=localStorage.getItem(DEVICE_KEY);if(!/^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(id||''))id=crypto.randomUUID?crypto.randomUUID():'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0,v=c==='x'?r:(r&3|8);return v.toString(16)});const namespaced='1a6a0000'+id.slice(8);if(id!==namespaced)localStorage.setItem(DEVICE_KEY,namespaced);return namespaced}
     function telemetrySession(){const now=Date.now();let saved={};try{saved=JSON.parse(localStorage.getItem(TELEMETRY_SESSION_KEY)||'{}')}catch(e){}const isNew=!saved.id||now-Number(saved.lastAt||0)>30*60*1000;const value={id:isNew?`lg-${now}-${Math.random().toString(36).slice(2,9)}`:saved.id,lastAt:now};localStorage.setItem(TELEMETRY_SESSION_KEY,JSON.stringify(value));return {...value,isNew}}
@@ -452,7 +466,7 @@
     function allCards(){return Object.values(DECKS).flatMap(d=>d.cards)}
     function learnerMemory(){const cards=allCards(),byId=new Map(cards.map(c=>[c.id,c]));return {activeDeck:state.activeDeck,level:DECKS[state.activeDeck].level,masteredCount:state.mastered.length,wrongTargets:state.wrong.map(id=>byId.get(id)?.lemma||byId.get(id)?.target).filter(Boolean).slice(-8),pickedTargets:state.picked.map(x=>x.target).filter(Boolean).slice(0,8)}}
     function renderAccount(){const panel=$('#accountPanel');if(!panel)return;const token=accountToken(),email=accountEmail(),summary=$('#accountSummary');if(summary)summary.textContent=token?'已登录，管理同步':'登录或注册';$('#topAccount').textContent=token?'已同步':'EN · FR';if(token){panel.innerHTML=`<div class="account-state online">已登录 · ${esc(email||'LingoGrab 账号')}</div><div class="sync-line">${esc(cloudStatus)}</div><div class="button-row"><button class="btn dark" id="syncNowBtn" ${cloudBusy?'disabled':''}>${cloudBusy?'同步中…':'立即同步'}</button><button class="btn ghost" id="logoutBtn">退出账号</button></div>`;$('#syncNowBtn').onclick=()=>syncNow(false);$('#logoutBtn').onclick=()=>{clearAccountSession();toast('已退出，数据仍保留在本机')}}else{panel.innerHTML=`<div class="account-state">${esc(cloudStatus)}</div><div class="field"><label for="accountEmail">邮箱</label><input id="accountEmail" type="email" autocomplete="email" placeholder="name@example.com"></div><div class="field"><label for="accountPassword">密码</label><input id="accountPassword" type="password" autocomplete="current-password" minlength="6" placeholder="至少 6 位"></div><div class="button-row"><button class="btn dark" data-auth-action="login">登录</button><button class="btn ghost" data-auth-action="register">注册</button></div><div class="microcopy">注册即表示你同意仅将学习进度用于账号同步；密码由 Supabase Auth 安全处理，LingoGrab 不读取明文。</div>`;$$('[data-auth-action]').forEach(button=>button.onclick=()=>handleAuth(button.dataset.authAction))}}
-    function renderSettings(){const active=DECKS[state.activeDeck];if(!active)return;$('#currentLanguageSetting').textContent=active.lang==='fr'?'Français 法语':'English 英语';$('#dailyGoalSelect').value=state.settings.dailyGoal?String(state.settings.dailyGoal):'';$('#aiSettingText').textContent=state.settings.aiEnabled?'已开启':'已关闭';$('#aiToggleBtn').textContent=state.settings.aiEnabled?'关闭 AI 个性化':'开启 AI 个性化';$('#memoryMastered').textContent=state.mastered.length+' 张';$('#memoryWrong').textContent=state.wrong.length+' 张';$('#memoryPicked').textContent=state.picked.length+' 张卡';const memory=learnerMemory(),chips=[...memory.wrongTargets.map(x=>'待巩固 · '+x),...memory.pickedTargets.slice(0,4).map(x=>'拾取卡 · '+x)].slice(0,8);$('#memoryChips').innerHTML=chips.length?chips.map(x=>`<span>${esc(x)}</span>`).join(''):'<span>完成几道题后，这里会形成你的学习记忆</span>';const evidence=summarizeReviewHistory(state.reviewHistory),days=Object.entries(state.dailyActivity).sort(([a],[b])=>b.localeCompare(a)).slice(0,7);$('#evidenceCompleted').textContent=evidence.completed;$('#evidenceFirstTry').textContent=evidence.firstTryRate+'%';$('#evidenceDelayedRecall').textContent=evidence.delayedRecallRate===null?'—':evidence.delayedRecallRate+'%';$('#evidenceRetries').textContent=evidence.retried;$('#evidenceAttempts').textContent=evidence.attempts;$('#evidenceDays').innerHTML=days.length?days.map(([day,value])=>`<span>${esc(day.slice(5))} · ${(value.reviewed||[]).length} 个</span>`).join(''):'<span>还没有学习记录</span>';renderAccount()}
+    function renderSettings(){const active=DECKS[state.activeDeck];if(!active)return;$('#learningLanguageSelect').value=active.lang;$('#dailyGoalSelect').value=String(state.settings.dailyGoal);$('#aiSettingText').textContent=state.settings.aiEnabled?'已开启':'已关闭';$('#aiToggleBtn').textContent=state.settings.aiEnabled?'关闭 AI 个性化':'开启 AI 个性化';$('#memoryMastered').textContent=state.mastered.length+' 张';$('#memoryWrong').textContent=state.wrong.length+' 张';$('#memoryPicked').textContent=state.picked.length+' 张卡';const memory=learnerMemory(),chips=[...memory.wrongTargets.map(x=>'待巩固 · '+x),...memory.pickedTargets.slice(0,4).map(x=>'拾取卡 · '+x)].slice(0,8);$('#memoryChips').innerHTML=chips.length?chips.map(x=>`<span>${esc(x)}</span>`).join(''):'<span>完成几道题后，这里会形成你的学习记忆</span>';const evidence=summarizeReviewHistory(state.reviewHistory),days=Object.entries(state.dailyActivity).sort(([a],[b])=>b.localeCompare(a)).slice(0,7);$('#evidenceCompleted').textContent=evidence.completed;$('#evidenceFirstTry').textContent=evidence.firstTryRate+'%';$('#evidenceDelayedRecall').textContent=evidence.delayedRecallRate===null?'—':evidence.delayedRecallRate+'%';$('#evidenceRetries').textContent=evidence.retried;$('#evidenceAttempts').textContent=evidence.attempts;$('#evidenceDays').innerHTML=days.length?days.map(([day,value])=>`<span>${esc(day.slice(5))} · ${(value.reviewed||[]).length} 个</span>`).join(''):'<span>还没有学习记录</span>';renderAccount()}
     const PREVIEW_STOPWORDS={en:new Set('the a an and or but i you he she it we they me him her us them my your his its our their this that these those is am are was were be been being have has had do does did to of in on at for from with by as what who which when where why how can could will would shall should may might must not no yes if then than so just very'.split(' ')),fr:new Set('de du des le la les un une et ou mais je tu il elle nous vous ils elles me te se mon ma mes ton ta tes son sa ses notre votre leur ce cet cette ces qui que quoi dont où est sont suis es être avoir ai as a avons avez ont ne pas plus très dans sur sous pour par avec sans en au aux y ça cela'.split(' '))};function previewWords(d){const curated=d.cards.map(c=>c.lemma),pool=frequencyIndex[d.lang].slice(d.range[0],d.range[1]).map(x=>x.word).filter(word=>word.length>2&&!PREVIEW_STOPWORDS[d.lang].has(word));return [...new Set([...curated,...pool])].slice(0,12)}
     function dateKey(date=new Date()){return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`}
     function previousDateKey(key){const date=new Date(`${key}T12:00:00`);date.setDate(date.getDate()-1);return dateKey(date)}
@@ -495,15 +509,16 @@
       const fresh = allRefs().filter(ref=>!reviewed.has(refKey(ref))&&!state.studyRecords[refKey(ref)]);
       return [...old,...fresh];
     }
-    let roundFirstAnswerLogged=false;
+    let roundFirstAnswerLogged=false,roundRoute='today';
     function beginQueue(refs,{route='today',deckId=''}={}){
       studyQueue=refs.filter(resolveRef);
       studyPosition=0;
       studySessionId=studyQueue.length?`session-${Date.now()}-${Math.random().toString(36).slice(2,7)}`:null;
       sessionCompleteLogged=false;
       roundFirstAnswerLogged=false;
+      roundRoute=route;
       sessionStats={answered:0,firstTryCorrect:0,retried:0,scheduledReviews:0,delayedFirstTry:0};
-      if(studyQueue.length){
+      if(studyQueue.length&&route!=='trial'){
         trackEvent('study_start',{source:studyQueue.some(ref=>ref.type==='picked')?'picked':'deck',language:state.preferredLang,count:studyQueue.length});
         const dimensions=[{e:'lg_round_entry',l:`${route}|${state.preferredLang}`}];
         if(deckId&&DECKS[deckId])dimensions.push({e:'lg_book',l:`start|${deckId}`});
@@ -585,7 +600,6 @@
       const scheduled=forecast.reduce((sum,item)=>sum+item.count,0);
       $('#forecastSummary').textContent=scheduled?`${languageName}已排入 ${scheduled} 个表达`:'完成练习后会出现排期';
       $('#reviewForecast').innerHTML=forecast.map(item=>{const date=new Date(`${item.date}T12:00:00`),label=item.offset===0?'今天':item.offset===1?'明天':`周${'日一二三四五六'[date.getDay()]}`;return `<div class="forecast-day ${item.count?'due':''}"><span>${label}</span><b>${item.count}</b><small>${esc(item.date.slice(5).replace('-','/'))}</small></div>`}).join('');
-      if($('#currentLanguageSetting'))$('#currentLanguageSetting').textContent=lang==='fr'?'Français 法语':'English 英语';
     }
     function selectDeck(id){invalidatePickupRequest();invalidateSmartRequest();state.activeDeck=id;state.preferredLang=DECKS[id].lang;currentFilter=state.preferredLang;studyQueue=[];save();renderDecks();renderLibrary()}
     async function startDeck(id,button){
@@ -612,8 +626,40 @@
     function renderDecks(){const box=$('#deckRow'),d=DECKS[state.activeDeck];box.classList.add('single');box.innerHTML=`<article class="deck-card active" data-deck="${d.id}" tabindex="0" role="button" aria-label="预览${d.title}"><span class="deck-n">当前词书</span><div class="lang">${d.lang==='fr'?'FRANÇAIS':'ENGLISH'} · ${d.level}</div><h3>${d.title}</h3><p>${d.subtitle}</p><div class="deck-status"><span>${deckSize(d)} 张${d.origin==='tatoeba'?'语料练习卡':'人工整理练习卡'} · ${d.size.toLocaleString('en-US')} 词频索引</span><b>${d.origin==='tatoeba'?'每轮优先复习到期卡，再随机抽新卡':`新增 ${deckSize(DECKS[d.lang+'-context'])||0} 张语境卡可选`}</b></div><div class="deck-actions"><button type="button" class="start-deck" data-start-deck="${d.id}">开始一轮</button><button type="button" data-change-deck>更换词书</button>${d.origin==='tatoeba'?'':`<button type="button" data-start-context>练 ${deckSize(DECKS[d.lang+'-context']).toLocaleString('en-US')||0} 张语境卡</button>`}</div></article>`;const cardEl=$('[data-deck]');cardEl.onclick=e=>{if(!e.target.closest('button'))openDeckDetail(d.id)};cardEl.onkeydown=e=>{if((e.key==='Enter'||e.key===' ')&&!e.target.closest('button')){e.preventDefault();openDeckDetail(d.id)}};$('[data-start-deck]').onclick=e=>{e.stopPropagation();startDeck(d.id,e.currentTarget)};$('[data-change-deck]').onclick=e=>{e.stopPropagation();currentScope='system';currentFilter=d.lang;go('library')};if($('[data-start-context]'))$('[data-start-context]').onclick=e=>{e.stopPropagation();startDeck(d.lang+'-context',e.currentTarget)}}
     function card(){if(!studyQueue.length)return null;const ref=studyQueue[studyPosition],resolved=resolveRef(ref);return resolved?{...resolved,i:studyPosition,key:refKey(ref),ref}:null}
     let retryRequired=false;function studyBodyMarkup(){return '<div class="translation" id="translation"></div><div class="cloze" id="cloze"></div><div class="corpus-note" id="corpusNote" hidden></div><div class="choice-options" id="choiceOptions" hidden></div><input class="answer" id="answer" autocomplete="off" autocapitalize="off" placeholder="输入缺失的词或表达"><button class="btn submit" id="checkBtn">提交答案</button><div class="feedback" id="feedback"></div>'}function clozeMarkup(cloze,answer='?'){return esc(cloze).replace('___',`<span class="blank">${esc(answer)}</span>`)}
-    function renderStudyComplete(){const total=sessionStats.answered,firstTry=sessionStats.firstTryCorrect,retried=sessionStats.retried,scheduledReviews=sessionStats.answered?sessionStats.scheduledReviews:0,delayedFirstTry=sessionStats.answered?sessionStats.delayedFirstTry:0,accuracy=total?Math.round(firstTry/total*100):0,delayedAccuracy=scheduledReviews?Math.round(delayedFirstTry/scheduledReviews*100):null,delayedDisplay=scheduledReviews?`${delayedFirstTry}/${scheduledReviews}`:'—',sources=new Set(studyQueue.map(ref=>ref.type==='picked'?'picked':ref.deckId)),source=sources.values().next().value,collectionTotal=source==='picked'?state.picked.filter(item=>item.lang===state.preferredLang).length:source?deckSize(DECKS[source]):0,collectionName=source==='picked'?'我的练习卡':DECKS[source]?.title;if(studySessionId&&total&&!sessionCompleteLogged){trackEvent('session_complete',{sessionId:studySessionId,total,firstTryCorrect:firstTry,retried,scheduledReviews,delayedRecallRate:delayedAccuracy??0,source:'study'});sessionCompleteLogged=true;measureJourney('round_complete');save()}$('#studyDeck').textContent='本轮完成';$('#studyIndex').textContent=`${total} 个表达`;$('#studyBar').style.width='100%';$('.study-body').innerHTML=`<div class="session-complete"><div class="complete-mark">✓</div><h2>${total?'这轮练习完成了':'今天没有待练内容'}</h2><p>${total?(sources.size===1?`${esc(collectionName)}共 ${collectionTotal} 张，其他卡片会在后续轮次出现。`:'回到今天可查看练习进度和下次复习。'):'可以生成新练习卡，或去词库开始另一轮练习。'}</p><div class="session-summary"><div><b>${total}</b><span>本轮完成</span></div><div><b>${accuracy}%</b><span>第一次就答对</span></div><div><b>${scheduledReviews}</b><span>旧题复习</span></div><div><b>${delayedDisplay}</b><span>隔天仍记得</span></div></div><details class="metric-help"><summary>这两个数是什么意思？</summary><p>“旧题复习”是本轮里以前学过、今天回来复习的题数；“隔天仍记得”显示这些旧题中第一次就答对的数量，例如 1/1。样本少时只是本轮记录，不代表能力已稳定。</p></details><div class="feedback-actions" style="justify-content:center"><button class="btn dark" id="backTodayBtn">回到今天</button><button class="btn ghost" id="goPickupBtn">生成新练习卡</button></div></div>`;$('#backTodayBtn').onclick=()=>{studyQueue=[];go('today')};$('#goPickupBtn').onclick=()=>{studyQueue=[];go('import')}}
-    function renderStudy(){retryRequired=false;if(studyPosition>=studyQueue.length)return renderStudyComplete();const current=card();if(!current){studyPosition+=1;return renderStudy()}const {d,c,i}=current;$('.study-body').innerHTML=studyBodyMarkup();$('#studyDeck').textContent=d.title;$('#studyIndex').textContent=`${i+1} / ${studyQueue.length}`;$('#studyBar').style.width=`${(i+1)/studyQueue.length*100}%`;$('#translation').textContent=c.translation;$('#cloze').innerHTML=clozeMarkup(c.cloze);const a=$('#answer');if(c.kind==='corpus-choice'){const options=$('#choiceOptions'),note=$('#corpusNote');note.hidden=false;note.innerHTML=`根据中文和原句，从四个词中选出缺失的一项；语料卡未经逐张人工审校。<span class="corpus-credit">例句：${(c.sourceIds||[]).map(id=>`<a href="https://tatoeba.org/en/sentences/show/${encodeURIComponent(id)}" target="_blank" rel="noopener">Tatoeba #${esc(id)}</a>`).join(' · ')}</span>`;options.hidden=false;options.innerHTML=c.choices.map(choice=>`<button type="button" data-choice="${esc(choice)}">${esc(choice)}</button>`).join('');options.querySelectorAll('button').forEach(button=>button.onclick=()=>{a.value=button.dataset.choice;check()});a.style.display='none';$('#checkBtn').style.display='none'}$('#checkBtn').onclick=check;a.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();e.stopPropagation();check()}};a.oninput=()=>{if(!retryRequired)return;const status=$('#retryStatus');if(status)status.textContent=`输入 ${c.target}，再提交一次。`;a.className='answer'};if(!matchMedia('(max-width:820px)').matches)setTimeout(()=>a.focus({preventScroll:true}),80)}
+    function renderFirstPreferences(){
+      if(!sessionCompleteLogged){
+        sessionCompleteLogged=true;
+        measureJourney('trial_completed');
+      }
+      $('#studyDeck').textContent='首题完成';
+      $('#studyIndex').textContent='';
+      $('#studyBar').style.width='100%';
+      $('.study-body').innerHTML=`<div class="session-complete first-preferences">
+        <h2 id="firstPreferencesTitle" tabindex="-1">第一题完成</h2>
+        <form id="firstPreferences" class="first-preferences-form">
+          <div class="form-row">
+            <div class="field"><label for="firstLanguage">接下来学什么</label><select id="firstLanguage">${$('#learningLanguageSelect').innerHTML}</select></div>
+            <div class="field"><label for="firstDailyGoal">每日目标</label><select id="firstDailyGoal">${$('#dailyGoalSelect').innerHTML}</select></div>
+          </div>
+          <button class="btn dark" type="submit">保存并回到今天</button>
+        </form>
+      </div>`;
+      $('#firstLanguage').value=state.preferredLang;
+      $('#firstDailyGoal').value=String(state.settings.dailyGoal);
+      $('#firstPreferences').onsubmit=event=>{
+        event.preventDefault();
+        const language=$('#firstLanguage').value;
+        const goal=Number($('#firstDailyGoal').value);
+        state.settings.dailyGoal=goal;
+        setLearningLanguage(language);
+        measureJourney('trial_saved',[{e:'lg_trial_language',l:language},{e:'lg_trial_goal',l:String(goal)}]);
+        go('today');
+        focusScreenHeading('#todayTitle');
+      };
+      focusScreenHeading('#firstPreferencesTitle');
+    }
+    function renderStudyComplete(){if(roundRoute==='trial'&&sessionStats.answered)return renderFirstPreferences();const total=sessionStats.answered,firstTry=sessionStats.firstTryCorrect,retried=sessionStats.retried,scheduledReviews=sessionStats.answered?sessionStats.scheduledReviews:0,delayedFirstTry=sessionStats.answered?sessionStats.delayedFirstTry:0,accuracy=total?Math.round(firstTry/total*100):0,delayedAccuracy=scheduledReviews?Math.round(delayedFirstTry/scheduledReviews*100):null,delayedDisplay=scheduledReviews?`${delayedFirstTry}/${scheduledReviews}`:'—',sources=new Set(studyQueue.map(ref=>ref.type==='picked'?'picked':ref.deckId)),source=sources.values().next().value,collectionTotal=source==='picked'?state.picked.filter(item=>item.lang===state.preferredLang).length:source?deckSize(DECKS[source]):0,collectionName=source==='picked'?'我的练习卡':DECKS[source]?.title;if(studySessionId&&total&&!sessionCompleteLogged){trackEvent('session_complete',{sessionId:studySessionId,total,firstTryCorrect:firstTry,retried,scheduledReviews,delayedRecallRate:delayedAccuracy??0,source:'study'});sessionCompleteLogged=true;measureJourney('round_complete');save()}$('#studyDeck').textContent='本轮完成';$('#studyIndex').textContent=`${total} 个表达`;$('#studyBar').style.width='100%';$('.study-body').innerHTML=`<div class="session-complete"><div class="complete-mark">✓</div><h2>${total?'这轮练习完成了':'今天没有待练内容'}</h2><p>${total?(sources.size===1?`${esc(collectionName)}共 ${collectionTotal} 张，其他卡片会在后续轮次出现。`:'回到今天可查看练习进度和下次复习。'):'可以生成新练习卡，或去词库开始另一轮练习。'}</p><div class="session-summary"><div><b>${total}</b><span>本轮完成</span></div><div><b>${accuracy}%</b><span>第一次就答对</span></div><div><b>${scheduledReviews}</b><span>旧题复习</span></div><div><b>${delayedDisplay}</b><span>隔天仍记得</span></div></div><details class="metric-help"><summary>这两个数是什么意思？</summary><p>“旧题复习”是本轮里以前学过、今天回来复习的题数；“隔天仍记得”显示这些旧题中第一次就答对的数量，例如 1/1。样本少时只是本轮记录，不代表能力已稳定。</p></details><div class="feedback-actions" style="justify-content:center"><button class="btn dark" id="backTodayBtn">回到今天</button><button class="btn ghost" id="goPickupBtn">生成新练习卡</button></div></div>`;$('#backTodayBtn').onclick=()=>{studyQueue=[];go('today')};$('#goPickupBtn').onclick=()=>{studyQueue=[];go('import')}}
+    function renderStudy(){retryRequired=false;if(studyPosition>=studyQueue.length)return renderStudyComplete();const current=card();if(!current){studyPosition+=1;return renderStudy()}const {d,c,i}=current;$('.study-body').innerHTML=studyBodyMarkup();$('#studyDeck').textContent=roundRoute==='trial'?'英语 · 首题体验':d.title;$('#studyIndex').textContent=`${i+1} / ${studyQueue.length}`;$('#studyBar').style.width=`${(i+1)/studyQueue.length*100}%`;$('#translation').textContent=c.translation;$('#cloze').innerHTML=clozeMarkup(c.cloze);const a=$('#answer');if(c.kind==='corpus-choice'){const options=$('#choiceOptions'),note=$('#corpusNote');note.hidden=false;note.innerHTML=`${roundRoute==='trial'?'从四个选项里选出缺少的词。':'根据中文和原句，从四个词中选出缺失的一项；语料卡未经逐张人工审校。'}<span class="corpus-credit">例句：${(c.sourceIds||[]).map(id=>`<a href="https://tatoeba.org/en/sentences/show/${encodeURIComponent(id)}" target="_blank" rel="noopener">Tatoeba #${esc(id)}</a>`).join(' · ')}</span>`;options.hidden=false;options.innerHTML=c.choices.map(choice=>`<button type="button" data-choice="${esc(choice)}">${esc(choice)}</button>`).join('');options.querySelectorAll('button').forEach(button=>button.onclick=()=>{a.value=button.dataset.choice;check()});a.style.display='none';$('#checkBtn').style.display='none'}$('#checkBtn').onclick=check;a.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();e.stopPropagation();check()}};a.oninput=()=>{if(!retryRequired)return;const status=$('#retryStatus');if(status)status.textContent=`输入 ${c.target}，再提交一次。`;a.className='answer'};if(!matchMedia('(max-width:820px)').matches)setTimeout(()=>a.focus({preventScroll:true}),80)}
     const {norm,withoutMarks,editDistance,difficultCard,gradeAnswer,nextReview,createLearningEvent,createReviewEvent,appendCappedUnique,summarizeReviewHistory,upcomingReviewSchedule}=LingoGrabRouting;
     function isKnownSingleTerm(value,lang){return Object.values(DECKS).filter(deck=>deck.lang===lang).flatMap(deck=>deck.cards).some(item=>norm(item.target)===value||norm(item.lemma)===value)||PICKABLE.some(item=>item.lang===lang&&norm(item.target)===value)||frequencyIndex[lang].some(item=>norm(item.word)===value)}
     function knownLanguageTerm(value,lang){if(!/^[a-zàâäæçéèêëîïôöœùûüÿ'’ -]+$/i.test(value))return false;const tokens=value.split(/[\s-]+/).filter(Boolean);return tokens.length===1?isKnownSingleTerm(value,lang):tokens.every(token=>isKnownSingleTerm(norm(token),lang))}
@@ -621,7 +667,7 @@
     function trackEvent(name,properties={}){state.eventLog=appendCappedUnique(state.eventLog,[createLearningEvent(name,properties)],1000);sendTelemetry(remoteLearningEvents(name,properties))}
     function recordReviewAttempt(current,{result,firstTry,schedule={interval:0,due:''},mistakeKind=''}){const previous=state.studyRecords[current.key]||{},source=current.ref.type==='picked'?'picked':'deck';state.reviewHistory=appendCappedUnique(state.reviewHistory,[createReviewEvent({cardKey:current.key,result,firstTry,previousInterval:previous.interval||0,scheduledInterval:schedule.interval||0,due:schedule.due||'',source,sessionId:studySessionId})],5000);trackEvent('study_submit',{cardKey:current.key,result,answerKind:result,mistakeKind,source,retry:!firstTry,sessionId:studySessionId,interval:schedule.interval||0,due:schedule.due||''})}
     function recordSuccess(current,passedAfterRetry,answerKind){const today=dateKey(),daily=state.dailyActivity[today]||{reviewed:[],firstTryCorrect:0,retried:0},previous=state.studyRecords[current.key]||{},isScheduledReview=(Number(previous.interval)||0)>0&&previous.lastResult!=='wrong',schedule=nextReview({record:previous,previousInterval:previous.interval||0,correct:true,firstTry:!passedAfterRetry&&current.c.kind!=='corpus-choice'}),newForToday=!daily.reviewed.includes(current.key);recordReviewAttempt(current,{result:passedAfterRetry?'retried':answerKind,firstTry:!passedAfterRetry,schedule});if(newForToday)daily.reviewed.push(current.key);if(passedAfterRetry){if(newForToday)daily.retried+=1;sessionStats.retried+=1}else{if(newForToday)daily.firstTryCorrect+=1;sessionStats.firstTryCorrect+=1;if(isScheduledReview)sessionStats.delayedFirstTry+=1;state.wrong=state.wrong.filter(id=>id!==current.c.id)}if(isScheduledReview)sessionStats.scheduledReviews+=1;sessionStats.answered+=1;state.dailyActivity[today]=daily;if(!state.activityDates.includes(today))state.activityDates.push(today);state.studyRecords[current.key]={...schedule,lastReviewed:today,lastResult:passedAfterRetry?'retried':'first_try'};if(!state.mastered.includes(current.c.id))state.mastered.push(current.c.id);if(current.ref.type==='deck')state.index[current.ref.deckId]=(state.index[current.ref.deckId]+1)%DECKS[current.ref.deckId].cards.length}
-    function check(){const current=card();if(!current)return;const {c,d}=current,a=$('#answer'),val=norm(a.value),grade=gradeAnswer(val,c),ok=grade.correct,acceptable=grade.kind==='acceptable',passedAfterRetry=ok&&retryRequired,lang=d.lang,route=ok?null:classifyMistake(val,c,lang);if(val&&!roundFirstAnswerLogged){roundFirstAnswerLogged=true;measureJourney('first_answer')}a.className='answer '+(ok?'good':'bad');if(ok){a.disabled=true;$('#checkBtn').style.display='none';recordSuccess(current,passedAfterRetry,grade.kind);retryRequired=false}else{const previous=state.studyRecords[current.key]||{},schedule=nextReview({record:previous,previousInterval:previous.interval||0,correct:false,firstTry:false});recordReviewAttempt(current,{result:grade.kind,firstTry:false,schedule,mistakeKind:route?.kind||''});state.studyRecords[current.key]={...schedule,lastReviewed:dateKey(),lastResult:'wrong'};retryRequired=true;if(!state.wrong.includes(c.id))state.wrong.push(c.id)}if(c.kind==='corpus-choice'){$('#choiceOptions').hidden=true;if(!ok){a.style.display='block';$('#checkBtn').style.display='block'}}save();const fb=$('#feedback'),headline=!ok?`正确答案是 ${esc(c.target)}`:acceptable?`也可以这样说：${esc(val)}`:passedAfterRetry?'这次答对了':'答对了',detail=!ok?`你写的是 ${esc(val||'（空白）')}。${esc(c.explanation)}`:acceptable?`本题推荐 ${esc(c.target)}；两种说法都可以，使用场景略有不同。`:'记住这个表达，下一题继续。',detailLabel=!ok?'想看更多解释':'查看用法';fb.className='feedback show '+(ok?'good':'bad');fb.innerHTML=`<div class="feedback-top"><div><h3>${headline}</h3><p class="answer-correction">${detail}</p>${ok?'':`<p id="retryStatus" class="microcopy">输入 ${esc(c.target)}，再提交一次。</p>`}</div></div>${ok?'<div class="feedback-actions"><button class="btn dark" id="nextBtn">下一词 →</button></div>':''}<details class="reaction-details"><summary>反馈这段解释</summary><div class="reaction-row"><button type="button" data-reaction="like" aria-label="有帮助">👍</button><button type="button" data-reaction="dislike" aria-label="没帮助">👎</button><span class="reaction-status" id="reactionStatus"></span></div></details><details class="feedback-details"><summary>${detailLabel}</summary><p>${esc(c.explanation)}</p><div class="grammar-tags">${c.grammar.map(x=>`<span>${esc(x)}</span>`).join('')}</div><div class="feedback-actions"><button class="btn grammar-link" id="aiExplainBtn">还是不懂？问 AI</button>${lang==='fr'?'<button class="btn grammar-link" id="grammarBtn">查看时态表</button>':''}</div><div class="ai-extra" id="aiExtra"></div></details>`;$('#cloze').innerHTML=clozeMarkup(c.cloze,ok?val:c.target);if(ok){$('#nextBtn').onclick=()=>{studyPosition+=1;renderStudy()}}else{a.value='';a.placeholder=`输入 ${c.target}`;a.disabled=false;$('#checkBtn').style.display='block';$('#checkBtn').textContent='提交答案';setTimeout(()=>a.focus(),80)}const aiButton=$('#aiExplainBtn');aiButton.onclick=()=>explainWithAI(c,val,ok,{mistakeKind:route?.kind});if($('#grammarBtn'))$('#grammarBtn').onclick=openGrammar;$$('[data-reaction]').forEach(button=>button.onclick=()=>submitLearningReaction(button,button.dataset.reaction,current,{ok,mistakeKind:route?.kind||''}))}document.addEventListener('keydown',e=>{const next=$('#nextBtn');if(e.key==='Enter'&&next&&$('#study').classList.contains('on')){e.preventDefault();next.click()}});
+    function check(){const current=card();if(!current)return;const {c,d}=current,a=$('#answer'),val=norm(a.value),grade=gradeAnswer(val,c),ok=grade.correct,acceptable=grade.kind==='acceptable',passedAfterRetry=ok&&retryRequired,lang=d.lang,route=ok?null:classifyMistake(val,c,lang);if(val&&!roundFirstAnswerLogged){roundFirstAnswerLogged=true;measureJourney(roundRoute==='trial'?'trial_answered':'first_answer')}a.className='answer '+(ok?'good':'bad');if(ok){a.disabled=true;$('#checkBtn').style.display='none';recordSuccess(current,passedAfterRetry,grade.kind);retryRequired=false}else{const previous=state.studyRecords[current.key]||{},schedule=nextReview({record:previous,previousInterval:previous.interval||0,correct:false,firstTry:false});recordReviewAttempt(current,{result:grade.kind,firstTry:false,schedule,mistakeKind:route?.kind||''});state.studyRecords[current.key]={...schedule,lastReviewed:dateKey(),lastResult:'wrong'};retryRequired=true;if(!state.wrong.includes(c.id))state.wrong.push(c.id)}if(c.kind==='corpus-choice'){$('#choiceOptions').hidden=true;if(!ok){a.style.display='block';$('#checkBtn').style.display='block'}}save();const fb=$('#feedback'),headline=!ok?`正确答案是 ${esc(c.target)}`:acceptable?`也可以这样说：${esc(val)}`:passedAfterRetry?'这次答对了':'答对了',detail=!ok?`你写的是 ${esc(val||'（空白）')}。${esc(c.explanation)}`:acceptable?`本题推荐 ${esc(c.target)}；两种说法都可以，使用场景略有不同。`:(roundRoute==='trial'?esc(c.explanation):'记住这个表达，下一题继续。'),detailLabel=!ok?'想看更多解释':'查看用法';fb.className='feedback show '+(ok?'good':'bad');fb.innerHTML=`<div class="feedback-top"><div><h3>${headline}</h3><p class="answer-correction">${detail}</p>${ok?'':`<p id="retryStatus" class="microcopy">输入 ${esc(c.target)}，再提交一次。</p>`}</div></div>${ok?`<div class="feedback-actions"><button class="btn dark" id="nextBtn">${roundRoute==='trial'?'设置学习偏好':'下一词 →'}</button></div>`:''}<details class="reaction-details"><summary>反馈这段解释</summary><div class="reaction-row"><button type="button" data-reaction="like" aria-label="有帮助">👍</button><button type="button" data-reaction="dislike" aria-label="没帮助">👎</button><span class="reaction-status" id="reactionStatus"></span></div></details><details class="feedback-details"><summary>${detailLabel}</summary><p>${esc(c.explanation)}</p><div class="grammar-tags">${c.grammar.map(x=>`<span>${esc(x)}</span>`).join('')}</div><div class="feedback-actions"><button class="btn grammar-link" id="aiExplainBtn">还是不懂？问 AI</button>${lang==='fr'?'<button class="btn grammar-link" id="grammarBtn">查看时态表</button>':''}</div><div class="ai-extra" id="aiExtra"></div></details>`;$('#cloze').innerHTML=clozeMarkup(c.cloze,ok?val:c.target);if(ok){if(roundRoute==='trial')measureJourney('trial_correct');$('#nextBtn').onclick=()=>{studyPosition+=1;renderStudy()}}else{a.value='';a.placeholder=`输入 ${c.target}`;a.disabled=false;$('#checkBtn').style.display='block';$('#checkBtn').textContent='提交答案';setTimeout(()=>a.focus(),80)}const aiButton=$('#aiExplainBtn');aiButton.onclick=()=>explainWithAI(c,val,ok,{mistakeKind:route?.kind});if($('#grammarBtn'))$('#grammarBtn').onclick=openGrammar;$$('[data-reaction]').forEach(button=>button.onclick=()=>submitLearningReaction(button,button.dataset.reaction,current,{ok,mistakeKind:route?.kind||''}))}document.addEventListener('keydown',e=>{const next=$('#nextBtn');if(e.key==='Enter'&&next&&$('#study').classList.contains('on')){e.preventDefault();next.click()}});
     async function submitLearningReaction(button,rating,current,{ok,mistakeKind=''}){const buttons=[...$$('[data-reaction]')],status=$('#reactionStatus');buttons.forEach(item=>item.disabled=true);status.textContent='正在提交…';trackEvent('feedback_reaction',{rating,area:'answer_feedback',result:ok?'correct':'wrong'});save({sync:false});const result=await accountPost('/feedback',{content:rating==='like'?'学习反馈：有帮助':'学习反馈：没帮助',meta:{source:'lingograb_web',brand:'lingograb',category:'learning_reaction',area:'answer_feedback',rating,cardId:String(current.c.id||'').slice(0,80),deckId:String(current.d.id||'').slice(0,80),answerResult:ok?'correct':'wrong',mistakeKind:String(mistakeKind||'').slice(0,40),version:'v0.4'}});if(result.ok){button.style.background='var(--sage-soft)';status.textContent='已收到，谢谢'}else{trackEvent('product_error',{kind:'feedback_submit'});buttons.forEach(item=>item.disabled=false);status.textContent='提交失败，请重试'}}
     function openGrammar(){$('#tenseGrid').innerHTML=TENSES.map(x=>`<div class="tense"><b>${x[0]}</b><p>${x[1]}</p></div>`).join('');$('#grammarModal').classList.add('show')}$('#closeModal').onclick=()=>$('#grammarModal').classList.remove('show');$('#grammarModal').onclick=e=>{if(e.target.id==='grammarModal')$('#grammarModal').classList.remove('show')};
     function bookMarkup(d){return `<article class="book-card" data-library-deck="${d.id}" tabindex="0" role="button" aria-label="预览${d.title}"><div class="book-cover ${d.lang} ${d.theme||''}"><small>${d.lang==='fr'?'FRANÇAIS':'ENGLISH'} · ${esc(d.level)}</small><b>${esc(d.title)}</b><span>${deckSize(d)} ${d.origin==='tatoeba'?'CORPUS CARDS':'CURATED CARDS'}</span></div><div class="book-info"><h3>${esc(d.title)}</h3><p>${esc(d.subtitle)}</p><div class="book-metrics"><div><b>${deckSize(d)}</b><small>${d.origin==='tatoeba'?'语境练习卡':'人工整理卡'}</small></div><div><b>${d.size.toLocaleString('en-US')}</b><small>词频索引</small></div><div><b>${deckSize(d)>120?Math.ceil(deckSize(d)*0.7/60)+' 小时':Math.max(2,Math.ceil(deckSize(d)*0.7))+' 分钟'}</b><small>完整练完</small></div></div><div class="book-state">${state.activeDeck===d.id?'✓ 当前正在学习':'打开预览 →'}</div></div></article>`}
@@ -697,98 +743,50 @@
     $('#deckDetailModal').onclick=e=>{if(e.target.id==='deckDetailModal')closeDeckDetail()};
     $('#deckDetailStart').onclick=e=>startDeck(detailDeckId,e.currentTarget);
     $('#startTodayBtn').onclick=e=>beginTodaySession(e.currentTarget);
-    let guideStep=1;
-    let guideOpener=null;
-    const guide=$('#onboardingModal');
-    const guideBackground=$$('.app,.topbar,.mobile-nav');
-    function showGuideStep(step){
-      guideStep=step;
-      $$('.guide-step').forEach(el=>el.classList.toggle('on',Number(el.dataset.guideStep)===step));
-      $$('.guide-progress i').forEach((el,index)=>el.classList.toggle('on',index<step));
-      $('#closeGuide').hidden=!hasDailyGoal();
-      const heading=$(`[data-guide-step="${step}"] h3`);
-      heading.tabIndex=-1;
-      heading.focus({preventScroll:true});
-    }
-    function hasDailyGoal(){return [3,5,8,12].includes(Number(state.settings.dailyGoal))&&localStorage.getItem('lingograb-daily-goal-chosen-v1')==='1'}
-    function closeGuide({restoreFocus=true}={}){
-      if(!hasDailyGoal()){toast('请先选择语言并设置每日目标');return}
-      localStorage.setItem('lingograb-onboarding-v2','1');
-      dismissGuide(restoreFocus);
-    }
-    function dismissGuide(restoreFocus=false){
-      guide.classList.remove('show');
-      guideBackground.forEach(element=>element.inert=false);
-      if(restoreFocus&&guideOpener?.isConnected)guideOpener.focus({preventScroll:true});
-      guideOpener=null;
-    }
-    function updateGuidePracticeCopy(){
-      const goal=Number(state.settings.dailyGoal)||3;
-      $('#guideQuickPracticeTitle').textContent=`直接练 ${goal} 个表达`;
-      $('#guideQuickPracticeCopy').textContent=`从语境练习卡中抽取今天的 ${goal} 个目标。`;
-    }
-    function onboardingPracticeRefs(){
-      const goal=Number(state.settings.dailyGoal)||3;
-      const deck=DECKS[state.activeDeck];
-      return nextRefsForDeck(deck.id,goal,deck.starter||deck.cards);
-    }
-    let firstGuide=false;
-    function openGuide(){
-      firstGuide=!localStorage.getItem('lingograb-onboarding-v2')||!hasDailyGoal();
-      if(firstGuide)measureJourney('guide_open');
-      guideOpener=document.activeElement;
-      onboardingLang=state.preferredLang;
-      updateGuidePracticeCopy();
-      guide.classList.add('show');
-      guideBackground.forEach(element=>element.inert=true);
-      showGuideStep(1);
-    }
     function focusScreenHeading(selector){
       const heading=$(selector);
       if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true})}
     }
-    guide.addEventListener('keydown',event=>{
-      if(event.key!=='Tab')return;
-      const controls=[...guide.querySelectorAll('button')].filter(button=>!button.disabled&&button.getClientRects().length);
-      const first=controls[0],last=controls.at(-1);
-      if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus()}
-      else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus()}
-    });
-    $('#closeGuide').onclick=()=>closeGuide();
-    guide.onclick=event=>{if(event.target===guide)closeGuide()};
-    $$('[data-guide-back]').forEach(button=>button.onclick=()=>showGuideStep(Number(button.dataset.guideBack)));
-    $$('[data-onboard-lang]').forEach(button=>button.onclick=()=>{onboardingLang=button.dataset.onboardLang;if(firstGuide)measureJourney('language',[{e:'lg_guide_language',l:onboardingLang}]);state.preferredLang=onboardingLang;state.activeDeck=onboardingLang==='en'?(DECKS['en-context']?'en-context':'en-b1'):(DECKS['fr-context']?'fr-context':'fr-daily-a1');currentFilter=onboardingLang;studyQueue=[];save();renderDecks();renderLibrary();showGuideStep(2)});
-    $$('[data-onboard-goal]').forEach(button=>button.onclick=()=>{state.settings.dailyGoal=Number(button.dataset.onboardGoal);if(firstGuide)measureJourney('goal',[{e:'lg_guide_goal',l:String(state.settings.dailyGoal)}]);localStorage.setItem('lingograb-daily-goal-chosen-v1','1');save();updateGuidePracticeCopy();showGuideStep(3)});
-    $('#guideQuickPractice').onclick=async event=>{
-      const deck=DECKS[state.activeDeck];
-      const goal=Number(state.settings.dailyGoal)||3;
-      let refs=onboardingPracticeRefs();
-      if(refs.length<goal){
-        const intent=++studyIntent;
-        const current=()=>guide.classList.contains('show')&&guideStep===3&&state.activeDeck===deck.id;
-        if(!await prepareStudyCorpus(deck,event.currentTarget,intent,current)||!current())return;
-        refs=nextRefsForDeck(deck.id,goal);
+    function setLearningLanguage(language){
+      if(!['en','fr'].includes(language))return;
+      if(language!==state.preferredLang){
+        studyIntent++;
+        selectDeck(language+'-context');
+      }else save();
+    }
+    function startFirstPractice({record=true,scroll=true}={}){
+      markLearningEntry();
+      const starter=DECKS['en-context'];
+      let deck=starter;
+      const welcomeCard=starter.starter.find(card=>card.id==='en-corpus-312035');
+      let refs=welcomeCard?nextRefsForDeck(deck.id,1,[welcomeCard]):[];
+      if(!refs.length)refs=nextRefsForDeck(deck.id,1,deck.starter);
+      if(!refs.length){
+        deck=DECKS['en-b1'];
+        refs=nextRefsForDeck(deck.id,1);
       }
-      if(firstGuide)measureJourney('guide_done');
-      trackEvent('onboarding_complete',{language:onboardingLang,path:'quick_practice'});
+      state.preferredLang='en';
+      state.activeDeck='en-context';
+      currentFilter='en';
+      save({touch:false,sync:false});
+      renderDecks();
+      renderLibrary();
+      beginQueue(refs,{route:'trial'});
+      go('study',{record,scroll});
+      if(refs.length){
+        measureJourney('trial_shown');
+        focusScreenHeading('#studyDeck');
+      }
+    }
+    $('#learningLanguageSelect').onchange=event=>setLearningLanguage(event.target.value);
+    $('#dailyGoalSelect').onchange=event=>{
+      const goal=Number(event.target.value);
+      if(![3,5,8,12].includes(goal))return;
+      state.settings.dailyGoal=goal;
       save();
-      closeGuide({restoreFocus:false});
-      beginQueue(refs,{route:'guide',deckId:deck.id});
-      go('study');
-      focusScreenHeading('#studyDeck');
+      toast('每日目标已更新');
     };
-    $('#guideTryPickup').onclick=()=>{
-      if(firstGuide)measureJourney('guide_done');
-      trackEvent('onboarding_complete',{language:onboardingLang,path:'pickup'});
-      save();
-      rotatePickupSample(onboardingLang);
-      closeGuide({restoreFocus:false});
-      go('import');
-      focusScreenHeading('#import h2');
-    };
-    $('#replayGuideBtn').onclick=openGuide;
-    $('#dailyGoalSelect').onchange=event=>{const goal=Number(event.target.value);if(![3,5,8,12].includes(goal)){toast('请选择每日目标');return}state.settings.dailyGoal=goal;localStorage.setItem('lingograb-daily-goal-chosen-v1','1');save();renderStats();toast('每日目标已更新')};
-    $('#aiToggleBtn').onclick=()=>{state.settings.aiEnabled=!state.settings.aiEnabled;save();toast(state.settings.aiEnabled?'AI 个性化已开启':'AI 个性化已关闭')};$('#exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify({exportedAt:new Date().toISOString(),data:state},null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='lingograb-learning-data.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),500);toast('学习数据已导出')};$('#resetBtn').onclick=()=>{const scope=accountToken()?'本机与登录账号中的':'当前浏览器里的';if(confirm(`清空${scope}学习进度、错题和个人词书？此操作不可恢复。`)){state=normalizeState({updatedAt:Date.now()});studyQueue=[];currentScope='system';currentFilter=state.preferredLang;localStorage.removeItem('lingograb-onboarding-v2');localStorage.removeItem('lingograb-daily-goal-chosen-v1');save();renderAll();openGuide();toast('学习数据已重置')}};document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if($('#onboardingModal').classList.contains('show'))closeGuide();if($('#deckDetailModal').classList.contains('show'))closeDeckDetail();if($('#grammarModal').classList.contains('show'))$('#grammarModal').classList.remove('show')});
+    $('#aiToggleBtn').onclick=()=>{state.settings.aiEnabled=!state.settings.aiEnabled;save();toast(state.settings.aiEnabled?'AI 个性化已开启':'AI 个性化已关闭')};$('#exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify({exportedAt:new Date().toISOString(),data:state},null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='lingograb-learning-data.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),500);toast('学习数据已导出')};$('#resetBtn').onclick=()=>{const scope=accountToken()?'本机与登录账号中的':'当前浏览器里的';if(confirm(`清空${scope}学习进度、错题和个人词书？此操作不可恢复。`)){state=normalizeState({activeDeck:state.activeDeck,preferredLang:state.preferredLang,settings:state.settings,updatedAt:Date.now()});studyQueue=[];currentScope='system';currentFilter=state.preferredLang;markLearningEntry();save();renderAll();toast('学习数据已重置')}};document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if($('#deckDetailModal').classList.contains('show'))closeDeckDetail();if($('#grammarModal').classList.contains('show'))$('#grammarModal').classList.remove('show')});
     function syncMobileNavViewport(){if(!matchMedia('(max-width:820px)').matches){document.documentElement.style.removeProperty('--mobile-nav-offset');return}const view=window.visualViewport;const offset=view&&view.scale===1?Math.max(0,window.innerHeight-view.height-view.offsetTop):0;document.documentElement.style.setProperty('--mobile-nav-offset',`${Math.round(offset)}px`)}window.addEventListener('resize',syncMobileNavViewport);if(window.visualViewport){window.visualViewport.addEventListener('resize',syncMobileNavViewport);window.visualViewport.addEventListener('scroll',syncMobileNavViewport)}syncMobileNavViewport();
     function buildResearchExport(){return {schemaVersion:1,exportedAt:new Date().toISOString(),product:'LingoGrab',privacy:{containsRawAnswers:false,containsImportedMaterial:false,containsContact:false},summary:summarizeReviewHistory(state.reviewHistory),dailyActivity:Object.entries(state.dailyActivity).map(([date,value])=>({date,completed:(value.reviewed||[]).length,firstTryCorrect:Number(value.firstTryCorrect)||0,retried:Number(value.retried)||0})),reviewHistory:state.reviewHistory,eventLog:state.eventLog}}
     $('#researchExportBtn').onclick=()=>{trackEvent('research_export',{});save();const blob=new Blob([JSON.stringify(buildResearchExport(),null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='lingograb-research-data.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),500);toast('研究数据包已导出')};
@@ -938,7 +936,6 @@
     }
     function openExperienceFeedbackLink({initial=false}={}){
       feedbackLinkActive=true;
-      if(guide.classList.contains('show'))dismissGuide();
       go('settings',{record:!initial,scroll:false});
       $('#settingsFeedback').open=true;
       $('#experience-feedback').open=true;
@@ -997,9 +994,19 @@
       if(event.currentTarget.open)measureJourney('feedback_open',[{e:'lg_feedback_entry',l:`open|${feedbackLinkActive?'invite':'experience'}`}]);
     });
     renderExperienceQuestions();
-    function renderAll(){renderStats();renderDecks();renderLibrary();renderSettings()}localStorage.setItem('pickup-mvp-state',JSON.stringify(state));const sharedFeedbackEntry=location.hash===EXPERIENCE_HASH;
-    const landingView=sharedFeedbackEntry?'settings':'today';
-    const initialTelemetry=[{e:'lg_visit',l:state.activityDates.length?'returning':'new',n:1},{e:'lg_view',l:landingView,n:1},{e:'lg_pv',l:landingView,n:1}];if(TELEMETRY_SESSION.isNew){initialTelemetry.push({e:'lg_session',l:'start',n:1},{e:'lg_referrer',l:telemetryReferrer(),n:1});const campaign=telemetryCampaign();if(campaign)initialTelemetry.push({e:'lg_campaign',l:campaign,n:1})}sendTelemetry(initialTelemetry);renderAll();measureJourney('ready');if(sharedFeedbackEntry)openExperienceFeedbackLink({initial:true});else if(!localStorage.getItem('lingograb-onboarding-v2')||!hasDailyGoal())openGuide();if(accountToken())syncNow(true);else renderSettings();
+    function renderAll(){renderStats();renderDecks();renderLibrary();renderSettings()}
+    const sharedFeedbackEntry=location.hash===EXPERIENCE_HASH;
+    const startWithTrial=firstVisitAvailable&&!sharedFeedbackEntry;
+    if(sharedFeedbackEntry&&firstVisitAvailable)localStorage.setItem(FIRST_VISIT_KEY,'feedback_only');
+    localStorage.setItem('pickup-mvp-state',JSON.stringify(state));
+    const landingView=sharedFeedbackEntry?'settings':startWithTrial?'study':'today';
+    const initialTelemetry=[{e:'lg_visit',l:firstVisitAvailable?'new':'returning',n:1},{e:'lg_view',l:landingView,n:1},{e:'lg_pv',l:landingView,n:1}];if(TELEMETRY_SESSION.isNew){initialTelemetry.push({e:'lg_session',l:'start',n:1},{e:'lg_referrer',l:telemetryReferrer(),n:1});const campaign=telemetryCampaign();if(campaign)initialTelemetry.push({e:'lg_campaign',l:campaign,n:1})}sendTelemetry(initialTelemetry);
+    renderAll();
+    measureJourney('ready');
+    if(sharedFeedbackEntry)openExperienceFeedbackLink({initial:true});
+    else if(startWithTrial)startFirstPractice({record:false,scroll:false});
+    else markLearningEntry();
+    if(accountToken())syncNow(true);
   </script>
 </body>
 </html>

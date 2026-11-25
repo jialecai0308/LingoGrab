@@ -27,11 +27,13 @@
   <div class="data-start" id="analyticsCoverage"></div>
   <h2>用户概况 <span>不看作答原文，只看匿名结构化行为</span></h2><div class="grid" id="overview"></div>
   <h2>关键动作 <span>每项独立去重，可以跳过词库直接练习</span></h2><div class="funnel-wrap"><div class="funnel-head"><div class="seg" id="audience"><button data-audience="all">含爬虫</button><button data-audience="humans" class="on">真人</button><button data-audience="people">按账号合并</button></div><span class="tag" id="funnelMethod"></span></div><div class="funnel" id="funnel"></div></div>
-  <h2>引导与练习</h2>
+  <h2>首次体验与日常练习</h2>
   <p class="journey-note" id="journeyNote"></p>
   <div class="split">
-    <section class="journey-group"><h3>首次引导</h3><div class="table-wrap"><table><thead><tr><th>动作</th><th>去重人数或设备</th></tr></thead><tbody id="guideSteps"></tbody></table></div></section>
-    <section class="journey-group"><h3>练习过程</h3><div class="table-wrap"><table><thead><tr><th>动作</th><th>去重人数或设备</th></tr></thead><tbody id="practiceSteps"></tbody></table></div></section>
+    <section class="journey-group"><h3>首题体验</h3><p class="journey-note" id="trialNote"></p><div class="table-wrap"><table><thead><tr><th>动作</th><th>去重人数或设备</th></tr></thead><tbody id="trialSteps"></tbody></table></div>
+      <details class="journey-history" id="historicGuide"><summary>旧版引导记录</summary><div class="table-wrap"><table><thead><tr><th>动作</th><th>去重人数或设备</th></tr></thead><tbody id="guideSteps"></tbody></table></div></details>
+    </section>
+    <section class="journey-group"><h3>日常练习</h3><div class="table-wrap"><table><thead><tr><th>动作</th><th>去重人数或设备</th></tr></thead><tbody id="practiceSteps"></tbody></table></div></section>
   </div>
   <p class="journey-note" id="journeySelections"></p>
   <div class="split">
@@ -85,13 +87,14 @@ async function load(){
     if(request===dashboardRequest)$('#load').disabled=false;
   }
 }
+const TRIAL_STEPS=[['trial_shown','看到英语首题'],['trial_answered','提交首题答案'],['trial_correct','答对首题'],['trial_completed','进入学习偏好'],['trial_saved','保存学习偏好']];
 const GUIDE_STEPS=[['guide_open','打开新手引导'],['language','选择语言'],['goal','设定每日目标'],['guide_done','选择体验路径']];
 const PRACTICE_STEPS=[['round_start','开始一轮'],['first_answer','首次提交答案'],['round_complete','完成一轮']];
 const BOOK_NAMES=new Map([
   ['en-context','英语语境练习'],['en-b1','职场英语 B1'],['en-b2','职场英语 B2'],
   ['fr-context','法语语境练习'],['fr-daily-a1','日常法语 A1'],['fr-travel-a2','旅行法语 A1–A2'],['fr-work-a2','职场法语 A2–B1'],
 ]);
-const ROUND_NAMES=new Map([['guide','新手引导'],['today','今日练习'],['book','词书'],['smart','智能精选'],['pickup','个人制卡']]);
+const ROUND_NAMES=new Map([['guide','旧版新手引导'],['today','今日练习'],['book','词书'],['smart','智能精选'],['pickup','个人制卡']]);
 function renderJourney(data){
   const journey=data.journey;
   const steps=journey?.byMode?.[audience];
@@ -107,20 +110,26 @@ function renderJourney(data){
   $('#journeyNote').textContent=hasMeasurements
     ?`本期有 ${fmt(readiness)} 个页面可操作记录。各步骤独立去重，练习包含新老用户。`
     :'细分步骤启用后才会有记录。没有样本的步骤显示「—」。';
-  const stepRows=(defs,recorded)=>defs.map(([key,label])=>{
+  const stepRows=(defs,recorded,hasData=hasMeasurements)=>defs.map(([key,label])=>{
     const row=recorded?.find(item=>item.key===key);
-    return `<tr><td>${esc(label)}</td><td>${hasMeasurements&&row?fmt(row.count):'—'}</td></tr>`;
+    return `<tr><td>${esc(label)}</td><td>${hasData&&row?fmt(row.count):'—'}</td></tr>`;
   }).join('');
+  const trialMeasured=Boolean(journey?.trialFrom);
+  $('#trialNote').textContent=trialMeasured
+    ?`自 ${journey.trialFrom} 有记录。首题单独统计。`
+    :'本期还没有新版首题记录。';
+  $('#trialSteps').innerHTML=stepRows(TRIAL_STEPS,steps?.trial,trialMeasured);
+  $('#historicGuide').hidden=!(steps?.guide||[]).some(row=>row.count>0);
   $('#guideSteps').innerHTML=stepRows(GUIDE_STEPS,steps?.guide);
   $('#practiceSteps').innerHTML=stepRows(PRACTICE_STEPS,steps?.practice);
   const sums=name=>new Map((data.actions?.[name]||[]).map(row=>[row.label,Number(row.count)||0]));
   const counts=map=>[...map.values()].reduce((a,b)=>a+b,0);
-  const languages=sums('guideLanguages'),goals=sums('guideGoals'),feedback=sums('feedbackEntries');
+  const languages=sums('trialLanguages'),goals=sums('trialGoals'),feedback=sums('feedbackEntries');
   const langs=[['en','英语'],['fr','法语']].filter(([key])=>languages.has(key)).map(([key,label])=>`${label} ${fmt(languages.get(key))} 次`);
   const targets=['3','5','8','12'].filter(key=>goals.has(key)).map(key=>`${key} 个 ${fmt(goals.get(key))} 次`);
   $('#journeySelections').textContent=[
-    langs.length?`语言选择：${langs.join('、')}`:'',
-    targets.length?`每日目标：${targets.join('、')}`:'',
+    langs.length?`首题后保存的语言：${langs.join('、')}`:'',
+    targets.length?`首题后保存的每日目标：${targets.join('、')}`:'',
     counts(feedback)?`反馈入口打开 ${fmt((feedback.get('open|settings')||0)+(feedback.get('open|experience')||0)+(feedback.get('open|invite')||0))} 次（朋友直达 ${fmt(feedback.get('open|invite'))} 次）`:'',
   ].filter(Boolean).join('　·　');
   const books=sums('books'),entries=sums('roundEntries');
