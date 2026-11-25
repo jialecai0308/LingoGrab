@@ -125,6 +125,19 @@
     .corpus-credit a{color:#397697}
     .deck-actions [data-start-context]{background:#e7f1f7;color:#386b88;border-color:#c9dce7}
     @media(max-width:480px){.choice-options{grid-template-columns:1fr 1fr}.choice-options button{padding:9px 10px}.deck-actions{flex-wrap:wrap}.deck-actions [data-start-context]{flex-basis:100%}}
+    .settings-feedback fieldset{border:0;margin:0;padding:0;min-inline-size:0}
+    .settings-feedback .feedback-legend{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+    .settings-feedback .form-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .settings-feedback .field label{font-size:13px;color:var(--ink)}
+    .settings-feedback [hidden]{display:none}
+    .settings-feedback .feedback-email{max-width:420px;margin-bottom:16px}
+    .settings-feedback .feedback-email .microcopy{margin:0;color:var(--muted)}
+    .settings-feedback #feedbackPrivacy{margin:-2px 0 12px}
+    .settings-feedback .feedback-status{margin:8px 0 0;font-size:13px}
+    .settings-feedback .feedback-status:empty{margin:0}
+    .settings-feedback .feedback-status[data-kind="error"]{color:#a44343}
+    .settings-feedback textarea:focus-visible{outline:2px solid var(--sage-deep);outline-offset:2px}
+    @media(max-width:680px){.settings-feedback .form-row{grid-template-columns:1fr;gap:0}}
   </style>
 </head>
 <body>
@@ -163,8 +176,66 @@
         <div class="panel setting-card"><h3>每天学多少</h3><p>每日目标只决定一天练几个，不会限制词书总量。</p><div class="setting-row"><span>当前语言</span><span id="currentLanguageSetting"></span></div><div class="field"><label for="dailyGoalSelect">每日目标</label><select id="dailyGoalSelect"><option value="">请选择每日目标</option><option value="3">3 个 · 约 2 分钟</option><option value="5">5 个 · 轻量</option><option value="8">8 个 · 标准</option><option value="12">12 个 · 进阶</option></select></div><div class="button-row"><button class="btn ghost" id="replayGuideBtn">重新看使用引导</button></div></div>
         <div class="panel setting-card"><h3>账号同步</h3><p>不登录也能使用；需要多设备同步时再登录。</p><details class="settings-details"><summary id="accountSummary">登录或注册</summary><div id="accountPanel"></div></details></div>
         <div class="panel setting-card wide"><h3>我的学习质量</h3><p>学习结果留在产品里，运营看板只看用户与产品表现。</p><div class="evidence-grid settings-evidence"><div><b id="evidenceCompleted">0</b><span>练过的表达</span></div><div><b id="evidenceFirstTry">0%</b><span>一次答对</span></div><div><b id="evidenceDelayedRecall">—</b><span>隔天还记得</span></div></div><details class="settings-details"><summary>查看完整记录</summary><div class="setting-row"><span>答错后重输正确</span><span id="evidenceRetries">0</span></div><div class="setting-row"><span>总提交次数</span><span id="evidenceAttempts">0</span></div><div class="evidence-days" id="evidenceDays"><span>还没有学习记录</span></div><p class="microcopy">“隔天还记得”只统计至少间隔一天的复习；样本不足时显示“—”。</p></details></div>
+        <div class="panel setting-card wide settings-feedback">
+          <details class="settings-details">
+            <summary>用户反馈</summary>
+            <form id="feedbackForm">
+              <fieldset id="feedbackFields">
+                <legend class="feedback-legend">填写反馈</legend>
+                <div class="form-row">
+                  <div class="field">
+                    <label for="feedbackCategory">反馈类型</label>
+                    <select id="feedbackCategory" name="category" required>
+                      <option value="">请选择</option>
+                      <option value="bug">遇到了问题</option>
+                      <option value="content">练习题有问题</option>
+                      <option value="idea">希望改进</option>
+                      <option value="positive">这点很好用</option>
+                      <option value="other">其他</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="feedbackArea">当时在做什么（选填）</label>
+                    <select id="feedbackArea" name="area">
+                      <option value="">请选择</option>
+                      <option value="onboarding">第一次使用</option>
+                      <option value="library">找词书或选内容</option>
+                      <option value="study">做练习或看讲解</option>
+                      <option value="review">复习旧题</option>
+                      <option value="smart">用智能精选</option>
+                      <option value="import">用自己的材料制卡</option>
+                      <option value="account">登录或同步进度</option>
+                      <option value="general">打开网站或切换页面</option>
+                      <option value="other">其他</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="field" id="feedbackImpactField" hidden>
+                  <label for="feedbackImpact">这次还能继续吗？（选填）</label>
+                  <select id="feedbackImpact" name="impact" disabled>
+                    <option value="">请选择</option>
+                    <option value="blocked">这一步做不下去</option>
+                    <option value="workaround">换个办法才继续</option>
+                    <option value="minor">可以继续，但有影响</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="feedbackText" id="feedbackTextLabel">反馈内容</label>
+                  <textarea id="feedbackText" name="content" maxlength="1000" rows="4" required aria-describedby="feedbackPrivacy" placeholder="例如：我想复习昨天学过的词，但找不到入口。"></textarea>
+                </div>
+                <p id="feedbackPrivacy">请勿填写密码或粘贴敏感材料。</p>
+                <div class="field feedback-email">
+                  <label for="feedbackContact">联系邮箱（选填）</label>
+                  <input id="feedbackContact" name="contact" type="email" autocomplete="email" maxlength="120" aria-describedby="feedbackContactHint">
+                  <span class="microcopy" id="feedbackContactHint">我们需要了解更多时，可能会发邮件联系你。</span>
+                </div>
+                <button class="btn dark" id="feedbackSubmitBtn" type="submit">提交反馈</button>
+              </fieldset>
+              <p class="feedback-status" id="feedbackStatus" role="status" aria-atomic="true" tabindex="-1"></p>
+            </form>
+          </details>
+        </div>
         <div class="panel setting-card wide"><details class="settings-details"><summary>更多设置</summary><h3>AI 辅助</h3><p>只有你主动使用智能筛选或点击“问 AI”时，相关内容才会发往模型服务。</p><div class="setting-row"><span>AI 辅助</span><span id="aiSettingText">已开启</span></div><div class="button-row"><button class="btn ghost" id="aiToggleBtn">关闭 AI 个性化</button></div><h3>学习记忆</h3><p>只记录学习进度，不保存密码、公司机密或整段导入材料。</p><div class="setting-row"><span>已练表达</span><span id="memoryMastered">0</span></div><div class="setting-row"><span>待巩固</span><span id="memoryWrong">0</span></div><div class="setting-row"><span>个人拾取</span><span id="memoryPicked">0</span></div><div class="memory-chips" id="memoryChips"></div><h3>数据管理</h3><div class="button-row"><button class="btn ghost" id="exportBtn">导出学习数据</button><button class="btn ghost" id="researchExportBtn">导出研究数据</button><button class="btn ghost" id="resetBtn">清空学习数据</button></div></details></div>
-        <div class="panel setting-card wide"><details class="settings-details"><summary>帮助与问题反馈</summary><p>请描述发生了什么、你希望怎样；不要填写密码或敏感业务信息。</p><div class="form-row"><div class="field"><label for="feedbackCategory">问题类型</label><select id="feedbackCategory"><option value="bug">功能异常</option><option value="content">词汇或例句问题</option><option value="idea">产品建议</option><option value="other">其他</option></select></div><div class="field"><label for="feedbackContact">联系方式（选填）</label><input id="feedbackContact" maxlength="120" placeholder="邮箱或其他联系方式"></div></div><div class="field"><label for="feedbackText">反馈内容</label><textarea id="feedbackText" maxlength="2000" placeholder="例如：我在旅行法语第 2 题遇到了……"></textarea></div><div class="button-row"><button class="btn dark" id="feedbackSubmitBtn">提交反馈</button><span class="sync-line" id="feedbackStatus"></span></div></details></div>
         <div class="panel setting-card wide"><details class="tech-details"><summary>技术说明（非使用必读）</summary><p>答案判断和 FSRS-6 复习排期在浏览器中完成：答错记为 Again，改正后记为 Hard，首次答对记为 Good；目标记忆保持率为 90%。旧学习记录先保留原到期日，下一次作答后自动迁移。AI 只在你主动使用智能功能时调用，暂时不可用也不影响普通练习和复习。</p></details></div>
       </div></div></section>
       <div class="footer">LingoGrab · 英法语境练习 · <a href="https://github.com/jialecai0308/lingograb" target="_blank" rel="noopener">查看源码</a> · 词频 <a href="https://github.com/hermitdave/FrequencyWords" target="_blank" rel="noopener">FrequencyWords · CC BY-SA 4.0</a> · 例句 <a href="https://tatoeba.org/en/downloads" target="_blank" rel="noopener">Tatoeba · CC BY 2.0 FR</a></div>
@@ -648,7 +719,77 @@
     $('#guideTryPickup').addEventListener('click',()=>{trackEvent('onboarding_complete',{language:onboardingLang,path:'pickup'});save()});
     function buildResearchExport(){return {schemaVersion:1,exportedAt:new Date().toISOString(),product:'LingoGrab',privacy:{containsRawAnswers:false,containsImportedMaterial:false,containsContact:false},summary:summarizeReviewHistory(state.reviewHistory),dailyActivity:Object.entries(state.dailyActivity).map(([date,value])=>({date,completed:(value.reviewed||[]).length,firstTryCorrect:Number(value.firstTryCorrect)||0,retried:Number(value.retried)||0})),reviewHistory:state.reviewHistory,eventLog:state.eventLog}}
     $('#researchExportBtn').onclick=()=>{trackEvent('research_export',{});save();const blob=new Blob([JSON.stringify(buildResearchExport(),null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='lingograb-research-data.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),500);toast('研究数据包已导出')};
-    $('#feedbackSubmitBtn').onclick=async()=>{const button=$('#feedbackSubmitBtn'),content=$('#feedbackText').value.trim(),contact=$('#feedbackContact').value.trim(),category=$('#feedbackCategory').value,status=$('#feedbackStatus');if(content.length<8){toast('请至少写 8 个字，方便定位问题');return}button.disabled=true;button.textContent='正在提交…';status.textContent='';const result=await accountPost('/feedback',{content,contact,meta:{source:'lingograb_web',brand:'lingograb',category,page:'settings',version:'v0.4'}});if(result.ok){trackEvent('feedback_reaction',{rating:'written',area:'settings',result:'submitted'});save({sync:false});$('#feedbackText').value='';status.textContent='已收到，谢谢你帮助 LingoGrab 变好。';toast('反馈已提交')}else{trackEvent('product_error',{kind:'feedback_submit'});status.textContent='提交失败，内容还保留在输入框里，请稍后重试。';toast('暂时无法提交反馈')}button.disabled=false;button.textContent='提交反馈'};
+    const feedbackForm=$('#feedbackForm');
+    const feedbackCategory=$('#feedbackCategory');
+    const feedbackText=$('#feedbackText');
+    const feedbackImpact=$('#feedbackImpact');
+    const feedbackStatus=$('#feedbackStatus');
+    const feedbackPrompts=new Map([
+      ['bug',['发生了什么？','例如：点了「开始今日练习」，页面没反应。我原本想继续复习旧题。']],
+      ['content',['哪道题有问题？','例如：法语题里的「Elle …」有两个选项都能填进去。']],
+      ['idea',['你最想改哪一处？','例如：想按「开会」筛选词书，方便在会议前练习。']],
+      ['positive',['哪一点帮到了你？','例如：答错后要再输一次，让我记住了刚才写错的表达。']],
+    ]);
+    function updateFeedbackFields(){
+      const kind=feedbackCategory.value;
+      const [label,example]=feedbackPrompts.get(kind)||['反馈内容','例如：我想复习昨天学过的词，但找不到入口。'];
+      const showImpact=kind==='bug'||kind==='content';
+      $('#feedbackTextLabel').textContent=label;
+      feedbackText.placeholder=example;
+      $('#feedbackImpactField').hidden=!showImpact;
+      feedbackImpact.disabled=!showImpact;
+      if(!showImpact)feedbackImpact.value='';
+    }
+    feedbackCategory.addEventListener('change',updateFeedbackFields);
+    feedbackText.addEventListener('input',()=>feedbackText.setCustomValidity(''));
+    feedbackForm.addEventListener('submit',async event=>{
+      event.preventDefault();
+      const fields=$('#feedbackFields');
+      if(fields.disabled)return;
+      const content=feedbackText.value.trim();
+      if(!content){
+        feedbackText.setCustomValidity('请描述你遇到的情况。');
+        feedbackText.reportValidity();
+        return;
+      }
+      const category=feedbackCategory.value;
+      const area=$('#feedbackArea').value;
+      const impact=feedbackImpact.disabled?'':feedbackImpact.value;
+      const contact=$('#feedbackContact').value.trim();
+      fields.disabled=true;
+      feedbackForm.setAttribute('aria-busy','true');
+      feedbackStatus.removeAttribute('data-kind');
+      feedbackStatus.textContent='正在提交…';
+      try{
+        const result=await accountPost('/feedback',{
+          content,
+          ...(contact?{contact}:{}),
+          meta:{
+            source:'lingograb_web',brand:'lingograb',page:'settings',
+            category,form:'settings_feedback_v1',
+            ...(area?{area}:{}),
+            ...(impact?{impact}:{}),
+          },
+        });
+        if(result.ok){
+          feedbackForm.reset();
+          updateFeedbackFields();
+          feedbackStatus.textContent='已收到反馈，谢谢。';
+          trackEvent('feedback_reaction',{rating:'written',area:'settings',result:'submitted'});
+          save({sync:false});
+        }else{
+          feedbackStatus.dataset.kind='error';
+          feedbackStatus.textContent=result.error==='rate_limited'
+            ?'提交太频繁。内容已保留，请稍后再试。'
+            :'没能提交。内容已保留，可以再试一次。';
+          trackEvent('product_error',{kind:'feedback_submit'});
+        }
+      }finally{
+        fields.disabled=false;
+        feedbackForm.removeAttribute('aria-busy');
+      }
+    });
+
     function renderAll(){renderStats();renderDecks();renderLibrary();renderSettings()}localStorage.setItem('pickup-mvp-state',JSON.stringify(state));const initialTelemetry=[{e:'lg_visit',l:state.activityDates.length?'returning':'new',n:1},{e:'lg_view',l:'today',n:1},{e:'lg_pv',l:'today',n:1}];if(TELEMETRY_SESSION.isNew){initialTelemetry.push({e:'lg_session',l:'start',n:1},{e:'lg_referrer',l:telemetryReferrer(),n:1});const campaign=telemetryCampaign();if(campaign)initialTelemetry.push({e:'lg_campaign',l:campaign,n:1})}sendTelemetry(initialTelemetry);renderAll();if(!localStorage.getItem('lingograb-onboarding-v2')||!hasDailyGoal())openGuide();if(accountToken())syncNow(true);else renderSettings();
   </script>
 </body>
