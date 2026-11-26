@@ -1,3 +1,4 @@
+import {startFixture,verifyFirstEntry} from '../ci/browser-fixtures.mjs'
 import fs from 'node:fs/promises'
 import http from 'node:http'
 import path from 'node:path'
@@ -66,19 +67,19 @@ const staticChecks = [
   ['学习记录与到期日', html.includes('studyRecords') && html.includes('lastReviewed')],
   ['学习数据导出', html.includes('id="exportBtn"') && html.includes('lingograb-learning-data.json')],
   ['词书数量口径', html.includes('张语料练习') && html.includes('张人工整理') && !html.includes('${d.size.toLocaleString(\'en-US\')} WORDS')],
-  ['首次体验包含每日目标', html.includes('data-onboard-goal="3"') && html.includes('data-onboard-goal="12"') && html.includes('先生成自己的练习卡')],
+  ['首题后可设置每日目标', html.includes('id="firstDailyGoal"') && html.includes('id="firstLanguage"') && html.includes('startFirstPractice')],
   ['英语词库扩展为百张卡', html.includes('data/en-curated-cards.js') && html.includes('FSRS-6')],
   ['反馈点赞点踩', html.includes('data-reaction="like"') && html.includes('data-reaction="dislike"') && html.includes("accountPost('/feedback'")],
   ['匿名产品埋点', html.includes("e:'lg_visit'") && html.includes("e:'lg_session_complete'") && !html.includes('userAnswer:val')],
   ['LingoGrab 用户运营看板', adminHtml.includes('LingoGrab 用户运营看板') && adminHtml.includes('/lingograb-analytics') && adminHtml.includes('feedbackItems') && adminHtml.includes('demoData')],
-  ['看板标注数据起点和北京时间', adminHtml.includes('2026-10-08 16:59') && adminHtml.includes('北京时间，UTC+8') && adminHtml.includes('beijingDay')],
+  ['看板标注数据起点和北京时间', adminHtml.includes('analyticsCoverage') && adminHtml.includes('beijingDay')],
   ['看板不混入学习质量', adminHtml.includes('UV') && adminHtml.includes('访问来源') && adminHtml.includes('稳定性') && !adminHtml.includes('一次答对率') && !adminHtml.includes('延迟回忆表现')],
   ['产品内学习质量', html.includes('我的学习质量')],
   ['三条内容路线导航', html.includes('data-screen="library"') && html.includes('data-screen="smart"') && html.includes('data-screen="import"')],
   ['个人拾取示例可轮换且不覆盖真实材料', html.includes('PICKUP_SAMPLES') && html.includes('id="samplePickupBtn"') && html.includes('已保留你的材料')],
   ['个人拾取可直达智能精选', html.includes('id="goSmartFromPickupBtn"') && html.includes("$('#goSmartFromPickupBtn').onclick=()=>go('smart')")],
   ['智能精选场景有对应文案', html.includes('SMART_SCENE_COPY') && html.includes('机场改签、酒店入住或问路') && html.includes('约时间、表达近况或提出建议')],
-  ['语言资产按三条内容路线统计', html.includes('<strong>基础词库</strong>') && html.includes('<strong>智能精选</strong>') && html.includes('<strong>个人拾取</strong>')],
+  ['语言资产按三条内容路线统计', html.includes("['基础词库',") && html.includes("['智能精选',") && html.includes("['个人拾取',")],
   ['材料或目标变化后会取消旧 AI 响应', html.includes('pickupRequestController') && html.includes('smartRequestController') && html.includes('invalidatePickupRequest') && html.includes('invalidateSmartRequest')],
   ['智能精选场景暴露明确选中状态', html.includes('data-smart-scene="work" aria-pressed="true"') && html.includes("item.setAttribute('aria-pressed',String(selected))")],
   ['点赞点踩默认弱化', html.includes('class="reaction-details"') && html.includes('<summary>反馈这段解释</summary>')],
@@ -149,13 +150,8 @@ try {
   ))
   check('数据同步', '跨设备重复卡合并并迁移复习引用', mergedDuplicate.picked.length === 1 && mergedDuplicate.picked[0].id === 'picked-local' && mergedDuplicate.studyRecords['picked:picked-local']?.interval === 7 && !mergedDuplicate.studyRecords['picked:picked-remote'] && Object.values(mergedDuplicate.dailyActivity).every(day => day.reviewed.every(key => key === 'picked:picked-local')) && mergedDuplicate.reviewHistory.every(item => item.cardKey === 'picked:picked-local'), JSON.stringify(mergedDuplicate))
 
-  check('浏览器旅程', '首次进入先选语言', await page.locator('[data-onboard-lang="en"]').isVisible(), '新手引导第 1 步')
-  check('浏览器旅程', '新用户连续天数从零开始', (await page.locator('#streakCount').innerText()) === '0', await page.locator('#streakCount').innerText())
-  await page.locator('[data-onboard-lang="en"]').click()
-  check('浏览器旅程', '语言选择后设置每日目标', await page.locator('[data-onboard-goal="3"]').isVisible() && await page.locator('[data-onboard-goal="12"]').isVisible(), '新手引导第 2 步')
-  await page.locator('[data-onboard-goal="3"]').click()
-  check('浏览器旅程', '设置目标后出现两条直达路径', await page.locator('#guideQuickPractice').isVisible() && await page.locator('#guideTryPickup').isVisible(), '新手引导第 3 步')
-  await page.locator('#guideQuickPractice').click()
+  await verifyFirstEntry(page,check)
+  await startFixture(page)
 
   for (const answer of ['explain', 'report', 'comment']) {
     await page.locator('#answer').fill(answer)
@@ -209,9 +205,7 @@ try {
   await retryPage.goto(`http://127.0.0.1:${port}`, { waitUntil: 'networkidle' })
   await retryPage.evaluate(() => localStorage.clear())
   await retryPage.reload({ waitUntil: 'networkidle' })
-  await retryPage.locator('[data-onboard-lang="en"]').click()
-  await retryPage.locator('[data-onboard-goal="3"]').click()
-  await retryPage.locator('#guideQuickPractice').click()
+  await startFixture(retryPage)
   await retryPage.locator('#answer').fill('banana')
   await retryPage.locator('#checkBtn').click()
   const retryFeedback = await retryPage.locator('#feedback').innerText()
@@ -230,7 +224,7 @@ try {
   check('浏览器旅程', '重输通过记录为待巩固', Object.values(retryState.studyRecords)[0].lastResult === 'retried' && retryState.wrong.includes('en-clarify'), JSON.stringify(retryState.studyRecords))
 
   await retryPage.locator('.side-nav [data-screen="settings"]').click()
-  check('设置页', '默认只显示三个核心区域', await retryPage.getByText('每天学多少', { exact: true }).isVisible() && await retryPage.getByText('账号同步', { exact: true }).isVisible() && await retryPage.getByText('我的学习质量', { exact: true }).isVisible(), '每日学习量、账号同步、我的学习质量')
+  check('设置页', '默认只显示三个核心区域', await retryPage.getByText('学习偏好', { exact: true }).isVisible() && await retryPage.getByText('账号同步', { exact: true }).isVisible() && await retryPage.getByText('我的学习质量', { exact: true }).isVisible(), '每日学习量、账号同步、我的学习质量')
   check('设置页', '高级功能默认收起', (await retryPage.locator('.settings-details[open], .tech-details[open]').count()) === 0, '更多设置、帮助和技术说明均默认收起')
 
   await retryPage.locator('.side-nav [data-screen="smart"]').click()
@@ -344,15 +338,15 @@ try {
   check('语言资产', '切换学习语言时侧栏与今日队列同步更新', frenchAssetLabel.startsWith('法语资产') && frenchLanguageState.preferredLang === 'fr' && frenchLanguageState.activeDeckLang === 'fr' && frenchLanguageState.todayDeck.includes('FRANÇAIS') && frenchLanguageState.refsMatch, JSON.stringify({ frenchAssetLabel, frenchLanguageState }))
   await legacyPage.locator('[data-filter="en"]').click()
   const assetBuckets = await legacyPage.locator('#profileLine > span').evaluateAll(rows => Object.fromEntries(rows.map(row => [row.querySelector('strong').textContent.trim(), row.querySelector('em').textContent.trim()])))
-  const englishSystemTotal = await legacyPage.evaluate(() => Object.values(DECKS).filter(deck => deck.lang === 'en').reduce((sum, deck) => sum + deck.cards.length, 0))
+  const englishSystemTotal = await legacyPage.evaluate(() => Object.values(DECKS).filter(deck => deck.lang === 'en').reduce((sum, deck) => sum + deckSize(deck), 0))
   check('语言资产', '三类资产使用准确且互斥的已练/可练口径', assetBuckets['基础词库'] === `0/${englishSystemTotal}` && assetBuckets['智能精选'] === '0/1' && assetBuckets['个人拾取'] === '1/1', JSON.stringify(assetBuckets))
-  check('安全边界', '拾取题面按纯文本渲染', await legacyPage.locator('#cloze img').count() === 0 && await legacyPage.evaluate(() => window.__pickedXss !== 1) && (await legacyPage.locator('#cloze').innerText()).includes('<img'), await legacyPage.locator('#cloze').innerText())
   check('数据迁移', '加载后立即持久化完整练习卡', migratedCard.id === 'picked-existing' && migratedCard.cardVersion === 2 && migratedCard.cloze.includes('___') && migratedCard.example.includes('touch base'), JSON.stringify(migratedCard))
   check('数据迁移', '旧拾取的复习记录不丢失', migratedState.studyRecords['picked:picked-existing']?.interval === 1, JSON.stringify(migratedState.studyRecords))
   await legacyPage.locator('.side-nav [data-screen="library"]').click()
   await legacyPage.locator('[data-scope="picked"]').click()
   check('数据迁移', '我的词书显示卡片和单卡练习入口', (await legacyPage.locator('#libraryCount').innerText()).includes('2 张练习卡') && await legacyPage.locator('[data-practice-picked="picked-existing"]').isVisible(), await legacyPage.locator('#termList').innerText())
   await legacyPage.locator('[data-practice-picked="picked-existing"]').click()
+  check('安全边界', '拾取题面按纯文本渲染', await legacyPage.locator('#cloze img').count() === 0 && await legacyPage.evaluate(() => window.__pickedXss !== 1) && (await legacyPage.locator('#cloze').innerText()).includes('<img'), await legacyPage.locator('#cloze').innerText())
   await legacyPage.locator('#answer').fill('touch base')
   await legacyPage.locator('#checkBtn').click()
   const migratedReviewedState = await legacyPage.evaluate(() => JSON.parse(localStorage.getItem('pickup-mvp-state')))
@@ -364,9 +358,10 @@ try {
   await frenchPage.goto(`http://127.0.0.1:${port}`, { waitUntil: 'networkidle' })
   await frenchPage.evaluate(() => localStorage.clear())
   await frenchPage.reload({ waitUntil: 'networkidle' })
-  await frenchPage.locator('[data-onboard-lang="fr"]').click()
-  await frenchPage.locator('[data-onboard-goal="3"]').click()
-  await frenchPage.locator('#guideTryPickup').click()
+  await frenchPage.locator('.side-nav [data-screen="settings"]').click()
+  await frenchPage.locator('#learningLanguageSelect').selectOption('fr')
+  await frenchPage.locator('.side-nav [data-screen="import"]').click()
+  await frenchPage.locator('#samplePickupBtn').click()
   await frenchPage.locator('#analyseBtn').click()
   const frenchCandidates = await frenchPage.locator('#candidates .candidate').count()
   check('法语制卡', '法语材料可在浏览器本地生成练习卡', frenchCandidates >= 4 && (await frenchPage.locator('#candidates').innerText()).includes('___'), await frenchPage.locator('#candidates').innerText())
@@ -402,7 +397,7 @@ try {
   await adminPage.route('**/api/lingograb-analytics', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(analyticsFixture) }))
   await adminPage.goto(`http://127.0.0.1:${port}/admin.html`, { waitUntil: 'networkidle' })
   check('用户运营看板', '北京时间不会在凌晨少一天', await adminPage.evaluate(() => beijingDay(Date.UTC(2026, 9, 8, 17)) === '2026-10-09'), 'UTC 10月8日 17:00 应归属北京时间 10月9日')
-  check('用户运营看板', '页面直接说明真实数据起点', (await adminPage.locator('.data-start').innerText()).includes('2026-10-08 16:59') && (await adminPage.locator('.data-start').innerText()).includes('无法回填历史 UV'), await adminPage.locator('.data-start').innerText())
+  check('用户运营看板', '演示看板不伪称真实数据覆盖', (await adminPage.locator('.data-start').innerText()).includes('演示数据'), await adminPage.locator('.data-start').innerText())
   check('用户运营看板', '未填 Key 展示完整演示数据', (await adminPage.locator('#mode').innerText()) === '演示数据' && (await adminPage.locator('#overview').innerText()).includes('126') && (await adminPage.locator('#sources').innerText()).includes('直接访问') && (await adminPage.locator('#feedback').innerText()).includes('演示反馈'), await adminPage.locator('#notice').innerText())
   await adminPage.locator('#key').fill('test-key')
   await adminPage.locator('#load').click()

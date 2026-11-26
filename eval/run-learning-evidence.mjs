@@ -1,3 +1,4 @@
+import {startFixture,verifyFirstEntry} from '../ci/browser-fixtures.mjs'
 import fs from 'node:fs/promises'
 import http from 'node:http'
 import path from 'node:path'
@@ -96,9 +97,7 @@ try {
   await page.goto(`http://127.0.0.1:${port}`, { waitUntil: 'networkidle' })
   await page.evaluate(() => localStorage.clear())
   await page.reload({ waitUntil: 'networkidle' })
-  await page.locator('[data-onboard-lang="en"]').click()
-  await page.locator('[data-onboard-goal="3"]').click()
-  await page.locator('#guideQuickPractice').click()
+  await startFixture(page)
 
   for (const answer of ['explain', 'report', 'comment']) {
     await page.locator('#answer').fill(answer)
@@ -109,7 +108,7 @@ try {
   const completedState = await page.evaluate(() => JSON.parse(localStorage.getItem('pickup-mvp-state')))
   check('浏览器证据链', '三次完成均写入逐次历史', completedState.reviewHistory.length === 3, `${completedState.reviewHistory.length} 条`)
   check('浏览器证据链', '可接受答案保留分类但不保留答案文本', completedState.reviewHistory.every(item => item.result === 'acceptable') && !JSON.stringify(completedState.reviewHistory).includes('explain'), JSON.stringify(completedState.reviewHistory))
-  check('浏览器证据链', '新手路径与完成事件写入日志', completedState.eventLog.some(item => item.name === 'onboarding_complete') && completedState.eventLog.some(item => item.name === 'session_complete'), completedState.eventLog.map(item => item.name).join(', '))
+  check('浏览器证据链', '学习开始与完成事件写入日志', completedState.eventLog.some(item => item.name === 'study_start') && completedState.eventLog.some(item => item.name === 'session_complete'), completedState.eventLog.map(item => item.name).join(', '))
 
   await page.locator('[data-screen="settings"]').first().click()
   check('浏览器证据链', '设置页展示完成数', (await page.locator('#evidenceCompleted').innerText()) === '3', await page.locator('#evidenceCompleted').innerText())
@@ -124,9 +123,7 @@ try {
   await retryPage.goto(`http://127.0.0.1:${port}`, { waitUntil: 'networkidle' })
   await retryPage.evaluate(() => localStorage.clear())
   await retryPage.reload({ waitUntil: 'networkidle' })
-  await retryPage.locator('[data-onboard-lang="en"]').click()
-  await retryPage.locator('[data-onboard-goal="3"]').click()
-  await retryPage.locator('#guideQuickPractice').click()
+  await startFixture(retryPage)
   await retryPage.locator('#answer').fill('banana')
   await retryPage.locator('#checkBtn').click()
   await retryPage.locator('#answer').fill('clarify')
