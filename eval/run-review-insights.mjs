@@ -1,3 +1,4 @@
+import {isolatePage} from '../ci/browser-fixtures.mjs'
 import fs from 'node:fs/promises'
 import http from 'node:http'
 import path from 'node:path'
@@ -87,6 +88,7 @@ let browser
 try {
   browser = await chromium.launch({ headless: true })
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } })
+  await isolatePage(page)
   const pageErrors = []
   page.on('pageerror', error => pageErrors.push(String(error)))
   await page.goto(`http://127.0.0.1:${port}`, { waitUntil: 'networkidle' })
@@ -134,15 +136,13 @@ try {
 
   await page.locator('[data-screen="today"]').first().click()
   await page.locator('#startTodayBtn').click()
-  await page.locator('#answer').fill('clarify')
-  await page.locator('#checkBtn').click()
-  await page.locator('#nextBtn').click()
-  await page.locator('#answer').fill('review')
-  await page.locator('#checkBtn').click()
-  await page.locator('#nextBtn').click()
-  await page.locator('#answer').fill('confirm')
-  await page.locator('#checkBtn').click()
-  await page.locator('#nextBtn').click()
+  for(let i=0;i<3;i++){
+    const answer=await page.evaluate(()=>card().c.target)
+    if(await page.locator('#choiceOptions [data-choice]').isVisible().catch(()=>false))
+      await page.locator('#choiceOptions').getByRole('button',{name:answer,exact:true}).click()
+    else {await page.locator('#answer').fill(answer);await page.locator('#checkBtn').click()}
+    await page.locator('#nextBtn').click()
+  }
   const sessionValues = await page.locator('.session-summary b').allInnerTexts()
   check('浏览器旅程', '完成页区分两次到期复习', sessionValues[0] === '3' && sessionValues[2] === '2', sessionValues.join(','))
   check('浏览器旅程', '旧题复习显示答对数与样本数', sessionValues[3] === '2/2', sessionValues.join(','))
@@ -154,6 +154,7 @@ try {
   check('浏览器旅程', '页面无运行时错误', pageErrors.length === 0, pageErrors.join(' | '))
 
   const mobile = await browser.newPage({ viewport: { width: 390, height: 844 } })
+  await isolatePage(mobile)
   await mobile.goto(`http://127.0.0.1:${port}`, { waitUntil: 'networkidle' })
   await mobile.evaluate(value => {
     localStorage.setItem('lingograb-onboarding-v2', '1')

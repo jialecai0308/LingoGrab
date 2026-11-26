@@ -1,1 +1,5 @@
 eval/node_modules/
+
+# Generated CI delivery and isolated browser dependencies
+delivery/
+ci/node_modules/
