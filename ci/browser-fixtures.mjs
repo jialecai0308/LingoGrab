@@ -19,3 +19,15 @@ export async function verifyFirstEntry(page,check) {
  await page.reload({waitUntil:'networkidle'});
  check('浏览器旅程','刷新保留偏好且不重复首题',await page.locator('#today').isVisible()&&await page.evaluate(()=>state.settings.dailyGoal===3),'独立新用户上下文');
 }
+
+export async function isolatePage(page) {
+ await page.addInitScript(()=>{
+   window.__ciDroppedBeacons=0;
+   Object.defineProperty(navigator,'sendBeacon',{configurable:true,value:()=>{window.__ciDroppedBeacons++;return true;}});
+ });
+ await page.route('**/*',route=>{
+   const url=new URL(route.request().url());
+   if(['127.0.0.1','localhost','[::1]'].includes(url.hostname))return route.continue();
+   return route.abort('blockedbyclient');
+ });
+}

@@ -1,4 +1,4 @@
-import {startFixture,verifyFirstEntry} from '../ci/browser-fixtures.mjs'
+import {startFixture,verifyFirstEntry,isolatePage} from '../ci/browser-fixtures.mjs'
 import fs from 'node:fs/promises'
 import http from 'node:http'
 import path from 'node:path'
@@ -92,6 +92,7 @@ let browser
 try {
   browser = await chromium.launch({ headless: true })
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } })
+  await isolatePage(page)
   const pageErrors = []
   page.on('pageerror', error => pageErrors.push(String(error)))
   await page.goto(`http://127.0.0.1:${port}`, { waitUntil: 'networkidle' })
@@ -120,6 +121,7 @@ try {
   check('浏览器证据链', '页面无运行时错误', pageErrors.length === 0, pageErrors.join(' | '))
 
   const retryPage = await browser.newPage({ viewport: { width: 390, height: 844 } })
+  await isolatePage(retryPage)
   await retryPage.goto(`http://127.0.0.1:${port}`, { waitUntil: 'networkidle' })
   await retryPage.evaluate(() => localStorage.clear())
   await retryPage.reload({ waitUntil: 'networkidle' })

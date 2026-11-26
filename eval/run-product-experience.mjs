@@ -1,4 +1,4 @@
-import {startFixture,verifyFirstEntry} from '../ci/browser-fixtures.mjs'
+import {startFixture,verifyFirstEntry,isolatePage} from '../ci/browser-fixtures.mjs'
 import fs from 'node:fs/promises'
 import http from 'node:http'
 import path from 'node:path'
@@ -115,6 +115,7 @@ let browser
 try {
   browser = await chromium.launch({ headless: true })
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } })
+  await isolatePage(page)
   await page.route('**/api/track', route => route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' }))
   const pageErrors = []
   page.on('pageerror', error => pageErrors.push(String(error)))
@@ -200,6 +201,7 @@ try {
   check('浏览器旅程', '页面无运行时错误', pageErrors.length === 0, pageErrors.join(' | '))
 
   const retryPage = await browser.newPage({ viewport: { width: 1280, height: 900 } })
+  await isolatePage(retryPage)
   await retryPage.route('**/api/track', route => route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' }))
   await retryPage.route('**/api/feedback', route => route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true,"id":"feedback-test"}' }))
   await retryPage.goto(`http://127.0.0.1:${port}`, { waitUntil: 'networkidle' })
@@ -244,6 +246,7 @@ try {
   check('内容路线', '没有材料可从拾取直达智能精选', await retryPage.locator('#smart').isVisible(), '个人拾取 → 智能精选')
 
   const stalePage = await browser.newPage({ viewport: { width: 1280, height: 900 } })
+  await isolatePage(stalePage)
   const extractGate = deferred()
   const recommendGates = [deferred(), deferred(), deferred()]
   let recommendIndex = 0
@@ -310,6 +313,7 @@ try {
   check('异步安全', '切换语言后忽略旧语言推荐', !(await stalePage.locator('#smartCandidates').innerText()).includes('STALE_LANGUAGE_RESULT') && (await stalePage.locator('#profileLine').getAttribute('aria-label')).startsWith('法语资产'), await stalePage.locator('#profileLine').getAttribute('aria-label'))
 
   const legacyPage = await browser.newPage({ viewport: { width: 1280, height: 900 } })
+  await isolatePage(legacyPage)
   await legacyPage.route('**/api/track', route => route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' }))
   await legacyPage.goto(`http://127.0.0.1:${port}`, { waitUntil: 'networkidle' })
   await legacyPage.evaluate(() => {
@@ -354,6 +358,7 @@ try {
   check('数据迁移', '旧排期首次复习后延续为 FSRS 状态', migratedRecord.algorithm === 'fsrs-6' && migratedRecord.fsrsCard?.reps === 2 && migratedRecord.interval > 1, JSON.stringify(migratedRecord))
 
   const frenchPage = await browser.newPage({ viewport: { width: 1280, height: 900 } })
+  await isolatePage(frenchPage)
   await frenchPage.route('**/api/track', route => route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' }))
   await frenchPage.goto(`http://127.0.0.1:${port}`, { waitUntil: 'networkidle' })
   await frenchPage.evaluate(() => localStorage.clear())
@@ -370,6 +375,7 @@ try {
   check('法语制卡', '法语拾取以完整卡片保存', frenchState.picked.length === frenchCandidates && frenchState.picked.every(item => item.lang === 'fr' && item.cardType === 'practice' && item.cloze.includes('___')), JSON.stringify(frenchState.picked))
 
   const adminPage = await browser.newPage({ viewport: { width: 1280, height: 900 } })
+  await isolatePage(adminPage)
   await adminPage.addInitScript(() => localStorage.removeItem('lingograb_admin_key'))
   const analyticsFixture = {
     ok: true,
@@ -409,6 +415,7 @@ try {
   check('用户运营看板', '点踩明细可定位到学习卡', (await adminPage.locator('#feedback').innerText()).includes('en-clarify') && (await adminPage.locator('#feedback').innerText()).includes('没帮助'), await adminPage.locator('#feedback').innerText())
 
   const mobile = await browser.newPage({ viewport: { width: 390, height: 844 } })
+  await isolatePage(mobile)
   await mobile.route('**/api/track', route => route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' }))
   await mobile.goto(`http://127.0.0.1:${port}`, { waitUntil: 'networkidle' })
   await mobile.evaluate(() => {

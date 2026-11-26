@@ -1,3 +1,4 @@
+import {isolatePage} from '../ci/browser-fixtures.mjs'
 import fs from 'node:fs/promises'
 import http from 'node:http'
 import path from 'node:path'
@@ -87,6 +88,7 @@ let browser
 try {
   browser = await chromium.launch({ headless: true })
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } })
+  await isolatePage(page)
   const pageErrors = []
   page.on('pageerror', error => pageErrors.push(String(error)))
   await page.goto(`http://127.0.0.1:${port}`, { waitUntil: 'networkidle' })
@@ -152,6 +154,7 @@ try {
   check('浏览器旅程', '页面无运行时错误', pageErrors.length === 0, pageErrors.join(' | '))
 
   const mobile = await browser.newPage({ viewport: { width: 390, height: 844 } })
+  await isolatePage(mobile)
   await mobile.goto(`http://127.0.0.1:${port}`, { waitUntil: 'networkidle' })
   await mobile.evaluate(value => {
     localStorage.setItem('lingograb-onboarding-v2', '1')
